@@ -1,38 +1,126 @@
-.App {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-252429: #252429;
+  --color-121212: #121212;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* Header */
+header .logo {
+  color: #fff;
+}
+
+header a {
+  font-size: 16px;
+  color: #ccc;
+}
+
+header a:hover {
+  color: #fff;
+  transition: 0.2s;
+}
+
+.header-top {
+  background-color: var(--color-252429);
+}
+
+.header-bottom {
+  background-color: var(--color-121212);
+}
+
+/* End Header */
+
+/* Footer */
+footer {
+  background-color: var(--color-252429);
+  color: #fff;
+}
+
+footer a {
+  color: #ccc;
+  transition: 0.2s;
+}
+
+footer a:hover {
+  color: #fff;
+}
+/* End Footer */
+
+/* Game Card */
+.game-card .action-btn {
+  top: 2%;
+  right: 8%;
+}
+
+.game-card .action-btn button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  display: none;
+}
+
+.game-card:hover .action-btn button {
+  display: block;
+}
+
+/* End Game Card */
+
+/* Home Page */
+.home-wrapper {
+  background-color: var(--color-121212);
+}
+
+/* Carousel Section */
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  font-size: 18px;
+  background: var(--color-121212);
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.swiper-pagination {
+  position: static !important;
+  margin-top: 20px;
 }
+
+.swiper-pagination-bullet {
+  background-color: white !important;
+}
+
+.carousel-wrapper .col-4 img {
+  width: 170px;
+}
+
+/* End Carousel Section */
+
+/* Discount Section */
+
+/* End Discount Section */
