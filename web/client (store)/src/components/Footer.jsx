@@ -57,7 +57,8 @@ const Footer = () => {
             <p className="mb-0 text-light">&copy; {new Date().getFullYear()}, Alvito Games,Inc. All rights reserved</p>
             <div className="d-flex align-items-center gap-3">
               <a href="">Privacy Policy</a>
-              <a href="">Terms of Use</a>
+              <a href="">Terms of Service</a>
+              <a href="">Store Refund Policy</a>
             </div>
           </div>
         </div>

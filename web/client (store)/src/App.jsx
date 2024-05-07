@@ -5,6 +5,9 @@ import Home from "./pages/Home";
 import GameDetail from "./pages/GameDetail";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
+import Browse from "./pages/Browse";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 const App = () => {
   return (
@@ -13,10 +16,13 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="game/:id" element={<GameDetail />} />
+            <Route path="browse" element={<Browse />} />
             <Route path="cart" element={<Cart />} />
             <Route path="wishlist" element={<Wishlist />} />
+            <Route path="game/id" element={<GameDetail />} />
           </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </BrowserRouter>
     </>

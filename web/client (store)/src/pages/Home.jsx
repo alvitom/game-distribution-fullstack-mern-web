@@ -143,15 +143,17 @@ const Home = () => {
                     <GameCard discount={true} />
                     <GameCard discount={true} />
                   </div>
-                </SwiperSlide>               
+                </SwiperSlide>
               </Swiper>
             </div>
           </section>
-          <div className="top-seller-section py-4">
+          <section className="top-seller-section py-4">
             <div className="row">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3>Penjualan Teratas</h3>
-                <a href="" className="btn btn-outline-light">Lihat Semua</a>
+                <a href="" className="btn btn-outline-light">
+                  Lihat Semua
+                </a>
               </div>
               <GameCard />
               <GameCard />
@@ -160,7 +162,147 @@ const Home = () => {
               <GameCard />
               <GameCard />
             </div>
-          </div>
+          </section>
+          <section className="most-played-section py-4">
+            <div className="row">
+              <div className="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3>Paling Banyak Dimainkan</h3>
+                <a href="" className="btn btn-outline-light">
+                  Lihat Semua
+                </a>
+              </div>
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+            </div>
+          </section>
+          <section className="upcoming-section py-4">
+            <div className="row">
+              <div className="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3>Segera Hadir</h3>
+                <a href="" className="btn btn-outline-light">
+                  Lihat Semua
+                </a>
+              </div>
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+            </div>
+          </section>
+          <section className="trending-section py-4">
+            <div className="row">
+              <div className="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3>Sedang Tren</h3>
+                <a href="" className="btn btn-outline-light">
+                  Lihat Semua
+                </a>
+              </div>
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+            </div>
+          </section>
+          <section className="new-release-section py-4">
+            <div className="row">
+              <div className="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3>Keluaran Terbaru</h3>
+                <a href="" className="btn btn-outline-light">
+                  Lihat Semua
+                </a>
+              </div>
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+              <GameCard />
+            </div>
+          </section>
+          <section className="most-popular-section py-4">
+            <div className="row">
+              <div className="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3>Paling Populer</h3>
+              </div>
+              <Swiper
+                spaceBetween={30}
+                centeredSlides={true}
+                pagination={{
+                  clickable: true,
+                }}
+                navigation={true}
+                modules={[Pagination, Navigation]}
+                className="mySwiper"
+              >
+                <SwiperSlide>
+                  <div className="row">
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <div className="row">
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                  </div>
+                </SwiperSlide>
+              </Swiper>
+            </div>
+          </section>
+          <section className="recently-updated-section py-4">
+            <div className="row">
+              <div className="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3>Baru-baru ini Diperbarui</h3>
+              </div>
+              <Swiper
+                spaceBetween={30}
+                centeredSlides={true}
+                pagination={{
+                  clickable: true,
+                }}
+                navigation={true}
+                modules={[Pagination, Navigation]}
+                className="mySwiper"
+              >
+                <SwiperSlide>
+                  <div className="row">
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <div className="row">
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                    <GameCard discount={true} />
+                  </div>
+                </SwiperSlide>
+              </Swiper>
+            </div>
+          </section>
         </div>
       </div>
     </>

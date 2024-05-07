@@ -3,7 +3,7 @@ import React from "react";
 const GameCard = ({ discount }) => {
   return (
     <div className="col-2">
-      <a href="" className="game-card position-relative">
+      <a href="/game/id" className="game-card position-relative">
         {discount ? (
           <>
             <div className="game-image">

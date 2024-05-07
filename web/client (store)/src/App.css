@@ -24,7 +24,7 @@ header .logo {
 }
 
 header a {
-  font-size: 16px;
+  font-size: 18px;
   color: #ccc;
 }
 
@@ -39,6 +39,34 @@ header a:hover {
 
 .header-bottom {
   background-color: var(--color-121212);
+}
+
+.header-bottom .search-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 8px 15px;
+  width: 250px;
+  background-color: #222;
+}
+
+.header-bottom .search-wrapper .btn-search-action {
+  border: none;
+  background-color: transparent;
+  color: #bbb;
+  margin-top: -3px;
+}
+
+.header-bottom .search-wrapper .search-input {
+  background-color: transparent;
+  border: none;
+  color: #ccc;
+  outline: 0;
+  padding: 1px 2px;
+  width: 100%;
+}
+
+.header-bottom .search-wrapper .search-input::-webkit-input-placeholder {
+  color: #aaa;
 }
 
 /* End Header */
@@ -79,11 +107,14 @@ footer a:hover {
 
 /* End Game Card */
 
-/* Home Page */
-.home-wrapper {
+/* Outlet */
+.outlet {
   background-color: var(--color-121212);
+  min-height: 53vh;
 }
+/* End Outlet */
 
+/* Home Page */
 /* Carousel Section */
 .swiper {
   width: 100%;
@@ -124,3 +155,99 @@ footer a:hover {
 /* Discount Section */
 
 /* End Discount Section */
+
+/* End Home Page */
+
+/* Browse Page */
+.genre-card .genre-image img {
+  width: 75px;
+}
+
+.genre-card .genre-wrapper {
+  background-color: #222;
+  transition: 0.3s ease-in-out;
+}
+
+.genre-card:hover .genre-wrapper {
+  background-color: #444;
+}
+
+/* End Browse Page */
+
+/* Cart Page */
+.cart-wrapper .cart-item {
+  background-color: #333;
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+
+.cart-wrapper .cart-item .game-image img {
+  width: 100px;
+}
+
+/* End Cart Page */
+
+/* Wishlist Page */
+
+.wishlist-wrapper .wishlist-item {
+  background-color: #333;
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+
+.wishlist-wrapper .wishlist-item .game-image img {
+  width: 100px;
+}
+
+/* End Wishlist Page */
+
+/* Login Page */
+.auth-wrapper {
+  background-color: var(--color-121212);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-wrapper .login-card {
+  background-color: #222;
+  border-radius: 10px;
+  padding: 50px;
+  width: 30%;
+}
+
+.auth-wrapper .login-card input {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #ccc;
+}
+
+.auth-wrapper .login-card input::-webkit-input-placeholder {
+  color: #aaa;
+}
+
+.auth-wrapper .login-card h1 {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.auth-wrapper .login-card h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.auth-wrapper .login-card .forgot-password {
+  margin-bottom: 20px;
+  color: #aaa;
+  transition: 0.2s ease-in-out;
+}
+
+.auth-wrapper .login-card .forgot-password:hover {
+  color: #fff;
+}
+
+/* End Login Page */
