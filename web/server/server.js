@@ -25,6 +25,7 @@ const newsRouter = require("./routes/newsRoute");
 // const Promotion = require("./models/promotionModel");
 
 app.use(morgan("dev"));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
