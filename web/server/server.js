@@ -25,18 +25,10 @@ const newsRouter = require("./routes/newsRoute");
 // const Promotion = require("./models/promotionModel");
 
 app.use(morgan("dev"));
-app.use(
-  cors({
-    origin: ["https://rest-api-alvito-game-store.vercel.app/"],
-  })
-);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.json("Hello");
-});
 app.use("/api/user", authRouter);
 app.use("/api/game", gameRouter);
 app.use("/api/genre", genreRouter);
