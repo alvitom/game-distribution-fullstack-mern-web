@@ -9,7 +9,7 @@ const Wishlist = () => {
       <div className="wishlist-wrapper">
         <div className="container">
           <div className="row">
-            <div className="col-12">
+            <div className="col-12 my-2">
               <h1>Wishlist</h1>
             </div>
             <div className="col-12">

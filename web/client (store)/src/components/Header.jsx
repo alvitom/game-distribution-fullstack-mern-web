@@ -1,7 +1,6 @@
 import React from "react";
 import { IoLanguage } from "react-icons/io5";
-import { MdAccountCircle } from "react-icons/md";
-import { FaShoppingCart, FaSearch } from "react-icons/fa";
+import { FaShoppingCart, FaSearch, FaDownload, FaHeart } from "react-icons/fa";
 
 const Header = () => {
   return (
@@ -28,7 +27,10 @@ const Header = () => {
                   Masuk
                 </a>
               </div>
-              <a href="#" className="btn btn-primary">Download AGS</a>
+              <a href="#" className="d-flex gap-2 align-items-center btn btn-primary">
+                <FaDownload />
+                <span>Download AGS</span>
+              </a>
             </div>
           </div>
         </div>
@@ -55,14 +57,15 @@ const Header = () => {
             </div>
             <div className="d-flex align-items-center gap-4">
               <div className="wishlist">
-                <a href="/wishlist" className="d-flex align-items-center gap-2">
-                  <span>Wishlist</span>
+                <a href="/wishlist" className="d-flex align-items-center gap-2 position-relative">
+                  <FaHeart className="fs-3" />
+                  <span className="wishlist-badge position-absolute bg-danger">0</span>
                 </a>
               </div>
               <div className="cart">
-                <a href="/cart" className="d-flex align-items-center gap-2">
-                  <FaShoppingCart />
-                  <span>Cart (0)</span>
+                <a href="/cart" className="d-flex align-items-center gap-2 position-relative">
+                  <FaShoppingCart className="fs-3" />
+                  <span className="cart-badge position-absolute bg-danger">0</span>
                 </a>
               </div>
             </div>

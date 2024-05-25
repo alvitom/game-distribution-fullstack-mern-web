@@ -1,8 +1,8 @@
 import React from "react";
 
-const GameCard = ({ discount }) => {
+const GameCard = ({ discount, collection, page }) => {
   return (
-    <div className="col-2">
+    <div className={collection || page === "browse" ? "col-3 my-4" : "col-2"}>
       <a href="/game/id" className="game-card position-relative">
         {discount ? (
           <>
@@ -39,8 +39,8 @@ const GameCard = ({ discount }) => {
               />
             </div>
             <div className="game-detail p-2 text-white">
-              <span className="title">Grand Theft Auto V: Premium Edition</span>
-              <span className="price">IDR 300,750</span>
+              <p className="title mb-1">Grand Theft Auto V: Premium Edition</p>
+              <p className="price mb-0">IDR 300,750</p>
             </div>
             <div className="action-btn position-absolute">
               <button className="border-white text-white btn btn-dark">+</button>
