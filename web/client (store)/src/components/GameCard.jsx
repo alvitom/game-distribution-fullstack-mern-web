@@ -2,7 +2,7 @@ import React from "react";
 
 const GameCard = ({ discount, collection, page }) => {
   return (
-    <div className={collection || page === "browse" ? "col-3 my-4" : "col-2"}>
+    <div className={collection || page === "game" ? "col-3 my-4" : "col-2"}>
       <a href="/game/id" className="game-card position-relative">
         {discount ? (
           <>

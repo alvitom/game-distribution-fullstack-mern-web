@@ -1,6 +1,5 @@
 import React from "react";
-import { IoLanguage } from "react-icons/io5";
-import { FaShoppingCart, FaSearch, FaDownload, FaHeart } from "react-icons/fa";
+import { FaShoppingCart, FaSearch, FaHeart } from "react-icons/fa";
 
 const Header = () => {
   return (
@@ -10,15 +9,15 @@ const Header = () => {
           <div className="d-flex justify-content-between mx-3">
             <div className="d-flex align-items-center gap-3">
               <a href="/" className="logo">
-                AGS
+                Alvito Game Store
               </a>
-              <a href="/help">Dukungan</a>
-              <a href="/distribution">Distribusi</a>
+              {/* <a href="/help">Dukungan</a>
+              <a href="/distribution">Distribusi</a> */}
             </div>
             <div className="d-flex align-items-center gap-3">
-              <a href="">
+              {/* <a href="">
                 <IoLanguage className="fs-3" />
-              </a>
+              </a> */}
               <div className="d-flex align-items-center gap-2">
                 <a href="/register" className="btn btn-outline-light">
                   Daftar
@@ -27,10 +26,10 @@ const Header = () => {
                   Masuk
                 </a>
               </div>
-              <a href="#" className="d-flex gap-2 align-items-center btn btn-primary">
+              {/* <a href="#" className="d-flex gap-2 align-items-center btn btn-primary">
                 <FaDownload />
                 <span>Download AGS</span>
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
@@ -51,7 +50,7 @@ const Header = () => {
                 <a href="/" className="text-white">
                   Beranda
                 </a>
-                <a href="/browse">Telusuri</a>
+                <a href="/game">Game</a>
                 <a href="/blog">Blog</a>
               </div>
             </div>

@@ -3,9 +3,12 @@ import Meta from "../components/Meta";
 import { FaWindows, FaApple, FaHeart, FaTrash } from "react-icons/fa";
 
 const Cart = () => {
+  const handleCheckout = () => {
+    location.href = "/checkout";
+  };
   return (
     <>
-      <Meta title="Keranjang" />
+      <Meta title="Cart" />
       <div className="cart-wrapper">
         <div className="container">
           <div className="row">
@@ -78,8 +81,9 @@ const Cart = () => {
                   <p>Total</p>
                   <p>IDR 950,749.00</p>
                 </div>
-                <p>Sales tax will be calculated during checkout where applicable</p>
-                <button className="btn btn-success w-100">Checkout</button>
+                <button className="btn btn-success w-100" onClick={handleCheckout}>
+                  Checkout
+                </button>
               </div>
             </div>
           </div>

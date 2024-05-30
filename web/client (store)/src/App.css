@@ -170,8 +170,8 @@ footer a:hover {
 
 /* End Home Page */
 
-/* Browse Page */
-.genre-card .genre-image img {
+/* Game Page */
+/* .genre-card .genre-image img {
   width: 75px;
 }
 
@@ -221,8 +221,8 @@ footer a:hover {
 
 .mantine-Select-dropdown {
   border: none !important;
-}
-/* End Browse Page */
+} */
+/* End Game Page */
 
 /* Cart Page */
 .cart-wrapper .cart-item {
@@ -327,6 +327,10 @@ footer a:hover {
   color: #fff;
   text-decoration: underline;
 }
+
+.blog-wrapper .blog-detail .read-more:hover {
+  text-decoration: none;
+}
 /* End Blog Page */
 
 /* Game Detail Page */
@@ -337,4 +341,49 @@ footer a:hover {
 .game-detail-wrapper .game-image-original img {
   width: 200px;
 }
+
+.game-detail-wrapper .game-description {
+  font-size: 18px;
+}
+
+/* .game-detail-wrapper .genres-features a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.game-detail-wrapper .genres-features a:hover {
+  text-decoration: none;
+} */
+
+.game-detail-wrapper .system-requirements {
+  background-color: var(--color-252429);
+  padding: 30px;
+}
+
+.game-detail-wrapper .system-requirements .mantine-Tabs-panel {
+  margin-block: 30px;
+  color: #aeaeae;
+}
+
+.game-detail-wrapper .system-requirements .mantine-Tabs-panel .value {
+  color: #fff;
+}
+
+.game-detail-wrapper .system-requirements .mantine-Tabs-tab:hover {
+  background-color: transparent;
+}
+
 /* End Game Detail Page */
+
+/* Checkout Page */
+.checkout-wrapper .checkout-container {
+  background-color: #333;
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+
+.checkout-wrapper .checkout-item .game-image img {
+  width: 100px;
+}
+
+/* End Checkout Page */

@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import GameDetail from "./pages/GameDetail";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
-import Browse from "./pages/Browse";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import TopSellersCollection from "./pages/TopSellersCollection";
@@ -16,6 +15,9 @@ import NewReleaseCollection from "./pages/NewReleaseCollection";
 import Blog from "./pages/Blog";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
+import BlogDetail from "./pages/BlogDetail";
+import Checkout from "./pages/Checkout";
+import Game from "./pages/Game";
 
 const App = () => {
   return (
@@ -24,7 +26,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="browse" element={<Browse />} />
+            <Route path="game" element={<Game />} />
             <Route path="blog" element={<Blog />} />
             <Route path="collection/top-sellers" element={<TopSellersCollection />} />
             <Route path="collection/most-played" element={<MostPlayedCollection />} />
@@ -34,6 +36,8 @@ const App = () => {
             <Route path="cart" element={<Cart />} />
             <Route path="wishlist" element={<Wishlist />} />
             <Route path="game/id" element={<GameDetail />} />
+            <Route path="blog/id" element={<BlogDetail />} />
+            <Route path="checkout" element={<Checkout />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
