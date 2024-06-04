@@ -1,38 +1,199 @@
-.App {
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+:root {
+  --color-252429: #252429;
+  --color-121212: #121212;
+  --color-47ad24: #47ad24;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff !important;
+  overflow: hidden;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+a {
+  text-decoration: none;
+}
+
+/* Header */
+.header {
+  background-color: var(--color-252429);
+  min-height: 10vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.header .container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header .container-fluid a {
+  color: #fff;
+}
+
+.header .container-fluid .brand {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.header .container-fluid .notification .mantine-Indicator-indicator {
+  top: 15%;
+  right: 25%;
+}
+
+.header .container-fluid .account .account-details span {
+  font-size: 14px;
+}
+
+.header .container-fluid .account .account-details span.name {
+  font-weight: bold;
+}
+
+.mantine-Menu-dropdown {
+  border: none !important;
+}
+/* End Header */
+
+/* Navbar */
+.navbar {
+  min-height: 90vh;
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
+  background-color: var(--color-252429);
+}
+
+.navbarMain {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 5px;
+}
+
+.footer {
+  padding-top: var(--mantine-spacing-md);
+  border-top: 1px solid var(--color-121212);
+  margin-bottom: 20px;
+}
+
+.link {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+  font-size: 16px;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: var(--mantine-radius-sm);
+  font-weight: 500;
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+  &[data-active] {
+    &,
+    &:hover {
+      box-shadow: var(--mantine-shadow-sm);
+      background-color: var(--mantine-color-white);
+      color: black;
+    }
   }
 }
+/* End Navbar */
+
+.outlet {
+  color: #fff;
+  background-color: #121212;
+}
+
+.outlet .mantine-ScrollArea-viewport {
+  padding: 20px 40px;
+  padding-bottom: 80px;
+}
+
+.mantine-ScrollArea-scrollbar {
+  background-color: transparent !important;
+}
+
+.mantine-ScrollArea-thumb {
+  background-color: #fff !important;
+}
+
+.mantine-Input-input {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+.mantine-RichTextEditor-root {
+  background-color: transparent !important;
+}
+
+.mantine-RichTextEditor-toolbar {
+  background-color: transparent !important;
+}
+
+.mantine-RichTextEditor-controlsGroup button {
+  background-color: var(--color-252429);
+}
+
+.mantine-RichTextEditor-controlsGroup button:hover {
+  background-color: var(--color-121212);
+}
+
+.mantine-RichTextEditor-content {
+  background-color: transparent !important;
+  min-height: 20vh;
+}
+
+.mantine-DatePickerInput-calendarHeader button {
+  color: black;
+}
+
+.mantine-MultiSelect-option {
+  color: black !important;
+}
+
+.mantine-MultiSelect-option:hover {
+  background-color: #eaeaea !important;
+}
+
+.mantine-Dropzone-root {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+.mantine-Dropzone-root:hover {
+  background-color: #555 !important;
+}
+
+.mantine-NumberInput-control {
+  color: #fff !important;
+}
+
+.mantine-NumberInput-control:hover {
+  background-color: #555 !important;
+}
+
+/* Dashboard Page */
+.dashboard-wrapper .row {
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dashboard-wrapper .row .col-2,
+.dashboard-wrapper .row .col-3,
+.dashboard-wrapper .row .col-8 {
+  padding: 20px;
+  border-radius: 15px;
+  background-color: var(--color-252429);
+}
+
+/* End Dashboard Page */
+
+/* Add Game Page */
+
+/* End Add Game Page */
