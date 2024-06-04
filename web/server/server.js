@@ -30,6 +30,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.get("/", (_, res) => {
+  res.send("Please enter the specific route. example: {{base_url}}/api/game");
+});
+
 app.use("/api/user", authRouter);
 app.use("/api/game", gameRouter);
 app.use("/api/genre", genreRouter);
