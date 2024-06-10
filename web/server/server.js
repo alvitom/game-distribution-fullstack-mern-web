@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
-require("dotenv").config();
+const path = require("path");
+const envFile = `.env.${process.env.NODE_ENV}`;
+require("dotenv").config({ path: path.resolve(__dirname, envFile) });
 const PORT = process.env.PORT;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -27,6 +29,7 @@ const newsRouter = require("./routes/newsRoute");
 app.use(morgan("dev"));
 app.use(
   cors({
+    origin: process.env.ADMIN_BASE_URL,
     credentials: true,
   })
 );
