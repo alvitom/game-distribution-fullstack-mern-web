@@ -27,7 +27,7 @@ const newsRouter = require("./routes/newsRoute");
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "https://admin-alvitogamestore.vercel.app",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
