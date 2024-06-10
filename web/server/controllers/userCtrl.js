@@ -4,6 +4,8 @@ const User = require("../models/userModel");
 const { generateToken } = require("../config/jwtToken");
 const { generateRefreshToken } = require("../config/refreshToken");
 const validateMongodbId = require("../utils/validateMongodbId");
+const sendEmail = require("./emailCtrl");
+const crypto = require("crypto");
 
 // Register User
 const registerUser = asyncHandler(async (req, res) => {
@@ -19,8 +21,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // Login User
 const loginUser = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ username });
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
   if (user && (await user.isPasswordMatched(password))) {
     const refreshToken = generateRefreshToken(user._id);
     await User.findByIdAndUpdate(
@@ -48,10 +50,10 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-// Login admin
+// Login Admin
 const loginAdmin = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ username });
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
   if (user.role !== "admin") throw new Error("Not permitted. You are not an admin");
   if (user && (await user.isPasswordMatched(password))) {
     const refreshToken = generateRefreshToken(user._id);
@@ -195,17 +197,6 @@ const unblockUser = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
-  try {
-    const deleteUser = await User.findByIdAndDelete(id);
-    res.json(deleteUser);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
 const changePassword = asyncHandler(async (req, res) => {
   const { id } = req.user;
   validateMongodbId(id);
@@ -226,4 +217,52 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerUser, loginUser, loginAdmin, handleRefreshToken, logout, getAllUsers, getUser, updateUser, blockUser, unblockUser, deleteUser, changePassword };
+const forgotPasswordToken = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("User not found with this email");
+  try {
+    const token = await user.createPasswordResetToken();
+    await user.save();
+    const resetURL = `Silahkan klik link ini untuk mereset password Anda. Link ini berlaku hingga 10 menit dari sekarang. <a href="http://localhost:5000/api/user/reset-password/${token}">Klik Disini</a>`;
+    const data = {
+      to: email,
+      subject: "Link Lupa Password",
+      text: "Hey User",
+      htm: resetURL,
+    };
+    sendEmail(data);
+    res.json(token);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user) throw new Error("Token expired, please try again later");
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+  res.json(user);
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  try {
+    const deleteUser = await User.findByIdAndDelete(id);
+    res.json(deleteUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = { registerUser, loginUser, loginAdmin, handleRefreshToken, logout, getAllUsers, getUser, updateUser, blockUser, unblockUser, changePassword, forgotPasswordToken, resetPassword, deleteUser };
