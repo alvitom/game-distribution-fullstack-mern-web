@@ -24,13 +24,12 @@ const reviewRouter = require("./routes/reviewRoute");
 const newsRouter = require("./routes/newsRoute");
 // const Promotion = require("./models/promotionModel");
 
-const corsOptions = {
-  origin: 'http://localhost:5173',
-  credentials: true,
-};
-
 app.use(morgan("dev"));
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
