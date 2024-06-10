@@ -1,8 +1,6 @@
 const express = require("express");
 const app = express();
-const path = require("path");
-const envFile = `.env.${process.env.NODE_ENV}`;
-require("dotenv").config({ path: path.resolve(__dirname, envFile) });
+require("dotenv").config();
 const PORT = process.env.PORT;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
