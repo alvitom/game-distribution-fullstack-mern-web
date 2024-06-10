@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { RxDashboard } from "react-icons/rx";
 import { MdGames, MdCategory, MdLogout } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
@@ -6,6 +6,7 @@ import { BiCategory, BiSolidDiscount } from "react-icons/bi";
 import { GrTransaction } from "react-icons/gr";
 import { FaBlogger, FaExchangeAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const data = [
   { link: "/", label: "Dashboard", icon: <RxDashboard className="fs-5" /> },
@@ -21,6 +22,7 @@ const data = [
 
 export const Navbar = () => {
   const [active, setActive] = useState("Dashboard");
+  const { logout } = useContext(AuthContext);
 
   const links = data.map((item) => (
     <Link
@@ -37,20 +39,26 @@ export const Navbar = () => {
     </Link>
   ));
 
+  const handleLogout = async () => {
+    await logout();
+    sessionStorage.removeItem("user");
+    location.reload();
+  };
+
   return (
     <nav className="navbar col-2">
       <h5 className="mb-3">Menu</h5>
       <div className="navbarMain">{links}</div>
 
       <div className="footer">
-        <a href="#" className="link gap-2" onClick={(event) => event.preventDefault()}>
+        <button className="btn link gap-2 mb-2">
           <FaExchangeAlt className="fs-5" />
           <span>Ganti Akun</span>
-        </a>
-        <a href="#" className="link gap-2" onClick={(event) => event.preventDefault()}>
+        </button>
+        <button className="btn link gap-2" onClick={handleLogout}>
           <MdLogout className="fs-5" />
           <span>Keluar</span>
-        </a>
+        </button>
       </div>
     </nav>
   );

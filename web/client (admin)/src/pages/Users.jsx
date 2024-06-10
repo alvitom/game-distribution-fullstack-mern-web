@@ -1,15 +1,26 @@
-import React from "react";
-import { elements } from "../utils/data";
+import React, { useContext, useEffect } from "react";
 import { Table, TextInput } from "@mantine/core";
 import { FaSearch } from "react-icons/fa";
+import { AuthContext } from "../context/AuthContext";
 
 const Users = () => {
-  const rows = elements.map((element) => (
-    <Table.Tr key={element.name}>
-      <Table.Td>{element.position}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.symbol}</Table.Td>
-      <Table.Td>{element.mass}</Table.Td>
+  const { users, loading, fetchAllUsers } = useContext(AuthContext);
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  const rows = users.map((user, index) => (
+    <Table.Tr key={user._id}>
+      <Table.Td>{index + 1}</Table.Td>
+      <Table.Td></Table.Td>
+      <Table.Td>{user.fullname}</Table.Td>
+      <Table.Td>{user.email}</Table.Td>
+      <Table.Td>{user.role}</Table.Td>
       <Table.Td>
         <button className="btn btn-danger">Block User</button>
       </Table.Td>
@@ -28,11 +39,12 @@ const Users = () => {
             <Table verticalSpacing="sm">
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Element position</Table.Th>
-                  <Table.Th>Element name</Table.Th>
-                  <Table.Th>Symbol</Table.Th>
-                  <Table.Th>Atomic mass</Table.Th>
-                  <Table.Th>Action</Table.Th>
+                  <Table.Th>No.</Table.Th>
+                  <Table.Th>Image</Table.Th>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Role</Table.Th>
+                  <Table.Th>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>

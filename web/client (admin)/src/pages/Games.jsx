@@ -1,22 +1,34 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Table, TextInput } from "@mantine/core";
-import { elements } from "../utils/data";
 import { FaSearch } from "react-icons/fa";
+import { GameContext } from "../context/GameContext";
 
 const Games = () => {
-  const rows = elements.map((element) => (
-    <Table.Tr key={element.name}>
-      <Table.Td>{element.position}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.symbol}</Table.Td>
-      <Table.Td>{element.mass}</Table.Td>
+  const { games, loading, fetchAllGames } = useContext(GameContext);
+
+  useEffect(() => {
+    fetchAllGames();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  const rows = games.map((game, index) => (
+    <Table.Tr key={game._id}>
+      <Table.Td>{index + 1}</Table.Td>
+      <Table.Td>
+        <img src={game.images[0]?.url} className="img-fluid" />
+      </Table.Td>
+      <Table.Td>{game.title}</Table.Td>
+      <Table.Td>{game.price}</Table.Td>
       <Table.Td>
         <div className="d-flex gap-2">
-          <Link to="/update-game" className="btn btn-primary">
-            Edit
+          <Link to={`update/${game._id}`} className="btn btn-primary">
+            Update
           </Link>
-          <Link to="/delete-game" className="btn btn-danger">
+          <Link to={`delete/${game._id}`} className="btn btn-danger">
             Delete
           </Link>
         </div>
@@ -40,11 +52,11 @@ const Games = () => {
           <Table verticalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Element position</Table.Th>
-                <Table.Th>Element name</Table.Th>
-                <Table.Th>Symbol</Table.Th>
-                <Table.Th>Atomic mass</Table.Th>
-                <Table.Th>Atomic mass</Table.Th>
+                <Table.Th>No.</Table.Th>
+                <Table.Th>Image</Table.Th>
+                <Table.Th>Title</Table.Th>
+                <Table.Th>Price</Table.Th>
+                <Table.Th>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>

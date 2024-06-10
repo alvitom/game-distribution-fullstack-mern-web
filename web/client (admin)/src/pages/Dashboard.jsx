@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { MdGames } from "react-icons/md";
 import { FaBlogger } from "react-icons/fa";
 import { BarChart, DonutChart, LineChart, PieChart } from "@mantine/charts";
@@ -6,8 +6,24 @@ import { sales, productSales, elements, salesMonth } from "../utils/data";
 import { Table } from "@mantine/core";
 import { BiCategory } from "react-icons/bi";
 import { FaUsers } from "react-icons/fa6";
+import { GameContext } from "../context/GameContext";
+import { GenreContext } from "../context/GenreContext";
+import { FeatureContext } from "../context/FeatureContext";
+import { AuthContext } from "../context/AuthContext";
 
 const Dashboard = () => {
+  const { games, fetchAllGames } = useContext(GameContext);
+  const { genres, fetchAllGenres } = useContext(GenreContext);
+  const { features, fetchAllFeatures } = useContext(FeatureContext);
+  const { users, fetchAllUsers } = useContext(AuthContext);
+
+  useEffect(() => {
+    fetchAllGames();
+    fetchAllGenres();
+    fetchAllFeatures();
+    fetchAllUsers();
+  }, []);
+
   const rows = elements.map((element) => (
     <Table.Tr key={element.name}>
       <Table.Td>{element.position}</Table.Td>
@@ -28,7 +44,7 @@ const Dashboard = () => {
               <MdGames className="fs-4" />
             </div>
             <div className="body">
-              <h5>35</h5>
+              <h5>{games.length}</h5>
             </div>
           </div>
           <div className="total-blog col-2">
@@ -46,7 +62,7 @@ const Dashboard = () => {
               <MdGames className="fs-4" />
             </div>
             <div className="body d-flex align-items-end justify-content-between">
-              <h5>15</h5>
+              <h5>{genres.length}</h5>
             </div>
           </div>
           <div className="total-feature col-2">
@@ -55,7 +71,7 @@ const Dashboard = () => {
               <BiCategory className="fs-4" />
             </div>
             <div className="body d-flex align-items-end justify-content-between">
-              <h5>10</h5>
+              <h5>{features.length}</h5>
             </div>
           </div>
           <div className="total-user col-2">
@@ -64,7 +80,7 @@ const Dashboard = () => {
               <FaUsers className="fs-4" />
             </div>
             <div className="body d-flex align-items-end justify-content-between">
-              <h5>120</h5>
+              <h5>{users.length}</h5>
             </div>
           </div>
           {/* <div className="total-transaction col-2">

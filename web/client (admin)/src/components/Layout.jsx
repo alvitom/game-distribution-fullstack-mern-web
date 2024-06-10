@@ -5,6 +5,11 @@ import Header from "./Header";
 import { ScrollArea } from "@mantine/core";
 
 const Layout = () => {
+  const token = sessionStorage.getItem("user");
+  if (!token) {
+    location.href = "/login";
+    return;
+  }
   return (
     <>
       <div className="row">

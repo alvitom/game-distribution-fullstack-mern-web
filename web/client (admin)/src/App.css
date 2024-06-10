@@ -197,3 +197,57 @@ a {
 /* Add Game Page */
 
 /* End Add Game Page */
+
+/* Auth Page */
+.auth-page {
+  background-color: #121212;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-page .auth-wrapper {
+  background-color: var(--color-252429);
+  width: 30%;
+  padding: 50px;
+  border-radius: 10px;
+}
+
+.auth-page .auth-wrapper input {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #ccc;
+}
+
+.auth-page .auth-wrapper input::-webkit-input-placeholder {
+  color: #aaa;
+}
+
+.auth-page .auth-wrapper h1 {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.auth-page .auth-wrapper button {
+  border-radius: 20px;
+}
+
+.auth-page .auth-wrapper a {
+  color: #aaa;
+  transition: 0.2s ease-in-out;
+  display: block;
+  text-decoration: underline;
+}
+
+.auth-page .auth-wrapper a.forgot-password {
+  margin-bottom: 20px;
+}
+
+.auth-page .auth-wrapper a:hover {
+  color: #fff;
+}
+/* End Auth Page */

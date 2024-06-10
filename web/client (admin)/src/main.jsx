@@ -7,11 +7,23 @@ import "@mantine/tiptap/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/dropzone/styles.css";
 import { MantineProvider } from "@mantine/core";
+import { GameProvider } from "./context/GameContext.jsx";
+import { GenreProvider } from "./context/GenreContext.jsx";
+import { FeatureProvider } from "./context/FeatureContext.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <MantineProvider>
-      <App />
+      <GameProvider>
+        <GenreProvider>
+          <FeatureProvider>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </FeatureProvider>
+        </GenreProvider>
+      </GameProvider>
     </MantineProvider>
   </React.StrictMode>
 );
