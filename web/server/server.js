@@ -27,7 +27,7 @@ const newsRouter = require("./routes/newsRoute");
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: process.env.ADMIN_BASE_URL || "http://localhost:5173",
+    origin: process.env.ADMIN_BASE_URL_DEV || process.env.ADMIN_BASE_URL_STG,
     credentials: true,
   })
 );
