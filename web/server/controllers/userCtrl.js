@@ -67,7 +67,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
       }
     );
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
+      // httpOnly: true,
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       secure: true,
       sameSite: "none",
@@ -106,7 +106,7 @@ const logout = asyncHandler(async (req, res) => {
   const user = await User.findOne({ refreshToken });
   if (!user) {
     res.clearCookie("refreshToken", {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
     });
     return res.sendStatus(204);
@@ -118,7 +118,7 @@ const logout = asyncHandler(async (req, res) => {
     }
   );
   res.clearCookie("refreshToken", {
-    httpOnly: true,
+    // httpOnly: true,
     secure: true,
   });
   res.sendStatus(204);
