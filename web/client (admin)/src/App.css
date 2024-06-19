@@ -164,6 +164,16 @@ a {
 .mantine-Dropzone-root {
   background-color: transparent !important;
   color: #fff !important;
+
+  &[data-accept] {
+    color: var(--mantine-color-white) !important;
+    background-color: var(--mantine-color-blue-9) !important;
+  }
+
+  &[data-reject] {
+    color: var(--mantine-color-white) !important;
+    background-color: var(--mantine-color-red-9) !important;
+  }
 }
 
 .mantine-Dropzone-root:hover {
@@ -176,6 +186,20 @@ a {
 
 .mantine-NumberInput-control:hover {
   background-color: #555 !important;
+}
+
+.mantine-Fieldset-root .mantine-Fieldset-legend {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.mantine-Fieldset-root {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+.mantine-Modal-content, .mantine-Modal-content .mantine-Modal-header, .mantine-Modal-content .mantine-Modal-body {
+  background-color: var(--color-252429) !important;
 }
 
 /* Dashboard Page */
@@ -195,6 +219,13 @@ a {
 /* End Dashboard Page */
 
 /* Add Game Page */
+.mantine-Table-table {
+  font-size: 16px !important;
+}
+
+.mantine-Table-table .mantine-Table-tbody .mantine-Table-tr .mantine-Table-td img {
+  width: 100px;
+}
 
 /* End Add Game Page */
 

@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,
     },
     password: {
       type: String,
@@ -20,11 +20,14 @@ const userSchema = new mongoose.Schema(
     },
     fullname: {
       type: String,
-      required: true,
     },
+    isVerified: { type: Boolean, default: false },
+    otp: { type: Number },
+    otpExpires: { type: Date },
     mobile: {
       type: String,
       unique: true,
+      sparse: true,
     },
     profile: {
       avatar: { type: String },

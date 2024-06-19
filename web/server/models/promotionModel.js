@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const promotionSchema = new mongoose.Schema({
-  gameId: {
+  game: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Game",
     required: true,

@@ -18,6 +18,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import BlogDetail from "./pages/BlogDetail";
 import Checkout from "./pages/Checkout";
 import Game from "./pages/Game";
+import VerifyOTP from "./pages/VerifyOTP";
+import AddUserInformation from "./pages/AddUserInformation";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   return (
@@ -40,9 +43,12 @@ const App = () => {
             <Route path="checkout" element={<Checkout />} />
           </Route>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-otp/:id" element={<VerifyOTP />} />
+          <Route path="/add-user-information/:id" element={<AddUserInformation />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </>

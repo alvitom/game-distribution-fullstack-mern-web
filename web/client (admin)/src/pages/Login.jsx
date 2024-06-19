@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 
 import { AuthContext } from "../context/AuthContext";
+import { modals } from "@mantine/modals";
+import { MdClose } from "react-icons/md";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +14,39 @@ const Login = () => {
       email,
       password,
     };
-    await login(userData);
-    const token = sessionStorage.getItem("user");
-    if (token) {
+    const data = await login(userData);
+    if (data) {
+      sessionStorage.setItem("user", JSON.stringify(data));
+    } else {
+      modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">Wrong email or password</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                  setEmail("");
+                  setPassword("");
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    }
+    const getUser = JSON.parse(sessionStorage.getItem("user"));
+    if (getUser) {
       location.href = "/";
     }
   };

@@ -13,8 +13,26 @@ const createLanguage = asyncHandler(async (req, res) => {
 
 const getAllLanguages = asyncHandler(async (req, res) => {
   try {
-    const languages = await Language.find();
-    res.json(languages);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const keyword = req.query.keyword;
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (keyword) {
+      query.language = { $regex: keyword, $options: "i" };
+    }
+
+    const languages = await Language.find(query).skip(skip).limit(limit);
+    const total = await Language.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      languages,
+      total,
+      page,
+      totalPages,
+    });
   } catch (error) {
     throw new Error(error);
   }

@@ -13,8 +13,26 @@ const createFeature = asyncHandler(async (req, res) => {
 
 const getAllFeatures = asyncHandler(async (req, res) => {
   try {
-    const features = await Feature.find();
-    res.json(features);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const keyword = req.query.keyword;
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (keyword) {
+      query.feature = { $regex: keyword, $options: "i" };
+    }
+
+    const features = await Feature.find(query).skip(skip).limit(limit);
+    const total = await Feature.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      features,
+      total,
+      page,
+      totalPages,
+    });
   } catch (error) {
     throw new Error(error);
   }

@@ -1,11 +1,11 @@
 import axios from "axios";
 import { createContext, useState } from "react";
 
-export const FeatureContext = createContext();
+export const LanguageContext = createContext();
 
-export const FeatureProvider = ({ children }) => {
-  const [features, setFeatures] = useState([]);
-  const [selectedFeature, setSelectedFeature] = useState(null);
+export const LanguageProvider = ({ children }) => {
+  const [languages, setLanguages] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -30,10 +30,10 @@ export const FeatureProvider = ({ children }) => {
     }
   );
 
-  const fetchAllFeatures = async (page, limit, debouncedKeyword) => {
+  const fetchAllLanguages = async (page, limit, debouncedKeyword) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/feature`, {
+      const response = await axiosInstance.get(`/language`, {
         params: {
           page,
           limit,
@@ -41,65 +41,64 @@ export const FeatureProvider = ({ children }) => {
         },
       });
       const data = await response.data;
-      setFeatures(data.features);
+      setLanguages(data.languages);
       setTotalPages(data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching features:", error);
+      console.error("Error fetching languages:", error);
       setLoading(false);
     }
   };
 
-  const fetchFeature = async (id) => {
+  const fetchLanguage = async (id) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/feature/${id}`);
+      const response = await axiosInstance.get(`/language/${id}`);
       const data = await response.data;
-      setSelectedFeature(data);
+      setSelectedLanguage(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching feature:", error);
+      console.error("Error fetching language:", error);
       setLoading(false);
     }
   };
 
-  const createFeature = async (feature) => {
+  const createLanguage = async (language) => {
     try {
-      const response = await axiosInstance.post("/feature", feature);
+      const response = await axiosInstance.post("/language", language);
       const data = await response.data;
       return data;
     } catch (error) {
-      console.error("Error creating feature:", error);
+      console.error("Error creating language:", error);
     }
   };
 
-  const updateFeature = async (id, updatedFeature) => {
+  const updateLanguage = async (id, updatedLanguage) => {
     try {
-      const response = await axiosInstance.put(`/feature/${id}`, updatedFeature);
+      const response = await axiosInstance.put(`/language/${id}`, updatedLanguage);
       const data = await response.data;
-      setFeatures(features.map((feature) => (feature._id === id ? data : feature)));
       return data;
     } catch (error) {
-      console.error("Error updating feature:", error);
+      console.error("Error updating language:", error);
     }
   };
 
-  const deleteFeature = async (id) => {
+  const deleteLanguage = async (id) => {
     try {
-      const response = await axiosInstance.delete(`/feature/${id}`);
+      const response = await axiosInstance.delete(`/language/${id}`);
       const data = await response.data;
       return data;
     } catch (error) {
-      console.error("Error deleting feature:", error);
+      console.error("Error deleting language:", error);
     }
   };
 
   return (
-    <FeatureContext.Provider
+    <LanguageContext.Provider
       value={{
-        features,
-        setFeatures,
-        selectedFeature,
+        languages,
+        setLanguages,
+        selectedLanguage,
         loading,
         setLoading,
         page,
@@ -110,14 +109,14 @@ export const FeatureProvider = ({ children }) => {
         setKeyword,
         debouncedKeyword,
         setDebouncedKeyword,
-        fetchAllFeatures,
-        fetchFeature,
-        createFeature,
-        updateFeature,
-        deleteFeature,
+        fetchAllLanguages,
+        fetchLanguage,
+        createLanguage,
+        updateLanguage,
+        deleteLanguage,
       }}
     >
       {children}
-    </FeatureContext.Provider>
+    </LanguageContext.Provider>
   );
 };

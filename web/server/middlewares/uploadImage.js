@@ -1,16 +1,18 @@
 const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
+const path = require("path");
 
-const multerStorage = multer.diskStorage({
+const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix + ".jpeg");
+    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
   },
 });
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/avif", "video/mp4"];
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(
@@ -22,10 +24,9 @@ const multerFilter = (req, file, cb) => {
   }
 };
 
-const uploadImage = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-  limits: { fileSize: 2000000 },
+const upload = multer({
+  storage,
+  fileFilter,
 });
 
 const gameImgResize = async (req, res, next) => {
@@ -39,4 +40,4 @@ const gameImgResize = async (req, res, next) => {
   next();
 };
 
-module.exports = { uploadImage, gameImgResize };
+module.exports = { upload, gameImgResize };

@@ -8,7 +8,15 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import GameCard from "../components/GameCard";
 import BtnSlider from "../components/BtnSlider";
 
+const user = JSON.parse(sessionStorage.getItem("user"));
+
 const Home = () => {
+  const handleAddToWishlist = () => {
+    if (!user) {
+      location.href = "/login";
+      return;
+    }
+  };
   return (
     <>
       <Meta title="Selamat Datang" />
@@ -48,7 +56,7 @@ const Home = () => {
                         <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-06-1920x1080-8799703619bf.avif" alt="" className="img-fluid" />
                       </button>
                     </div>
-                    <div className="details d-flex flex-column gap-2 mt-4">
+                    <div className="details d-flex flex-column justify-content-between mt-4">
                       <p className="text-start">
                         Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, quo perspiciatis nisi optio esse qui in adipisci rem numquam debitis saepe eveniet molestias ipsa a cupiditate consequuntur iste maiores commodi!
                       </p>
@@ -57,7 +65,9 @@ const Home = () => {
                         <a href="/game/id" className="btn btn-success">
                           Beli Sekarang
                         </a>
-                        <button className="btn btn-outline-light">Tambah ke Wishlist</button>
+                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
+                          Tambah ke Wishlist
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -92,7 +102,9 @@ const Home = () => {
                         <a href="/game/id" className="btn btn-success">
                           Beli Sekarang
                         </a>
-                        <button className="btn btn-outline-light">Tambah ke Wishlist</button>
+                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
+                          Tambah ke Wishlist
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -127,7 +139,9 @@ const Home = () => {
                         <a href="/game/id" className="btn btn-success">
                           Beli Sekarang
                         </a>
-                        <button className="btn btn-outline-light">Tambah ke Wishlist</button>
+                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
+                          Tambah ke Wishlist
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -162,7 +176,9 @@ const Home = () => {
                         <a href="/game/id" className="btn btn-success">
                           Beli Sekarang
                         </a>
-                        <button className="btn btn-outline-light">Tambah ke Wishlist</button>
+                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
+                          Tambah ke Wishlist
+                        </button>
                       </div>
                     </div>
                   </div>

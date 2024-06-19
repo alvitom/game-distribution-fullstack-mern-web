@@ -9,44 +9,121 @@ const crypto = require("crypto");
 
 // Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) {
-    const newUser = await User.create(req.body);
-    res.json(newUser);
-  } else {
-    throw new Error("User already exists");
+  const { email, password } = req.body;
+  try {
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ msg: "Email already exists" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = Date.now() + 1800000;
+
+    user = new User({ email, password, otp, otpExpires });
+    await user.save();
+
+    const body = `Your OTP code is ${otp}. Please enter the code for verification`;
+    const data = {
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}`,
+      htm: body,
+    };
+    sendEmail(data);
+    setTimeout(async () => {
+      const userToDelete = await User.findOne({ email, isVerified: false });
+      if (userToDelete) {
+        await User.deleteOne({ _id: userToDelete._id });
+      }
+    }, 1800000);
+    res.status(200).json({ msg: "OTP sent to email", id: user._id });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
   }
 });
 
-// Login User
-const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (user && (await user.isPasswordMatched(password))) {
-    const refreshToken = generateRefreshToken(user._id);
-    await User.findByIdAndUpdate(
-      user.id,
+const verifyOTP = async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  const { otp } = req.body;
+  try {
+    const user = await User.findOne({ _id: id });
+    if (user.otp !== otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ msg: "Invalid or expired OTP" });
+    }
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+    res.status(200).json({ msg: "Verification success" });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
+const addUserInformation = async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+  const { username, fullname } = req.body;
+  try {
+    const findUsername = await User.findOne({ username });
+    if (findUsername) return res.status(400).json({ msg: "Username already exists" });
+    const token = generateToken(id);
+    const user = await User.findByIdAndUpdate(
+      id,
       {
-        refreshToken,
+        username,
+        fullname,
+        refreshToken: token,
       },
       {
         new: true,
       }
     );
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", token, {
       httpOnly: true,
-      maxAge: 72 * 60 * 60 * 1000,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      secure: true,
+      sameSite: "none",
     });
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      fullname: user.fullname,
-      token: generateToken(user._id),
-    });
-  } else {
-    throw new Error("Invalid Credentials");
+    res.status(200).json({ _id: user._id, username: user.username, email: user.email, fullname: user.fullname, token });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
+// Login User
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user && (await user.isPasswordMatched(password))) {
+      const refreshToken = generateRefreshToken(user._id);
+      await User.findByIdAndUpdate(
+        user.id,
+        {
+          refreshToken,
+        },
+        {
+          new: true,
+        }
+      );
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        secure: true,
+        sameSite: "none",
+      });
+      res.status(200).json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        fullname: user.fullname,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ msg: "Invalid Credentials" });
+    }
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
   }
 });
 
@@ -126,8 +203,26 @@ const logout = asyncHandler(async (req, res) => {
 
 const getAllUsers = asyncHandler(async (req, res) => {
   try {
-    const users = await User.find();
-    res.json(users);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const keyword = req.query.keyword;
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (keyword) {
+      query.fullname = { $regex: keyword, $options: "i" };
+    }
+
+    const users = await User.find(query).skip(skip).limit(limit);
+    const total = await User.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      users,
+      total,
+      page,
+      totalPages,
+    });
   } catch (error) {
     throw new Error(error);
   }
@@ -223,10 +318,11 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found with this email");
+  const storeBaseURL = process.env.STORE_BASE_URL_DEV;
   try {
     const token = await user.createPasswordResetToken();
     await user.save();
-    const resetURL = `Silahkan klik link ini untuk mereset password Anda. Link ini berlaku hingga 10 menit dari sekarang. <a href="http://localhost:5000/api/user/reset-password/${token}">Klik Disini</a>`;
+    const resetURL = `Silahkan klik link ini untuk mereset password Anda. Link ini berlaku hingga 10 menit dari sekarang. <a href="${storeBaseURL}/reset-password/${token}">Klik Disini</a>`;
     const data = {
       to: email,
       subject: "Link Lupa Password",
@@ -243,17 +339,21 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
 const resetPassword = asyncHandler(async (req, res) => {
   const { password } = req.body;
   const { token } = req.params;
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
-  if (!user) throw new Error("Token expired, please try again later");
-  user.password = password;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
-  res.json(user);
+  try {
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+    if (!user) return res.status(400).json({ msg: "Token expired, please try again later" });
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    res.status(200).json({ _id: user._id, username: user.username, email: user.email, fullname: user.fullname });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
@@ -267,4 +367,4 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerUser, loginUser, loginAdmin, handleRefreshToken, logout, getAllUsers, getUser, updateUser, blockUser, unblockUser, changePassword, forgotPasswordToken, resetPassword, deleteUser };
+module.exports = { registerUser, verifyOTP, addUserInformation, loginUser, loginAdmin, handleRefreshToken, logout, getAllUsers, getUser, updateUser, blockUser, unblockUser, changePassword, forgotPasswordToken, resetPassword, deleteUser };

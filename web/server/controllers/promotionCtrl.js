@@ -13,8 +13,26 @@ const createPromotion = asyncHandler(async (req, res) => {
 
 const getAllPromotions = asyncHandler(async (req, res) => {
   try {
-    const promotions = await Promotion.find();
-    res.json(promotions);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const keyword = req.query.keyword;
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (keyword) {
+      query.game = { $regex: keyword, $options: "i" };
+    }
+
+    const promotions = await Promotion.find(query).skip(skip).limit(limit).populate("game");
+    const total = await Promotion.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      promotions,
+      total,
+      page,
+      totalPages,
+    });
   } catch (error) {
     throw new Error(error);
   }
@@ -24,7 +42,7 @@ const getDetailPromoGame = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongodbId(id);
   try {
-    const promotion = await Promotion.findById(id).populate("gameId");
+    const promotion = await Promotion.findById(id).populate("game");
     res.json(promotion);
   } catch (error) {
     throw new Error(error);

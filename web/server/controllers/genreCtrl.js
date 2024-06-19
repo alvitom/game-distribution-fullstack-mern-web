@@ -13,8 +13,26 @@ const createGenre = asyncHandler(async (req, res) => {
 
 const getAllGenres = asyncHandler(async (req, res) => {
   try {
-    const genres = await Genre.find();
-    res.json(genres);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const keyword = req.query.keyword;
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (keyword) {
+      query.genre = { $regex: keyword, $options: "i" };
+    }
+
+    const genres = await Genre.find(query).skip(skip).limit(limit);
+    const total = await Genre.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      genres,
+      total,
+      page,
+      totalPages,
+    });
   } catch (error) {
     throw new Error(error);
   }

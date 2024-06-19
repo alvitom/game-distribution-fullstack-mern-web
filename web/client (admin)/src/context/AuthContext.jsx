@@ -5,11 +5,15 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+  const limit = 10;
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
     withCredentials: true,
     headers: {
       "Content-Type": "application/json",
@@ -18,9 +22,9 @@ export const AuthProvider = ({ children }) => {
 
   axiosInstance.interceptors.request.use(
     (config) => {
-      const token = sessionStorage.getItem("user");
-      if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`;
+      const data = JSON.parse(sessionStorage.getItem("user"));
+      if (data) {
+        config.headers["Authorization"] = `Bearer ${data.token}`;
       }
       return config;
     },
@@ -32,10 +36,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     try {
       const response = await axiosInstance.post(`/user/login-admin`, userData);
-      const { token } = await response.data;
-      if (token) {
-        sessionStorage.setItem("user", token);
-      }
+      const data = await response.data;
+      return data;
     } catch (error) {
       console.error("Login admin failed:", error);
     }
@@ -45,16 +47,23 @@ export const AuthProvider = ({ children }) => {
     try {
       await axiosInstance.get(`/user/logout`);
     } catch (error) {
-      console.error("Login admin failed:", error);
+      console.error("Logout failed:", error);
     }
   };
 
-  const fetchAllUsers = async () => {
+  const fetchAllUsers = async (page, limit, debouncedKeyword) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/user`);
+      const response = await axiosInstance.get(`/user`, {
+        params: {
+          page,
+          limit,
+          keyword: debouncedKeyword,
+        },
+      });
       const data = await response.data;
-      setUsers(data);
+      setUsers(data.users);
+      setTotalPages(data.totalPages);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -62,16 +71,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchGenre = async (id) => {
-    setLoading(true);
+  const blockUser = async (id) => {
     try {
-      const response = await axiosInstance.get(`/genre/${id}`);
+      const response = await axiosInstance.put(`/user/block/${id}`);
       const data = await response.data;
-      setSelectedGenre(data);
-      setLoading(false);
+      return data;
     } catch (error) {
-      console.error("Error fetching genre:", error);
-      setLoading(false);
+      console.error("Error blocking users:", error);
+    }
+  };
+
+  const unblockUser = async (id) => {
+    try {
+      const response = await axiosInstance.put(`/user/unblock/${id}`);
+      const data = await response.data;
+      return data;
+    } catch (error) {
+      console.error("Error unblocking users:", error);
+    }
+  };
+
+  const deleteAccount = async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/user/${id}`);
+      const data = await response.data;
+      return data;
+    } catch (error) {
+      console.error("Error deleting account:", error);
     }
   };
 
@@ -104,5 +130,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  return <AuthContext.Provider value={{ users, loading, fetchAllUsers, login , logout/* , updateGame, deleteGame */ }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ users, setUsers, loading, setLoading, page, setPage, totalPages, limit, keyword, setKeyword, debouncedKeyword, setDebouncedKeyword, fetchAllUsers, login, logout, blockUser, unblockUser, deleteAccount }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

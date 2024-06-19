@@ -4,9 +4,27 @@ import { FaShoppingCart, FaHeart, FaWindows, FaApple } from "react-icons/fa";
 import { Tabs } from "@mantine/core";
 import { imgGallery, imgGalleryHero } from "../utils/Data";
 
+const user = JSON.parse(sessionStorage.getItem("user"));
+
 const GameDetail = () => {
   const handleCheckout = () => {
+    if (!user) {
+      location.href = "/login";
+      return;
+    }
     location.href = "/checkout";
+  };
+  const handleAddToCart = () => {
+    if (!user) {
+      location.href = "/login";
+      return;
+    }
+  };
+  const handleAddToWishlist = () => {
+    if (!user) {
+      location.href = "/login";
+      return;
+    }
   };
   return (
     <>
@@ -179,11 +197,11 @@ const GameDetail = () => {
                 <button className="btn btn-success w-100" onClick={handleCheckout}>
                   Beli Sekarang
                 </button>
-                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center">
+                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToCart}>
                   <FaShoppingCart />
                   <span>Tambah ke Keranjang</span>
                 </button>
-                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center">
+                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToWishlist}>
                   <FaHeart />
                   <span>Tambah ke Wishlist</span>
                 </button>

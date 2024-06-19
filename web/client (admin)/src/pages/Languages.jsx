@@ -1,24 +1,24 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Pagination, Table, TextInput } from "@mantine/core";
-import { FaSearch, FaCheck } from "react-icons/fa";
-import { GameContext } from "../context/GameContext";
+import { FaCheck, FaSearch } from "react-icons/fa";
 import { modals } from "@mantine/modals";
 import { MdClose } from "react-icons/md";
+import { LanguageContext } from "../context/LanguageContext";
 
-const Games = () => {
-  const { games, setGames, loading, page, setPage, totalPages, limit, keyword, setKeyword, debouncedKeyword, setDebouncedKeyword, genre, feature, platform, fetchAllGames, deleteGame } = useContext(GameContext);
+const Languages = () => {
+  const { languages, setLanguages, loading, page, setPage, totalPages, limit, keyword, setKeyword, debouncedKeyword, setDebouncedKeyword, fetchAllLanguages, deleteLanguage } = useContext(LanguageContext);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    fetchAllGames(page, limit, debouncedKeyword, genre, feature, platform);
+    fetchAllLanguages(page, limit, debouncedKeyword);
   }, [page, debouncedKeyword]);
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [debouncedKeyword, page, games]);
+  }, [debouncedKeyword, page, languages]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -33,8 +33,8 @@ const Games = () => {
     return <p>Loading...</p>;
   }
 
-  const handleDeleteGame = async (id) => {
-    const data = await deleteGame(id);
+  const handleDeleteLanguage = async (id) => {
+    const data = await deleteLanguage(id);
     if (data) {
       modals.open({
         radius: "md",
@@ -46,13 +46,13 @@ const Games = () => {
             <div className="d-flex justify-content-center mb-2">
               <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
             </div>
-            <p className="text-center">Delete game success</p>
+            <p className="text-center">Delete language success</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setGames(games.filter((game) => game._id !== id));
+                  setLanguages(languages.filter((language) => language._id !== id));
                 }}
               >
                 Close
@@ -72,7 +72,7 @@ const Games = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">Delete game failed</p>
+            <p className="text-center">Delete language failed</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
@@ -89,14 +89,14 @@ const Games = () => {
     }
   };
 
-  const openDeleteModal = (id, title) =>
+  const openDeleteModal = (id, language) =>
     modals.open({
       radius: "md",
-      title: "Delete game",
+      title: "Delete language",
       centered: true,
       children: (
         <>
-          <p>Are you sure you want to delete {title}?</p>
+          <p>Are you sure you want to delete {language}?</p>
           <div className="d-flex justify-content-end gap-3">
             <button className="btn btn-light" onClick={() => modals.closeAll()}>
               Cancel
@@ -104,7 +104,7 @@ const Games = () => {
             <button
               className="btn btn-danger"
               onClick={() => {
-                handleDeleteGame(id);
+                handleDeleteLanguage(id);
               }}
             >
               Delete
@@ -114,25 +114,16 @@ const Games = () => {
       ),
     });
 
-  const rows = games.map((game, index) => (
+  const rows = languages.map((item, index) => (
     <Table.Tr key={index}>
       <Table.Td>{(page - 1) * limit + index + 1}</Table.Td>
-      <Table.Td>
-        <img src={game.coverImages[0]?.url} className="img-fluid" />
-      </Table.Td>
-      <Table.Td>{game.title}</Table.Td>
-      <Table.Td>
-        {new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-        }).format(game.price)}
-      </Table.Td>
+      <Table.Td>{item.language}</Table.Td>
       <Table.Td>
         <div className="d-flex gap-2">
-          <Link to={`update/${game._id}`} className="btn btn-primary">
+          <Link to={`update/${item._id}`} className="btn btn-primary">
             Update
           </Link>
-          <button className="btn btn-danger" onClick={() => openDeleteModal(game._id, game.title)}>
+          <button className="btn btn-danger" onClick={() => openDeleteModal(item._id, item.language)}>
             Delete
           </button>
         </div>
@@ -144,15 +135,14 @@ const Games = () => {
     setPage(1);
     setKeyword(e.target.value);
   };
-
   return (
     <>
-      <div className="games-wrapper">
-        <h1>Game</h1>
+      <div className="languages-wrapper">
+        <h1>Language</h1>
         <div className="row">
           <div className="d-flex justify-content-between align-items-center me-3 my-4">
             <Link to="add" className="btn btn-success">
-              Add Game
+              Add Language
             </Link>
             <div className="d-flex gap-2 align-items-center">
               <label htmlFor="filters">Filters:</label>
@@ -163,9 +153,7 @@ const Games = () => {
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>No.</Table.Th>
-                <Table.Th>Image</Table.Th>
-                <Table.Th>Title</Table.Th>
-                <Table.Th>Price</Table.Th>
+                <Table.Th>Language</Table.Th>
                 <Table.Th>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -180,4 +168,4 @@ const Games = () => {
   );
 };
 
-export default Games;
+export default Languages;

@@ -11,19 +11,28 @@ import { GameProvider } from "./context/GameContext.jsx";
 import { GenreProvider } from "./context/GenreContext.jsx";
 import { FeatureProvider } from "./context/FeatureContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { LanguageProvider } from "./context/LanguageContext.jsx";
+import { ModalsProvider } from "@mantine/modals";
+import { PromotionProvider } from "./context/PromotionContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <MantineProvider>
-      <GameProvider>
-        <GenreProvider>
-          <FeatureProvider>
-            <AuthProvider>
-              <App />
-            </AuthProvider>
-          </FeatureProvider>
-        </GenreProvider>
-      </GameProvider>
+      <ModalsProvider>
+        <GameProvider>
+          <GenreProvider>
+            <FeatureProvider>
+              <AuthProvider>
+                <LanguageProvider>
+                  <PromotionProvider>
+                    <App />
+                  </PromotionProvider>
+                </LanguageProvider>
+              </AuthProvider>
+            </FeatureProvider>
+          </GenreProvider>
+        </GameProvider>
+      </ModalsProvider>
     </MantineProvider>
   </React.StrictMode>
 );

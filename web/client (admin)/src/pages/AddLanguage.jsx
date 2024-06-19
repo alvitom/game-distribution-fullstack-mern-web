@@ -1,34 +1,21 @@
 import { Input } from "@mantine/core";
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { GenreContext } from "../context/GenreContext";
+import React, { useContext, useState } from "react";
 import { modals } from "@mantine/modals";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { LanguageContext } from "../context/LanguageContext";
 
-const UpdateGenre = () => {
-  const { id } = useParams();
+const AddLanguage = () => {
   const navigate = useNavigate();
-  const { genres, setGenres, selectedGenre, fetchGenre, updateGenre } = useContext(GenreContext);
+  const { languages, setLanguages, createLanguage } = useContext(LanguageContext);
 
-  const [genre, setGenre] = useState({
-    genre: "",
+  const [language, setLanguage] = useState({
+    language: "",
   });
 
-  useEffect(() => {
-    fetchGenre(id);
-  }, [id]);
-
-  useEffect(() => {
-    if (selectedGenre) {
-      setGenre({
-        genre: selectedGenre.genre,
-      });
-    }
-  }, [selectedGenre]);
-
-  const handleUpdateGenre = async () => {
-    const data = await updateGenre(id, genre);
+  const handleCreateLanguage = async () => {
+    const data = await createLanguage(language);
     if (data) {
       modals.open({
         radius: "md",
@@ -40,14 +27,14 @@ const UpdateGenre = () => {
             <div className="d-flex justify-content-center mb-2">
               <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
             </div>
-            <p className="text-center">Update genre success</p>
+            <p className="text-center">Add language success</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  navigate("/genres");
-                  setGenres(genres.map((genre) => (genre._id === id ? data : genre)));
+                  navigate("/languages");
+                  setLanguages([...languages, data]);
                 }}
               >
                 Close
@@ -67,13 +54,13 @@ const UpdateGenre = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">Update genre failed</p>
+            <p className="text-center">Add language failed</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setGenre({ genre: selectedGenre.genre });
+                  setLanguage({ language: "" });
                 }}
               >
                 Close
@@ -84,19 +71,18 @@ const UpdateGenre = () => {
       });
     }
   };
-
   return (
     <>
-      <div className="update-genre-wrapper">
-        <h1>Update Genre</h1>
+      <div className="add-language-wrapper">
+        <h1>Add New Language</h1>
         <div className="d-flex flex-column gap-4">
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="genre">Genre</label>
-            <Input placeholder="Genre" size="md" id="genre" value={genre.genre} onChange={(e) => setGenre((prevGenre) => ({ ...prevGenre, genre: e.target.value }))} />
+            <label htmlFor="language">Language</label>
+            <Input placeholder="Language" size="md" id="language" value={language.language} onChange={(e) => setLanguage((prevLanguage) => ({ ...prevLanguage, language: e.target.value }))} />
           </div>
           <div className="d-flex justify-content-center align-items-center">
-            <button className="btn btn-success w-25" onClick={handleUpdateGenre}>
-              Update Genre
+            <button className="btn btn-success w-25" onClick={handleCreateLanguage}>
+              Add Language
             </button>
           </div>
         </div>
@@ -105,4 +91,4 @@ const UpdateGenre = () => {
   );
 };
 
-export default UpdateGenre;
+export default AddLanguage;

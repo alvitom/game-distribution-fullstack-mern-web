@@ -1,11 +1,11 @@
 import axios from "axios";
 import { createContext, useState } from "react";
 
-export const FeatureContext = createContext();
+export const PromotionContext = createContext();
 
-export const FeatureProvider = ({ children }) => {
-  const [features, setFeatures] = useState([]);
-  const [selectedFeature, setSelectedFeature] = useState(null);
+export const PromotionProvider = ({ children }) => {
+  const [promotions, setPromotions] = useState([]);
+  const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -30,10 +30,10 @@ export const FeatureProvider = ({ children }) => {
     }
   );
 
-  const fetchAllFeatures = async (page, limit, debouncedKeyword) => {
+  const fetchAllPromotions = async (page, limit, debouncedKeyword) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/feature`, {
+      const response = await axiosInstance.get(`/promotion`, {
         params: {
           page,
           limit,
@@ -41,65 +41,64 @@ export const FeatureProvider = ({ children }) => {
         },
       });
       const data = await response.data;
-      setFeatures(data.features);
+      setPromotions(data.promotions);
       setTotalPages(data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching features:", error);
+      console.error("Error fetching promotions:", error);
       setLoading(false);
     }
   };
 
-  const fetchFeature = async (id) => {
+  const fetchPromotion = async (id) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/feature/${id}`);
+      const response = await axiosInstance.get(`/promotion/${id}`);
       const data = await response.data;
-      setSelectedFeature(data);
+      setSelectedPromotion(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching feature:", error);
+      console.error("Error fetching promotion:", error);
       setLoading(false);
     }
   };
 
-  const createFeature = async (feature) => {
+  const createPromotion = async (promotion) => {
     try {
-      const response = await axiosInstance.post("/feature", feature);
+      const response = await axiosInstance.post("/promotion", promotion);
       const data = await response.data;
       return data;
     } catch (error) {
-      console.error("Error creating feature:", error);
+      console.error("Error creating promotion:", error);
     }
   };
 
-  const updateFeature = async (id, updatedFeature) => {
+  const updatePromotion = async (id, updatedPromotion) => {
     try {
-      const response = await axiosInstance.put(`/feature/${id}`, updatedFeature);
+      const response = await axiosInstance.put(`/promotion/${id}`, updatedPromotion);
       const data = await response.data;
-      setFeatures(features.map((feature) => (feature._id === id ? data : feature)));
       return data;
     } catch (error) {
-      console.error("Error updating feature:", error);
+      console.error("Error updating promotion:", error);
     }
   };
 
-  const deleteFeature = async (id) => {
+  const deletePromotion = async (id) => {
     try {
-      const response = await axiosInstance.delete(`/feature/${id}`);
+      const response = await axiosInstance.delete(`/promotion/${id}`);
       const data = await response.data;
       return data;
     } catch (error) {
-      console.error("Error deleting feature:", error);
+      console.error("Error deleting promotion:", error);
     }
   };
 
   return (
-    <FeatureContext.Provider
+    <PromotionContext.Provider
       value={{
-        features,
-        setFeatures,
-        selectedFeature,
+        promotions,
+        setPromotions,
+        selectedPromotion,
         loading,
         setLoading,
         page,
@@ -110,14 +109,14 @@ export const FeatureProvider = ({ children }) => {
         setKeyword,
         debouncedKeyword,
         setDebouncedKeyword,
-        fetchAllFeatures,
-        fetchFeature,
-        createFeature,
-        updateFeature,
-        deleteFeature,
+        fetchAllPromotions,
+        fetchPromotion,
+        createPromotion,
+        updatePromotion,
+        deletePromotion,
       }}
     >
       {children}
-    </FeatureContext.Provider>
+    </PromotionContext.Provider>
   );
 };

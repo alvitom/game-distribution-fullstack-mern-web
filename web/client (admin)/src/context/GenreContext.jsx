@@ -6,18 +6,43 @@ export const GenreContext = createContext();
 export const GenreProvider = ({ children }) => {
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+  const limit = 10;
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
   });
 
-  const fetchAllGenres = async () => {
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      const data = JSON.parse(sessionStorage.getItem("user"));
+      if (data) {
+        config.headers["Authorization"] = `Bearer ${data.token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
+  const fetchAllGenres = async (page, limit, debouncedKeyword) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/genre`);
+      const response = await axiosInstance.get(`/genre`, {
+        params: {
+          page,
+          limit,
+          keyword: debouncedKeyword,
+        },
+      });
       const data = await response.data;
-      setGenres(data);
+      setGenres(data.genres);
+      setTotalPages(data.totalPages);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching genres:", error);
@@ -38,34 +63,60 @@ export const GenreProvider = ({ children }) => {
     }
   };
 
-  const createGame = async (game) => {
+  const createGenre = async (genre) => {
     try {
-      const response = await axiosInstance.post("/game", game);
+      const response = await axiosInstance.post("/genre", genre);
       const data = await response.data;
-      setGames([...games, data]);
+      return data;
     } catch (error) {
-      console.error("Error creating game:", error);
+      console.error("Error creating genre:", error);
     }
   };
 
-  const updateGame = async (id, updatedGame) => {
+  const updateGenre = async (id, updatedGenre) => {
     try {
-      const response = await axiosInstance.put(`/game/${id}`, updatedGame);
+      const response = await axiosInstance.put(`/genre/${id}`, updatedGenre);
       const data = await response.data;
-      setGames(games.map((game) => (game._id === id ? data : game)));
+      return data;
     } catch (error) {
-      console.error("Error updating game:", error);
+      console.error("Error updating genre:", error);
     }
   };
 
-  const deleteGame = async (id) => {
+  const deleteGenre = async (id) => {
     try {
-      await axiosInstance.delete(`/game/${id}`);
-      setGames(games.filter((game) => game._id !== id));
+      const response = await axiosInstance.delete(`/genre/${id}`);
+      const data = await response.data;
+      return data;
     } catch (error) {
-      console.error("Error deleting game:", error);
+      console.error("Error deleting genre:", error);
     }
   };
 
-  return <GenreContext.Provider value={{ genres, selectedGenre, loading, fetchAllGenres, fetchGenre /* , createGame, updateGame, deleteGame */ }}>{children}</GenreContext.Provider>;
+  return (
+    <GenreContext.Provider
+      value={{
+        genres,
+        setGenres,
+        selectedGenre,
+        loading,
+        setLoading,
+        page,
+        setPage,
+        totalPages,
+        limit,
+        keyword,
+        setKeyword,
+        debouncedKeyword,
+        setDebouncedKeyword,
+        fetchAllGenres,
+        fetchGenre,
+        createGenre,
+        updateGenre,
+        deleteGenre,
+      }}
+    >
+      {children}
+    </GenreContext.Provider>
+  );
 };

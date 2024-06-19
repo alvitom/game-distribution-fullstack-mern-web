@@ -25,7 +25,7 @@ header .logo {
 
 header a {
   font-size: 18px;
-  color: #ccc;
+  color: #aeaeae;
 }
 
 header a:hover {
@@ -67,6 +67,12 @@ header a:hover {
 
 .header-bottom .search-wrapper .search-input::-webkit-input-placeholder {
   color: #aaa;
+}
+
+.header-bottom .link {
+  &[data-active] {
+    color: #fff;
+  }
 }
 
 .header-bottom .cart .cart-badge,
@@ -120,6 +126,12 @@ footer a:hover {
 .outlet {
   background-color: var(--color-121212);
   padding-bottom: 100px;
+}
+
+.mantine-Modal-content,
+.mantine-Modal-content .mantine-Modal-header,
+.mantine-Modal-content .mantine-Modal-body {
+  background-color: var(--color-252429) !important;
 }
 
 /* Home Page */
@@ -263,7 +275,7 @@ footer a:hover {
   background-color: #222;
   border-radius: 10px;
   padding: 50px;
-  width: 30%;
+  width: 31%;
 }
 
 .auth-wrapper .login-card input {
@@ -387,3 +399,29 @@ footer a:hover {
 }
 
 /* End Checkout Page */
+
+/* Verify Page */
+.mantine-Group-root {
+  gap: 30px !important;
+  justify-content: center !important;
+  margin-top: 10px;
+  margin-bottom: 50px;
+
+  @media screen and (max-width: 1400px) {
+    gap: 20px !important;
+  }
+}
+
+.mantine-PinInput-input {
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 18px !important;
+
+  @media screen and (max-width: 1400px) {
+    font-size: 14px !important;
+    width: 43px !important;
+    height: 43px !important;
+  }
+}
+
+/* End Verify Page */

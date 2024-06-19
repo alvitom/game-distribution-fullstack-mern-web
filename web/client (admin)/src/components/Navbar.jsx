@@ -4,9 +4,11 @@ import { MdGames, MdCategory, MdLogout } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
 import { BiCategory, BiSolidDiscount } from "react-icons/bi";
 import { GrTransaction } from "react-icons/gr";
-import { FaBlogger, FaExchangeAlt } from "react-icons/fa";
+import { FaBlogger } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { IoLanguage } from "react-icons/io5";
+import { modals } from "@mantine/modals";
 
 const data = [
   { link: "/", label: "Dashboard", icon: <RxDashboard className="fs-5" /> },
@@ -17,7 +19,7 @@ const data = [
   { link: "/promotions", label: "Promotions", icon: <BiSolidDiscount className="fs-5" /> },
   { link: "/transactions", label: "Transactions", icon: <GrTransaction className="fs-5" /> },
   { link: "/users", label: "Users", icon: <FaUsers className="fs-5" /> },
-  // { link: "/languages", label: "Languages", icon: <IoLanguage className="fs-5" />},
+  { link: "/languages", label: "Languages", icon: <IoLanguage className="fs-5" /> },
 ];
 
 export const Navbar = () => {
@@ -45,19 +47,35 @@ export const Navbar = () => {
     location.reload();
   };
 
+  const openLogoutModal = () =>
+    modals.open({
+      radius: "md",
+      title: "Logout user",
+      centered: true,
+      children: (
+        <>
+          <p>Are you sure you want to logout?</p>
+          <div className="d-flex justify-content-end gap-3">
+            <button className="btn btn-light" onClick={() => modals.closeAll()}>
+              Cancel
+            </button>
+            <button className="btn btn-danger" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </>
+      ),
+    });
+
   return (
     <nav className="navbar col-2">
       <h5 className="mb-3">Menu</h5>
       <div className="navbarMain">{links}</div>
 
       <div className="footer">
-        <button className="btn link gap-2 mb-2">
-          <FaExchangeAlt className="fs-5" />
-          <span>Ganti Akun</span>
-        </button>
-        <button className="btn link gap-2" onClick={handleLogout}>
+        <button className="btn link gap-2" onClick={openLogoutModal}>
           <MdLogout className="fs-5" />
-          <span>Keluar</span>
+          <span>Logout</span>
         </button>
       </div>
     </nav>

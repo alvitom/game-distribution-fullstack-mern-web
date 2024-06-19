@@ -1,22 +1,134 @@
-import React from "react";
+import React, { useContext } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Avatar, UnstyledButton } from "@mantine/core";
 import { Menu } from "@mantine/core";
+import { MdClose, MdLogout } from "react-icons/md";
+import { AuthContext } from "../context/AuthContext";
+import { modals } from "@mantine/modals";
+import { FaTrash, FaCheck } from "react-icons/fa";
 
-const UserButton = () => (
-  <div className="account d-flex gap-2 align-items-center">
-    <div className="account-image">
-      <Avatar size="md" radius="sm" src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png" />
+const user = JSON.parse(sessionStorage.getItem("user"));
+
+const UserButton = () => {
+  return (
+    <div className="account d-flex gap-2 align-items-center">
+      <div className="account-image">
+        <Avatar size="md" radius="sm" src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png" />
+      </div>
+      <div className="account-details d-flex flex-column">
+        <span className="name">{user.username}</span>
+        <span className="email">{user.email}</span>
+      </div>
+      <IoMdArrowDropdown className="fs-4" />
     </div>
-    <div className="account-details d-flex flex-column">
-      <span className="name">Muhammad Alvito</span>
-      <span className="email">muhammadalvito23@gmail.com</span>
-    </div>
-    <IoMdArrowDropdown className="fs-4" />
-  </div>
-);
+  );
+};
 
 const Header = () => {
+  const { logout, deleteAccount } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    await logout();
+    sessionStorage.removeItem("user");
+    location.reload();
+  };
+
+  const openLogoutModal = () =>
+    modals.open({
+      radius: "md",
+      title: "Logout user",
+      centered: true,
+      children: (
+        <>
+          <p>Are you sure you want to logout?</p>
+          <div className="d-flex justify-content-end gap-3">
+            <button className="btn btn-light" onClick={() => modals.closeAll()}>
+              Cancel
+            </button>
+            <button className="btn btn-danger" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </>
+      ),
+    });
+
+  const handleDeleteAccount = async () => {
+    const data = await deleteAccount(user._id);
+    if (data) {
+      modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
+            </div>
+            <p className="text-center">Delete account success</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                  sessionStorage.removeItem("user");
+                  location.reload();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">Delete account failed</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    }
+  };
+
+  const openDeleteAccountModal = () =>
+    modals.open({
+      radius: "md",
+      title: "Delete account",
+      centered: true,
+      children: (
+        <>
+          <p>Are you sure you want to delete your account?</p>
+          <div className="d-flex justify-content-end gap-3">
+            <button className="btn btn-light" onClick={() => modals.closeAll()}>
+              Cancel
+            </button>
+            <button className="btn btn-danger" onClick={handleDeleteAccount}>
+              Delete
+            </button>
+          </div>
+        </>
+      ),
+    });
   return (
     <>
       <header className="header">
@@ -43,9 +155,12 @@ const Header = () => {
                 <Menu.Item /* leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />} */>Akun Saya</Menu.Item>
                 <Menu.Item /* leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />} */>Pengaturan</Menu.Item>
                 <Menu.Divider />
-                <Menu.Item /* leftSection={<IconArrowsLeftRight style={{ width: rem(14), height: rem(14) }} />} */>Ganti Akun</Menu.Item>
-                <Menu.Item color="red" /* leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }} />} */>Hapus Akun</Menu.Item>
-                <Menu.Item color="red" /* leftSection={<IconArrowsLeftRight style={{ width: rem(14), height: rem(14) }} />} */>Keluar</Menu.Item>
+                <Menu.Item color="red" leftSection={<FaTrash />} onClick={openDeleteAccountModal}>
+                  Hapus Akun
+                </Menu.Item>
+                <Menu.Item color="red" leftSection={<MdLogout />} onClick={openLogoutModal}>
+                  Logout
+                </Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </div>

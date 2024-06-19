@@ -3,11 +3,13 @@ import Meta from "../components/Meta";
 import { AuthContext } from "../context/AuthContext";
 import { modals } from "@mantine/modals";
 import { MdClose } from "react-icons/md";
+import { useParams } from "react-router-dom";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, error } = useContext(AuthContext);
+const AddUserInformation = () => {
+  const { id } = useParams();
+  const [username, setUsername] = useState("");
+  const [fullname, setFullname] = useState("");
+  const { addUserInformation, error } = useContext(AuthContext);
 
   useEffect(() => {
     if (error) {
@@ -27,8 +29,8 @@ const Login = () => {
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setEmail("");
-                  setPassword("");
+                  setUsername("");
+                  setFullname("");
                 }}
               >
                 Close
@@ -40,12 +42,12 @@ const Login = () => {
     }
   }, [error]);
 
-  const handleLogin = async () => {
+  const handleAddUserInfo = async () => {
     const userData = {
-      email,
-      password,
+      username,
+      fullname,
     };
-    const data = await login(userData);
+    const data = await addUserInformation(id, userData);
     if (data) {
       sessionStorage.setItem("user", JSON.stringify(data));
       location.href = "/";
@@ -53,17 +55,14 @@ const Login = () => {
   };
   return (
     <>
-      <Meta title="Login" />
+      <Meta title="Add User Information" />
       <div className="auth-wrapper">
         <div className="login-card text-center">
-          <h1>Login</h1>
-          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <a href="/forgot-password" className="forgot-password d-block text-decoration-underline">
-            Forgot Password
-          </a>
-          <button className="btn btn-success w-100" onClick={handleLogin}>
-            Login
+          <h1>Add Your Information</h1>
+          <input type="text" className="w-100" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input type="text" className="w-100" placeholder="Full Name" value={fullname} onChange={(e) => setFullname(e.target.value)} />
+          <button className="btn btn-success w-100" onClick={handleAddUserInfo}>
+            Submit
           </button>
         </div>
       </div>
@@ -71,4 +70,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AddUserInformation;

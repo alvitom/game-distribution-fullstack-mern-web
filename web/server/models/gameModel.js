@@ -144,6 +144,9 @@ const gameSchema = new mongoose.Schema({
       },
     ],
   },
+  fileDownload: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Game", gameSchema);

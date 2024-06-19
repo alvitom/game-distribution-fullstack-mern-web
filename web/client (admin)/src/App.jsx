@@ -13,13 +13,17 @@ import AddGame from "./pages/AddGame";
 import AddBlog from "./pages/AddBlog";
 import AddGenre from "./pages/AddGenre";
 import AddFeature from "./pages/AddFeature";
-import AddPromo from "./pages/AddPromo";
 import UpdateGame from "./pages/UpdateGame";
 import UpdateGenre from "./pages/UpdateGenre";
 import UpdateFeature from "./pages/UpdateFeature";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Languages from "./pages/Languages";
+import AddLanguage from "./pages/AddLanguage";
+import UpdateLanguage from "./pages/UpdateLanguage";
+import UpdatePromotion from "./pages/UpdatePromotion";
+import AddPromotion from "./pages/AddPromotion";
 
 const App = () => {
   return (
@@ -40,10 +44,13 @@ const App = () => {
             <Route path="features/add" element={<AddFeature />} />
             <Route path="features/update/:id" element={<UpdateFeature />} />
             <Route path="promotions" element={<Promotions />} />
-            <Route path="promotions/add" element={<AddPromo />} />
+            <Route path="promotions/add" element={<AddPromotion />} />
+            <Route path="promotions/update/:id" element={<UpdatePromotion />} />
             <Route path="users" element={<Users />} />
             <Route path="transactions" element={<Transactions />} />
-            {/* <Route path="languages" element={<Languages />} /> */}
+            <Route path="languages" element={<Languages />} />
+            <Route path="languages/add" element={<AddLanguage />} />
+            <Route path="languages/update/:id" element={<UpdateLanguage />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
