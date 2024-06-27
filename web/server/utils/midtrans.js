@@ -7,12 +7,14 @@ let snap = new midtransClient.Snap({
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
-const verifySignature = ({ order_id, status_code, gross_amount, signature_key }) => {
+const verifySignature = (notification) => {
+  const { order_id, status_code, gross_amount, signature_key } = notification;
   const serverKey = process.env.MIDTRANS_SERVER_KEY;
-  const dataToHash = [order_id, status_code, gross_amount, serverKey].join('');
-  const hash = crypto.createHash('sha512').update(dataToHash).digest('hex');
+  const hash = crypto.createHash("sha512");
+  hash.update(order_id + status_code + gross_amount + serverKey);
+  const expectedSignature = hash.digest("hex");
 
-  return hash === signature_key;
+  return expectedSignature === signature_key;
 };
 
 module.exports = { snap, verifySignature };
