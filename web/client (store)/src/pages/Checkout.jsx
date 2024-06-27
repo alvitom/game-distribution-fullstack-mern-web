@@ -79,7 +79,7 @@ const Checkout = () => {
               ),
             });
           } else {
-            console.log(result);
+            console.log(response.data);
           }
         },
         onPending: async function (result) {
@@ -110,7 +110,7 @@ const Checkout = () => {
               ),
             });
           } else {
-            console.log(result);
+            console.log(response.data);
           }
         },
         onError: async function (result) {

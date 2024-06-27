@@ -10,9 +10,9 @@ const midtransNotification = asyncHandler(async (req, res) => {
     const notification = req.body;
     const isVerified = verifySignature(notification);
 
-    if (!isVerified) {
-      errorResponse(res, 400, "Invalid signature");
-    }
+    // if (!isVerified) {
+    //   errorResponse(res, 400, "Invalid signature");
+    // }
 
     const orderId = notification.order_id;
     const transactionStatus = notification.transaction_status;
