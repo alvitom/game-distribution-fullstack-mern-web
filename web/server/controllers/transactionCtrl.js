@@ -3,7 +3,7 @@ const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
 const { validateMongodbId } = require("../utils/validations");
 const { successResponse, errorResponse } = require("../utils/response");
-const { snap } = require("../utils/midtrans");
+const snap = require("../utils/midtrans");
 const sendEmail = require("../utils/nodemailer");
 
 const createTransaction = asyncHandler(async (req, res) => {
@@ -31,7 +31,6 @@ const createTransaction = asyncHandler(async (req, res) => {
         name: item.title,
         quantity: 1,
       })),
-      notification_url: `${process.env.API_BASE_URL}/api/midtrans/notification`,
     });
 
     await Transaction.create({
@@ -41,9 +40,10 @@ const createTransaction = asyncHandler(async (req, res) => {
       orderId,
     });
 
+    
     await Cart.deleteMany({ userId: id, gameId: { $in: items.map((item) => item._id) } });
 
-    const body = `Dear customer, your payment for the order ${orderId} is currently pending. Please complete your payment to process your order. Thank you!`;
+    const body = `Dear customer, your payment for the ${orderId} is currently pending. Please complete your payment to process your order. Thank you!`;
     const data = {
       to: email,
       subject: "Your payment is pending",
