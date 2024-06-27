@@ -3,9 +3,9 @@ const asyncHandler = require("express-async-handler");
 
 const sendEmail = asyncHandler(async (data, req, res) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: process.env.EMAIL_PORT == 465,
     auth: {
       // TODO: replace `user` and `pass` values from <https://forwardemail.net>
       user: process.env.MAIL_ID,
@@ -23,9 +23,6 @@ const sendEmail = asyncHandler(async (data, req, res) => {
       text: data.text, // plain text body
       html: data.htm, // html body
     });
-
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
   }
 
   main().catch(console.error);
