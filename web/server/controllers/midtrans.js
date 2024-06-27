@@ -1,21 +1,17 @@
 const Transaction = require("../models/transactionModel");
 const asyncHandler = require("express-async-handler");
 const { errorResponse, successResponse } = require("../utils/response");
-const crypto = require("crypto");
+const { verifySignature } = require("../utils/midtrans");
 const sendEmail = require("../utils/nodemailer");
 
 const midtransNotification = asyncHandler(async (req, res) => {
   try {
     const { email } = req.user;
     const notification = req.body;
+    const isVerified = verifySignature(notification);
 
-    const serverKey = process.env.MIDTRANS_SERVER_KEY;
-    const hash = crypto.createHash("sha512");
-    hash.update(notification.order_id + notification.status_code + notification.gross_amount + serverKey);
-    const expectedSignature = hash.digest("hex");
-
-    if(expectedSignature !== notification.signature_key) {
-      errorResponse(res, 401, "Invalid signature key");
+    if (!isVerified) {
+      errorResponse(res, 400, "Invalid signature");
     }
 
     const orderId = notification.order_id;
