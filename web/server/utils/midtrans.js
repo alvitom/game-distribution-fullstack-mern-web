@@ -14,4 +14,4 @@ let snap = new midtransClient.Snap({
 //   return expectedSignature === signature_key;
 // };
 
-module.exports = { snap, verifySignature };
+module.exports = { snap/* , verifySignature */ };
