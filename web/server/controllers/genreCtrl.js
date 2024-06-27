@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Genre = require("../models/genreModel");
-const validateMongodbId = require("../utils/validateMongodbId");
+const { validateMongodbId } = require("../utils/validations");
 
 const createGenre = asyncHandler(async (req, res) => {
   try {

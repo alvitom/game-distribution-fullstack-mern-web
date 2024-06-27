@@ -1,35 +1,55 @@
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const Game = require("../models/gameModel");
-const validateMongodbId = require("../utils/validateMongodbId");
+const { validateMongodbId, validatePageAndLimit } = require("../utils/validations");
 const { uploadToCloudinary, cloudinaryDeleteImg } = require("../utils/cloudinary");
+const { successResponse, errorResponse } = require("../utils/response");
 
 const createGame = asyncHandler(async (req, res) => {
   try {
     const systemRequirements = JSON.parse(req.body.systemRequirements);
-    const coverImages = req.files.coverImages;
-    const images = req.files.images;
-    const videos = req.files.videos;
+    const coverImage = req.files.coverImage || [];
+    const images = req.files.images || [];
+    const videos = req.files.videos || [];
 
-    const urlCoverImages = [];
+    let urlCoverImage = {};
     const urlImages = [];
     const urlVideos = [];
 
-    for (const coverImage of coverImages) {
-      const { path } = coverImage;
-      const newPath = await uploadToCloudinary(path, { folder: "games/coverImages" });
-      urlCoverImages.push(newPath);
+    for (const image of coverImage) {
+      const { path } = image;
+      const newPath = await uploadToCloudinary(path, {
+        folder: "games/coverImage",
+        eager: [
+          { width: 150, height: 150 },
+          { width: 640, height: 480 },
+          { width: 1280, height: 720 },
+          { width: 1920, height: 1080 },
+        ],
+      });
+      urlCoverImage = newPath;
     }
 
     for (const image of images) {
       const { path } = image;
-      const newPath = await uploadToCloudinary(path, { folder: "games/images" });
+      const newPath = await uploadToCloudinary(path, {
+        folder: "games/images",
+        eager: [
+          { width: 150, height: 150 },
+          { width: 640, height: 480 },
+          { width: 1280, height: 720 },
+          { width: 1920, height: 1080 },
+        ],
+      });
       urlImages.push(newPath);
     }
 
     for (const video of videos) {
       const { path } = video;
-      const newPath = await uploadToCloudinary(path, { folder: "games/videos", resource_type: "video" });
+      const newPath = await uploadToCloudinary(path, {
+        folder: "games/videos",
+        resource_type: "video",
+      });
       urlVideos.push(newPath);
     }
 
@@ -39,74 +59,91 @@ const createGame = asyncHandler(async (req, res) => {
     const newGame = await Game.create({
       ...req.body,
       systemRequirements,
-      coverImages: urlCoverImages.map((file) => file),
+      coverImage: urlCoverImage,
       images: urlImages.map((file) => file),
       videos: urlVideos.map((file) => file),
     });
-    res.json(newGame);
+    successResponse(res, newGame, "Game created successfully", 201);
   } catch (error) {
-    throw new Error(error);
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((value) => value.message);
+      return errorResponse(res, 400, messages);
+    }
+    errorResponse(res, 500, "Failed to create game");
+    console.log(error);
   }
 });
 
 const getAllGames = asyncHandler(async (req, res) => {
+  const { page, limit, keyword, genre, feature, platform } = req.query;
+  const sanitizedPage = parseInt(page);
+  const sanitizedLimit = parseInt(limit);
+
+  // if (Number.isNaN(sanitizedPage) || sanitizedPage < 1) {
+  //   errorResponse(res, 400, "Invalid page parameter");
+  // }
+
+  // if (Number.isNaN(sanitizedLimit) || sanitizedLimit < 1) {
+  //   errorResponse(res, 400, "Invalid limit parameter");
+  // }
+
+  const query = {};
+
+  if (keyword) {
+    query.title = { $regex: keyword, $options: "i" };
+  }
+  if (genre) {
+    query.genre = genre;
+  }
+  if (feature) {
+    query.feature = feature;
+  }
+  if (platform) {
+    query.platform = platform;
+  }
+
+  const skip = (sanitizedPage - 1) * sanitizedLimit;
+
   try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const keyword = req.query.keyword;
-    const genre = req.query.genre;
-    const feature = req.query.feature;
-    const platform = req.query.platform;
-    const skip = (page - 1) * limit;
-    const query = {};
-
-    if (keyword) {
-      query.title = { $regex: keyword, $options: "i" };
-    }
-    if (genre) {
-      query.genre = genre;
-    }
-    if (feature) {
-      query.feature = feature;
-    }
-    if (platform) {
-      query.platform = platform;
-    }
-
-    const games = await Game.find(query).skip(skip).limit(limit);
+    const games = await Game.find(query).skip(skip).limit(sanitizedLimit);
     const total = await Game.countDocuments(query);
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / sanitizedLimit);
 
-    res.json({
-      games,
-      total,
-      page,
-      totalPages,
-    });
+    successResponse(res, { games, total, page: sanitizedPage, totalPages }, "Games fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch games");
   }
 });
 
 const getGame = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
+  const { title } = req.params;
+
+  if (!title) {
+    errorResponse(res, 404, "Game not found");
+  }
+
   try {
-    const game = await Game.findById(id).populate("genres").populate("features");
-    res.json(game);
+    const game = await Game.findOne({ slug: title }).populate("genres").populate("features");
+    successResponse(res, game, "Game fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch game");
   }
 });
 
 const updateGame = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+
+  if (!validateMongodbId(id)) {
+    errorResponse(res, 404, "Game not found");
+  }
+
+  if (req.body.title) {
+    req.body.slug = slugify(req.body.title);
+  }
+
   try {
     const systemRequirements = JSON.parse(req.body.systemRequirements);
-    const coverImages = req.files.coverImages;
-    const images = req.files.images;
-    const videos = req.files.videos;
+    const { coverImages, images, videos } = req.files;
 
     const urlCoverImages = [];
     const urlImages = [];
@@ -114,52 +151,54 @@ const updateGame = asyncHandler(async (req, res) => {
 
     for (const coverImage of coverImages) {
       const { path } = coverImage;
-      const newPath = await uploadToCloudinary(path, { folder: "coverImages" });
-      urlCoverImages.push(newPath);
+      const size = coverImage.fieldname;
+      const newPath = await uploadToCloudinary(path, { folder: "games/coverImages" });
+      urlCoverImages.push({ url: newPath, size });
     }
 
     for (const image of images) {
       const { path } = image;
-      const newPath = await uploadToCloudinary(path, { folder: "images" });
-      urlImages.push(newPath);
+      const newPath = await uploadToCloudinary(path, { folder: "games/images" });
+      urlImages.push({ url: newPath });
     }
 
     for (const video of videos) {
       const { path } = video;
-      const newPath = await uploadToCloudinary(path, { folder: "videos", resource_type: "video" });
-      urlVideos.push(newPath);
+      const newPath = await uploadToCloudinary(path, { folder: "games/videos", resource_type: "video" });
+      urlVideos.push({ url: newPath });
     }
 
-    if (req.body.title) {
-      req.body.slug = slugify(req.body.title);
-    }
     const updateGame = await Game.findByIdAndUpdate(
       id,
       {
         ...req.body,
         systemRequirements,
-        coverImages: urlCoverImages.map((file) => file),
-        images: urlImages.map((file) => file),
-        videos: urlVideos.map((file) => file),
+        coverImages: urlCoverImages,
+        images: urlImages,
+        videos: urlVideos,
       },
       {
         new: true,
       }
     );
-    res.json(updateGame);
+    successResponse(res, updateGame, "Game updated successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to update game");
   }
 });
 
 const deleteGame = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+
+  if (!validateMongodbId(id)) {
+    errorResponse(res, 404, "Game not found");
+  }
+
   try {
-    const deleteGame = await Game.findByIdAndDelete(id);
-    res.json(deleteGame);
+    await Game.findByIdAndDelete(id);
+    successResponse(res, null, "Game deleted successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to delete game");
   }
 });
 

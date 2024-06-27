@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Promotion = require("../models/promotionModel");
-const validateMongodbId = require("../utils/validateMongodbId");
+const { validateMongodbId } = require("../utils/validations");
 
 const createPromotion = asyncHandler(async (req, res) => {
   try {

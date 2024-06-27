@@ -49,7 +49,7 @@ const gameSchema = new mongoose.Schema({
       ref: "Feature",
     },
   ],
-  coverImages: [],
+  coverImage: {},
   images: [],
   videos: [],
   ratings: [

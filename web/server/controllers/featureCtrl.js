@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Feature = require("../models/featureModel");
-const validateMongodbId = require("../utils/validateMongodbId");
+const { validateMongodbId } = require("../utils/validations");
 
 const createFeature = asyncHandler(async (req, res) => {
   try {

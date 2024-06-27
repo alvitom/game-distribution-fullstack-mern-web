@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Language = require("../models/languageModel");
-const validateMongodbId = require("../utils/validateMongodbId");
+const { validateMongodbId } = require("../utils/validations");
 
 const createLanguage = asyncHandler(async (req, res) => {
   try {

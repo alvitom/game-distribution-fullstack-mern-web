@@ -21,19 +21,23 @@ const userSchema = new mongoose.Schema(
     fullname: {
       type: String,
     },
-    isVerified: { type: Boolean, default: false },
-    otp: { type: Number },
-    otpExpires: { type: Date },
-    mobile: {
+    address: {
       type: String,
-      unique: true,
-      sparse: true,
     },
-    profile: {
-      avatar: { type: String },
-      bio: { type: String },
+    city: {
+      type: String,
     },
-    ownedGames: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
+    country: {
+      type: String,
+    },
+    postalCode: {
+      type: String,
+    },
+    isVerified: { type: Boolean, default: false },
+    otp: { type: String },
+    otpExpires: { type: Date },
+    image: { type: String },
+    library: [{ type: mongoose.Schema.Types.ObjectId, ref: "Library" }],
     role: {
       type: String,
       default: "user",
@@ -62,8 +66,19 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+userSchema.pre("save", async function () {
+  if (this.isModified("otp")) {
+    const salt = await bcrypt.genSalt(10);
+    this.otp = await bcrypt.hash(this.otp, salt);
+  }
+});
+
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.isOTPMatched = async function (enteredOTP) {
+  return await bcrypt.compare(enteredOTP, this.otp);
 };
 
 userSchema.methods.createPasswordResetToken = async function () {

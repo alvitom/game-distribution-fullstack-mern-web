@@ -22,12 +22,13 @@ const promotionRouter = require("./routes/promotionRoute");
 const languageRouter = require("./routes/languageRoute");
 const reviewRouter = require("./routes/reviewRoute");
 const newsRouter = require("./routes/newsRoute");
+const midtransRouter = require("./routes/midtrans");
 // const Promotion = require("./models/promotionModel");
 
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: [process.env.ADMIN_BASE_URL_DEV, process.env.ADMIN_BASE_URL_STG],
+    origin: [process.env.ADMIN_BASE_URL_DEV, process.env.ADMIN_BASE_URL_STG, process.env.STORE_BASE_URL_DEV, process.env.STORE_BASE_URL_STG],
     credentials: true,
   })
 );
@@ -51,6 +52,7 @@ app.use("/api/promotion", promotionRouter);
 app.use("/api/language", languageRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/news", newsRouter);
+app.use("/api/midtrans", midtransRouter);
 
 // Cron job untuk menghapus diskon yang telah berakhir
 cron.schedule("0 0 * * *", async () => {

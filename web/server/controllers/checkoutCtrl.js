@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const validateMongodbId = require("../utils/validateMongodbId");
+const { validateMongodbId } = require("../utils/validations");
 const Checkout = require("../models/checkoutModel");
 const Game = require("../models/gameModel");
 const Promotion = require("../models/promotionModel");

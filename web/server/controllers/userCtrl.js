@@ -1,370 +1,639 @@
 const asyncHandler = require("express-async-handler");
-const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const { generateToken } = require("../config/jwtToken");
 const { generateRefreshToken } = require("../config/refreshToken");
-const validateMongodbId = require("../utils/validateMongodbId");
-const sendEmail = require("./emailCtrl");
+const { validateMongodbId, validateEmail, validatePassword, validateOTP, validateUsername } = require("../utils/validations");
+const { generateOTP } = require("../utils/generateOTP");
+const sendEmail = require("../utils/nodemailer");
 const crypto = require("crypto");
+const { errorResponse, successResponse } = require("../utils/response");
+const { clearRefreshTokenCookie, createRefreshTokenCookie } = require("../utils/cookie");
 
-// Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ msg: "Email already exists" });
+  const { email, password, confirmPassword } = req.body;
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  if (!email || !password || !confirmPassword) {
+    return errorResponse(res, 400, "Email, password, and confirm password are required");
+  }
+
+  if (!validateEmail(email)) {
+    return errorResponse(res, 400, "Invalid email address");
+  }
+
+  if (password !== confirmPassword) {
+    return errorResponse(res, 400, "Password and confirm password do not match");
+  }
+
+  if (password.length < 6 || password.length > 20) {
+    return errorResponse(res, 400, "Password must be between 6 and 20 characters");
+  }
+
+  if (!validatePassword(password)) {
+    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return errorResponse(res, 400, "Email already exists");
+    }
+
+    const otp = generateOTP();
     const otpExpires = Date.now() + 1800000;
 
-    user = new User({ email, password, otp, otpExpires });
-    await user.save();
+    const user = await User.create({ email, password, otp, otpExpires });
 
     const body = `Your OTP code is ${otp}. Please enter the code for verification`;
     const data = {
       to: email,
       subject: "Your OTP Code",
-      text: `Your OTP code is ${otp}`,
+      text: body,
       htm: body,
     };
+
     sendEmail(data);
+
     setTimeout(async () => {
-      const userToDelete = await User.findOne({ email, isVerified: false });
-      if (userToDelete) {
-        await User.deleteOne({ _id: userToDelete._id });
-      }
+      await User.deleteOne({ email, isVerified: false });
     }, 1800000);
-    res.status(200).json({ msg: "OTP sent to email", id: user._id });
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
+
+    successResponse(res, { id: user._id }, "OTP sent to email", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Registration failed");
   }
 });
 
-const verifyOTP = async (req, res) => {
+const verifyOTP = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
   const { otp } = req.body;
-  try {
-    const user = await User.findOne({ _id: id });
-    if (user.otp !== otp || user.otpExpires < Date.now()) {
-      return res.status(400).json({ msg: "Invalid or expired OTP" });
-    }
-    user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
-    await user.save();
-    res.status(200).json({ msg: "Verification success" });
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
-  }
-};
 
-const addUserInformation = async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
-  const { username, fullname } = req.body;
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  if (!otp) {
+    return errorResponse(res, 400, "OTP is required");
+  }
+
+  if (!validateOTP(otp)) {
+    return errorResponse(res, 400, "Invalid OTP");
+  }
+
   try {
-    const findUsername = await User.findOne({ username });
-    if (findUsername) return res.status(400).json({ msg: "Username already exists" });
+    const user = await User.findById(id).select("+otp +otpExpires");
+    
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    if (user.isVerified) {
+      return errorResponse(res, 400, "User is already verified");
+    }
+
+    if (Date.now() > user.otpExpires) {
+      return errorResponse(res, 400, "Expired OTP");
+    }
+
+    if (!(await user.isOTPMatched(otp))) {
+      return errorResponse(res, 400, "Invalid OTP");
+    }
+
+    await User.findByIdAndUpdate(id, { otp: null, otpExpires: null, isVerified: true });
+
+    successResponse(res, null, "Verification successful", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Verification failed");
+  }
+});
+
+const addUserInformation = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { username, fullname } = req.body;
+
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  if (!username || !fullname) {
+    return errorResponse(res, 400, "Username and fullname are required");
+  }
+
+  if (username.length < 3 || username.length > 20) {
+    return errorResponse(res, 400, "Username must be between 3 and 20 characters");
+  }
+
+  if (fullname.length < 3 || fullname.length > 50) {
+    return errorResponse(res, 400, "Fullname must be between 3 and 50 characters");
+  }
+
+  if (username.toLowerCase() === fullname.toLowerCase()) {
+    return errorResponse(res, 400, "Username and fullname cannot be the same");
+  }
+
+  if (username.toLowerCase() === "admin" || fullname.toLowerCase() === "admin") {
+    return errorResponse(res, 400, "Username and fullname cannot be 'admin'");
+  }
+
+  if (!validateUsername(username)) {
+    return errorResponse(res, 400, "Username must contain only letters, numbers, and underscores");
+  }
+
+  try {
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return errorResponse(res, 400, "Username already exists");
+    }
+
     const token = generateToken(id);
+
     const user = await User.findByIdAndUpdate(
       id,
-      {
-        username,
-        fullname,
-        refreshToken: token,
-      },
+      { username, fullname, refreshToken: token },
       {
         new: true,
       }
     );
-    res.cookie("refreshToken", token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      secure: true,
-      sameSite: "none",
-    });
-    res.status(200).json({ _id: user._id, username: user.username, email: user.email, fullname: user.fullname, token });
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
-  }
-};
 
-// Login User
-const loginUser = asyncHandler(async (req, res) => {
+    createRefreshTokenCookie(res, token);
+
+    successResponse(
+      res,
+      {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        fullname: user.fullname,
+        token,
+      },
+      "User information added successfully",
+      200
+    );
+  } catch (err) {
+    errorResponse(res, 500, "Failed to add user information");
+  }
+});
+
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return errorResponse(res, 400, "Email and password are required");
+  }
+
+  if (!validateEmail(email) || !validatePassword(password)) {
+    return errorResponse(res, 400, "Invalid email or password");
+  }
+
   try {
-    const user = await User.findOne({ email });
-    if (user && (await user.isPasswordMatched(password))) {
-      const refreshToken = generateRefreshToken(user._id);
-      await User.findByIdAndUpdate(
-        user.id,
-        {
-          refreshToken,
-        },
-        {
-          new: true,
-        }
-      );
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        secure: true,
-        sameSite: "none",
-      });
-      res.status(200).json({
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user || !(await user.isPasswordMatched(password))) {
+      return errorResponse(res, 400, "Invalid email or password");
+    }
+
+    if (!user.isVerified) {
+      return errorResponse(res, 400, "Please verify your email first");
+    }
+
+    if (user.isBlocked) {
+      return errorResponse(res, 400, "Your account has been blocked");
+    }
+
+    const refreshToken = generateRefreshToken(user._id);
+    await user.updateOne({ refreshToken });
+
+    createRefreshTokenCookie(res, refreshToken);
+
+    successResponse(
+      res,
+      {
         _id: user._id,
         username: user.username,
         email: user.email,
         fullname: user.fullname,
         token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ msg: "Invalid Credentials" });
-    }
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
-  }
-});
-
-// Login Admin
-const loginAdmin = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (user.role !== "admin") throw new Error("Not permitted. You are not an admin");
-  if (user && (await user.isPasswordMatched(password))) {
-    const refreshToken = generateRefreshToken(user._id);
-    await User.findByIdAndUpdate(
-      user.id,
-      {
-        refreshToken,
       },
-      {
-        new: true,
-      }
+      "Login successful",
+      200
     );
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      secure: true,
-      sameSite: "none",
-    });
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      fullname: user.fullname,
-      token: generateToken(user._id),
-    });
-  } else {
-    throw new Error("Invalid Credentials");
+  } catch (err) {
+    errorResponse(res, 500, "Login failed");
   }
-});
+};
 
-// Refresh Token
-const handleRefreshToken = asyncHandler(async (req, res) => {
-  const cookie = req.cookies;
-  if (!cookie.refreshToken) throw new Error("No refresh token in cookies");
-  const refreshToken = cookie.refreshToken;
-  const user = await User.findOne({ refreshToken });
-  if (!user) throw new Error("No refresh token present in db or not matched");
-  jwt.verify(refreshToken, process.env.JWT_SECRET, (err, decoded) => {
-    if (err || user.id !== decoded.id) throw new Error("There is something wrong with refresh token");
-    const accessToken = generateToken(user._id);
-    res.json({ accessToken });
-  });
-});
-
-// Logout
-const logout = asyncHandler(async (req, res) => {
-  const cookie = req.cookies;
-  if (!cookie.refreshToken) throw new Error("No refresh token in cookies");
-  const refreshToken = cookie.refreshToken;
-  const user = await User.findOne({ refreshToken });
-  if (!user) {
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true,
-    });
-    return res.sendStatus(204);
-  }
-  await User.findOneAndUpdate(
-    { refreshToken },
-    {
-      refreshToken: "",
-    }
-  );
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: true,
-  });
-  res.sendStatus(204);
-});
-
-const getAllUsers = asyncHandler(async (req, res) => {
-  try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const keyword = req.query.keyword;
-    const skip = (page - 1) * limit;
-    const query = {};
-
-    if (keyword) {
-      query.fullname = { $regex: keyword, $options: "i" };
-    }
-
-    const users = await User.find(query).skip(skip).limit(limit);
-    const total = await User.countDocuments(query);
-    const totalPages = Math.ceil(total / limit);
-
-    res.json({
-      users,
-      total,
-      page,
-      totalPages,
-    });
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
+// Not updated
 const getUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.user;
   validateMongodbId(id);
+
   try {
-    const user = await User.findById(id);
-    res.json(user);
+    const user = await User.findById(id).select("-password");
+
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    successResponse(res, user, "User fetched successfully");
   } catch (error) {
-    throw new Error(error);
+    console.error("Error fetching user:", error);
+
+    if (error.name === "CastError" && error.kind === "ObjectId") {
+      return errorResponse(res, 400, "Invalid user ID");
+    }
+
+    errorResponse(res, 500, "Failed to fetch user");
   }
 });
 
+// Not updated
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.user;
   validateMongodbId(id);
-  try {
-    const updateUser = await User.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    res.json(updateUser);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
 
-const blockUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
   try {
-    await User.findByIdAndUpdate(
-      id,
-      {
-        isBlocked: true,
-      },
-      {
-        new: true,
-      }
-    );
-    res.json({
-      message: "User blocked",
-    });
-  } catch (error) {
-    throw new Error(error);
-  }
-});
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true }).select("-password");
 
-const unblockUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
-  try {
-    await User.findByIdAndUpdate(
-      id,
-      {
-        isBlocked: false,
-      },
-      {
-        new: true,
-      }
-    );
-    res.json({
-      message: "User unblocked",
-    });
+    if (!updatedUser) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    successResponse(res, updatedUser, "User updated successfully");
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to update user");
   }
 });
 
 const changePassword = asyncHandler(async (req, res) => {
   const { id } = req.user;
-  validateMongodbId(id);
-  const { password } = req.body;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  if (!newPassword || !currentPassword || !confirmPassword) {
+    return errorResponse(res, 400, "Please provide all required fields.");
+  }
+
+  if (newPassword !== confirmPassword) {
+    return errorResponse(res, 400, "New password and confirm password do not match.");
+  }
+
+  if (newPassword === currentPassword) {
+    return errorResponse(res, 400, "New password cannot be the same as the current password.");
+  }
+
+  if (newPassword.length < 6 || newPassword.length > 20) {
+    return errorResponse(res, 400, "Password must be between 6 and 20 characters long.");
+  }
+
+  if (!validatePassword(newPassword)) {
+    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+  }
+
   try {
     const user = await User.findById(id);
-    if (password) {
-      user.password = password;
-      await user.save();
-      res.json(user);
-    } else {
-      res.json({
-        message: "The field cannot be empty",
-      });
+
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
     }
+
+    if (!(await user.isPasswordMatched(currentPassword))) {
+      return errorResponse(res, 400, "Current password is incorrect.");
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    clearRefreshTokenCookie(res);
+    successResponse(res, user, "Password changed successfully. Please log in again.", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to change password");
   }
 });
 
 const forgotPasswordToken = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) throw new Error("User not found with this email");
-  const storeBaseURL = process.env.STORE_BASE_URL_DEV;
+
+  if (!email) {
+    return errorResponse(res, 400, "Email is required");
+  }
+
+  if (!validateEmail(email)) {
+    return errorResponse(res, 400, "Invalid email address");
+  }
+
   try {
-    const token = await user.createPasswordResetToken();
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return errorResponse(res, 404, "User not found with this email");
+    }
+
+    if (user.isBlocked) {
+      return errorResponse(res, 400, "Your account has been blocked");
+    }
+
+    const storeBaseURL = process.env.STORE_BASE_URL_DEV;
+    const resetToken = await user.createPasswordResetToken();
     await user.save();
-    const resetURL = `Silahkan klik link ini untuk mereset password Anda. Link ini berlaku hingga 10 menit dari sekarang. <a href="${storeBaseURL}/reset-password/${token}">Klik Disini</a>`;
+
+    const resetURL = `${storeBaseURL}/reset-password/${resetToken}`;
     const data = {
       to: email,
-      subject: "Link Lupa Password",
-      text: "Hey User",
-      htm: resetURL,
+      subject: "Reset Password Link",
+      text: `Hey User, click the link below to reset your password. This link will expire in 10 minutes. ${resetURL}`,
     };
+
     sendEmail(data);
-    res.json(token);
+
+    successResponse(res, { token: resetToken }, "Password reset link sent successfully. Please check your email to reset your password", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to send password reset link");
   }
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { password } = req.body;
+  const { password, confirmPassword } = req.body;
   const { token } = req.params;
+
+  if (!password || !confirmPassword) {
+    return errorResponse(res, 400, "Password and confirm password are required");
+  }
+
+  if (password.length < 6 || password.length > 20) {
+    return errorResponse(res, 400, "Password must be between 6 and 20 characters long");
+  }
+
+  if (password !== confirmPassword) {
+    return errorResponse(res, 400, "Passwords do not match");
+  }
+
+  if (!validatePassword(password)) {
+    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
+  }
+
   try {
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-    const user = await User.findOne({
+
+    const resetUser = await User.findOne({
       passwordResetToken: hashedToken,
       passwordResetExpires: { $gt: Date.now() },
     });
-    if (!user) return res.status(400).json({ msg: "Token expired, please try again later" });
-    user.password = password;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save();
-    res.status(200).json({ _id: user._id, username: user.username, email: user.email, fullname: user.fullname });
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
+
+    if (!resetUser) {
+      return errorResponse(res, 400, "Invalid or expired token. Please try again.");
+    }
+
+    resetUser.password = password;
+    resetUser.passwordResetToken = undefined;
+    resetUser.passwordResetExpires = undefined;
+
+    await resetUser.save();
+
+    successResponse(
+      res,
+      {
+        _id: resetUser._id,
+        username: resetUser.username,
+        email: resetUser.email,
+        fullname: resetUser.fullname,
+      },
+      "Password reset successful. Please login with your new password.",
+      200
+    );
+  } catch (error) {
+    errorResponse(res, 500, "Failed to reset password");
   }
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
+  const { id } = req.user;
+  const { refreshToken } = req.cookies;
+
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  if (!refreshToken) {
+    return errorResponse(res, 400, "No refresh token found");
+  }
+
   try {
-    const deleteUser = await User.findByIdAndDelete(id);
-    res.json(deleteUser);
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    clearRefreshTokenCookie(res);
+    successResponse(res, null, "User deleted successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to delete user");
   }
 });
 
-module.exports = { registerUser, verifyOTP, addUserInformation, loginUser, loginAdmin, handleRefreshToken, logout, getAllUsers, getUser, updateUser, blockUser, unblockUser, changePassword, forgotPasswordToken, resetPassword, deleteUser };
+const handleRefreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    return errorResponse(res, 400, "No refresh token in cookies");
+  }
+
+  try {
+    const user = await User.findOne({ refreshToken });
+
+    if (!user || user.refreshToken !== refreshToken) {
+      return errorResponse(res, 403, "Invalid refresh token");
+    }
+
+    const accessToken = generateToken(user._id);
+    successResponse(res, { accessToken }, "Access token generated successfully", 200);
+  } catch (err) {
+    errorResponse(res, 500, "Failed to handle refresh token");
+  }
+});
+
+const logout = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    return errorResponse(res, 400, "No refresh token in cookies");
+  }
+
+  try {
+    await User.findOneAndUpdate({ refreshToken }, { refreshToken: "" }, { new: true });
+
+    clearRefreshTokenCookie(res);
+    successResponse(res, null, "Logout successful", 200);
+  } catch (err) {
+    errorResponse(res, 500, "Failed to logout");
+  }
+});
+
+// Admin
+const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return errorResponse(res, 400, "Email and password are required");
+  }
+
+  if (!validateEmail(email) || !validatePassword(password)) {
+    return errorResponse(res, 400, "Invalid email or password");
+  }
+
+  try {
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user || !(await user.isPasswordMatched(password))) {
+      return errorResponse(res, 400, "Invalid email or password");
+    }
+
+    if (!user.isVerified) {
+      return errorResponse(res, 400, "Please verify your email first");
+    }
+
+    if (user.isBlocked) {
+      return errorResponse(res, 400, "Your account has been blocked");
+    }
+
+    if (user.role !== "admin") {
+      return errorResponse(res, 403, "Not permitted. You are not an admin");
+    }
+
+    const refreshToken = generateRefreshToken(user._id);
+    await user.updateOne({ refreshToken });
+
+    createRefreshTokenCookie(res, refreshToken);
+
+    successResponse(
+      res,
+      {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        fullname: user.fullname,
+        token: generateToken(user._id),
+      },
+      "Login successful",
+      200
+    );
+  } catch (err) {
+    errorResponse(res, 500, "Login failed");
+  }
+};
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, keyword } = req.query;
+  const sanitizedPage = parseInt(page);
+  const sanitizedLimit = parseInt(limit);
+
+  if (Number.isNaN(sanitizedPage) || sanitizedPage < 1) {
+    return errorResponse(res, 400, "Invalid page parameter");
+  }
+
+  if (Number.isNaN(sanitizedLimit) || sanitizedLimit < 1) {
+    return errorResponse(res, 400, "Invalid limit parameter");
+  }
+
+  const skip = (sanitizedPage - 1) * sanitizedLimit;
+  const query = keyword ? { fullname: { $regex: keyword, $options: "i" } } : {};
+
+  try {
+    const users = await User.find(query).skip(skip).limit(sanitizedLimit).select("-password");
+    const total = await User.countDocuments(query);
+    const totalPages = Math.ceil(total / sanitizedLimit);
+
+    successResponse(res, { users, total, page: sanitizedPage, totalPages }, "Users fetched successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to fetch users");
+  }
+});
+
+const blockUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { isBlocked: true }, { new: true }).select("-password");
+
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    successResponse(res, null, "User blocked successfully", 200);
+  } catch {
+    errorResponse(res, 500, "Failed to block user");
+  }
+});
+
+const unblockUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { isBlocked: false }, { new: true }).select("-password");
+
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    successResponse(res, null, "User unblocked successfully", 200);
+  } catch {
+    errorResponse(res, 500, "Failed to unblock user");
+  }
+});
+
+const changeRole = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  if (!validateMongodbId(id)) {
+    return errorResponse(res, 400, "Invalid user ID");
+  }
+
+  if (!role) {
+    return errorResponse(res, 400, "Role is required");
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { role }, { new: true }).select("-password");
+
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    successResponse(res, { _id: user._id, role: user.role }, "User role updated successfully", 200);
+  } catch {
+    errorResponse(res, 500, "Failed to update user role");
+  }
+});
+
+module.exports = {
+  registerUser,
+  verifyOTP,
+  addUserInformation,
+  loginUser,
+  loginAdmin,
+  handleRefreshToken,
+  logout,
+  getAllUsers,
+  getUser,
+  updateUser,
+  blockUser,
+  unblockUser,
+  changeRole,
+  changePassword,
+  forgotPasswordToken,
+  resetPassword,
+  deleteUser,
+};
