@@ -6,11 +6,6 @@ export const TransactionContext = createContext();
 export const TransactionProvider = ({ children }) => {
   const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "User-Agent": "Veritrans",
-    },
   });
 
   axiosInstance.interceptors.request.use(

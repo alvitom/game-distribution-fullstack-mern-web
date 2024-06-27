@@ -1,12 +1,18 @@
 const Transaction = require("../models/transactionModel");
 const asyncHandler = require("express-async-handler");
 const { errorResponse, successResponse } = require("../utils/response");
+const { verifySignature } = require("../utils/midtrans");
 const sendEmail = require("../utils/nodemailer");
 
 const midtransNotification = asyncHandler(async (req, res) => {
   try {
     const { email } = req.user;
     const notification = req.body;
+    const isVerified = verifySignature(notification);
+
+    // if (!isVerified) {
+    //   errorResponse(res, 400, "Invalid signature");
+    // }
 
     const orderId = notification.order_id;
     const transactionStatus = notification.transaction_status;
@@ -23,6 +29,8 @@ const midtransNotification = asyncHandler(async (req, res) => {
         htm: body,
       };
       sendEmail(data);
+    } else if (transactionStatus === "pending") {
+      status = "pending";
     } else if (transactionStatus === "deny" || transactionStatus === "cancel" || transactionStatus === "expire") {
       status = "failed";
     }

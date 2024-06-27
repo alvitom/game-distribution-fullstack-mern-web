@@ -3,7 +3,7 @@ const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
 const { validateMongodbId } = require("../utils/validations");
 const { successResponse, errorResponse } = require("../utils/response");
-const snap = require("../utils/midtrans");
+const { snap } = require("../utils/midtrans");
 const sendEmail = require("../utils/nodemailer");
 
 const createTransaction = asyncHandler(async (req, res) => {
@@ -40,7 +40,6 @@ const createTransaction = asyncHandler(async (req, res) => {
       orderId,
     });
 
-    
     await Cart.deleteMany({ userId: id, gameId: { $in: items.map((item) => item._id) } });
 
     const body = `Dear customer, your payment for the ${orderId} is currently pending. Please complete your payment to process your order. Thank you!`;
