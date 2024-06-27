@@ -9,20 +9,20 @@ router.post(
   authMiddleware,
   isAdmin,
   upload.fields([
-    { name: "coverImages", maxCount: 5 },
+    { name: "coverImage", maxCount: 1 },
     { name: "images", maxCount: 15 },
-    { name: "videos", maxCount: 5 },
+    { name: "videos", maxCount: 10 },
   ]),
   createGame
 );
 router.get("/", getAllGames);
-router.get("/:id", getGame);
+router.get("/:title", getGame);
 router.put(
   "/:id",
   authMiddleware,
   isAdmin,
   upload.fields([
-    { name: "coverImages", maxCount: 5 },
+    { name: "coverImages", maxCount: 1 },
     { name: "images", maxCount: 15 },
     { name: "videos", maxCount: 5 },
   ]),

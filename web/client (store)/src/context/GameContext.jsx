@@ -14,36 +14,31 @@ export const GameProvider = ({ children }) => {
   const [genre, setGenre] = useState("");
   const [feature, setFeature] = useState("");
   const [platform, setPlatform] = useState("");
-  const limit = 10;
 
   const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   });
 
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const data = JSON.parse(sessionStorage.getItem("user"));
-      if (data) {
-        config.headers["Authorization"] = `Bearer ${data.token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
+//   axiosInstance.interceptors.request.use(
+//     (config) => {
+//       const data = JSON.parse(sessionStorage.getItem("user"));
+//       if (data) {
+//         config.headers["Authorization"] = `Bearer ${data.token}`;
+//       }
+//       return config;
+//     },
+//     (error) => {
+//       return Promise.reject(error);
+//     }
+//   );
 
-  const fetchAllGames = async (page, limit, debouncedKeyword, genre, feature, platform) => {
+  const fetchAllGames = async (page, limit, genre, feature, platform) => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/game`, {
         params: {
           page,
           limit,
-          keyword: debouncedKeyword,
           genre,
           feature,
           platform,
@@ -59,42 +54,15 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  const fetchGame = async (id) => {
+  const fetchGame = async (title) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/game/${id}`);
+      const response = await axiosInstance.get(`/game/${title}`);
       const datas = await response.data;
       setSelectedGame(datas.data);
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      return error.response.data;
-    }
-  };
-
-  const createGame = async (gameData) => {
-    try {
-      const response = await axiosInstance.post("/game", gameData);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
-    }
-  };
-
-  const updateGame = async (id, updatedGame) => {
-    try {
-      const response = await axiosInstance.put(`/game/${id}`, updatedGame);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
-    }
-  };
-
-  const deleteGame = async (id) => {
-    try {
-      const response = await axiosInstance.delete(`/game/${id}`);
-      return response.data;
-    } catch (error) {
       return error.response.data;
     }
   };
@@ -110,7 +78,6 @@ export const GameProvider = ({ children }) => {
         page,
         setPage,
         totalPages,
-        limit,
         keyword,
         setKeyword,
         debouncedKeyword,
@@ -120,9 +87,6 @@ export const GameProvider = ({ children }) => {
         platform,
         fetchAllGames,
         fetchGame,
-        createGame,
-        updateGame,
-        deleteGame,
       }}
     >
       {children}

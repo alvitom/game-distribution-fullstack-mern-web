@@ -104,6 +104,10 @@ footer a:hover {
 /* End Footer */
 
 /* Game Card */
+.game-card {
+  transition: 0.3s all;
+}
+
 .game-card .action-btn {
   top: 2%;
   right: 8%;
@@ -115,6 +119,10 @@ footer a:hover {
   padding: 0;
   border-radius: 50%;
   display: none;
+}
+
+.game-card:hover {
+  filter: grayscale(100%);
 }
 
 .game-card:hover .action-btn button {
@@ -132,6 +140,36 @@ footer a:hover {
 .mantine-Modal-content .mantine-Modal-header,
 .mantine-Modal-content .mantine-Modal-body {
   background-color: var(--color-252429) !important;
+}
+
+.mantine-Input-input {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+.mantine-Fieldset-root .mantine-Fieldset-legend {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.mantine-Fieldset-root {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+.mantine-NavLink-root {
+  color: #fff !important;
+
+  &[data-active] {
+    &,
+    &:hover {
+      background-color: rgb(25, 135, 84);
+    }
+  }
+}
+
+.mantine-NavLink-root:hover {
+  background-color: rgb(25, 135, 84) !important;
 }
 
 /* Home Page */
@@ -262,6 +300,79 @@ footer a:hover {
 
 /* End Wishlist Page */
 
+/* Change Password Page */
+.change-password-wrapper {
+  background-color: var(--color-121212);
+  min-height: 37.4vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.change-password-wrapper .auth-card {
+  background-color: #222;
+  border-radius: 10px;
+  padding: 50px;
+  width: 31%;
+}
+
+.change-password-wrapper .auth-card input {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #ccc;
+}
+
+.change-password-wrapper .auth-card input::-webkit-input-placeholder {
+  color: #aaa;
+}
+
+.change-password-wrapper .auth-card h1 {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.change-password-wrapper .auth-card button {
+  border-radius: 20px;
+}
+
+/* End Change Password Page */
+
+/* Profile Page */
+.profile-container,
+.profile-Navlink-container {
+  padding: 20px;
+  background-color: var(--color-252429);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-container .form-group {
+  margin-bottom: 15px;
+}
+
+.profile-container .form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.profile-container .form-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: transparent;
+}
+
+/* End Profile Page */
+
 /* Login Page */
 .auth-wrapper {
   background-color: var(--color-121212);
@@ -346,8 +457,48 @@ footer a:hover {
 /* End Blog Page */
 
 /* Game Detail Page */
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  width: 100%;
+  gap: 20px;
+}
+
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-container .scroll-button {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-container .scroll-button.left {
+  left: 0;
+}
+
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-container .scroll-button.right {
+  right: 0;
+}
+
 .game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-items .img-gallery-item {
   width: 100px;
+}
+
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-items img.active {
+  border: 2px solid #555;
+  transform: scale(1.1);
+  filter: grayscale(100%);
+}
+
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-items img.active:hover {
+  transform: scale(1.1);
+}
+
+.game-detail-wrapper .img-gallery-wrapper .img-gallery .img-gallery-items img:hover {
+  transform: scale(1.05);
 }
 
 .game-detail-wrapper .game-image-original img {

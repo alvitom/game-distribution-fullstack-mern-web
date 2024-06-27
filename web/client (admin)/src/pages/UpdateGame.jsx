@@ -105,7 +105,7 @@ const UpdateGame = (props) => {
     images: [],
     systemRequirements: {},
     videos: [],
-    coverImages: [],
+    coverImage: {},
     fileDownload: "",
   });
 
@@ -128,7 +128,7 @@ const UpdateGame = (props) => {
         images: selectedGame.images,
         systemRequirements: selectedGame.systemRequirements,
         videos: selectedGame.videos,
-        coverImages: selectedGame.coverImages,
+        coverImage: selectedGame.coverImage,
         fileDownload: selectedGame.fileDownload,
       });
     }
@@ -168,9 +168,7 @@ const UpdateGame = (props) => {
     formData.append("price", game.price);
     formData.append("systemRequirements", JSON.stringify(systemRequirements));
     formData.append("fileDownload", game.fileDownload.path);
-    game.coverImages.forEach((image) => {
-      formData.append(`coverImages`, image);
-    });
+    formData.append("coverImage", game.coverImage);
     game.images.forEach((image) => {
       formData.append(`images`, image);
     });
@@ -180,7 +178,7 @@ const UpdateGame = (props) => {
     await updateGame(id, formData);
   };
 
-  const uploadCoverImages = (files) => {
+  const uploadCoverImage = (files) => {
     files.map((file) => {
       Object.assign(file, {
         preview: URL.createObjectURL(file),
@@ -188,7 +186,7 @@ const UpdateGame = (props) => {
     });
     setGame((prevState) => ({
       ...prevState,
-      coverImages: [...prevState.coverImages, ...files],
+      coverImage: files[0],
     }));
   };
 
@@ -225,17 +223,12 @@ const UpdateGame = (props) => {
 
   useEffect(() => {
     return () => {
-      game.coverImages.forEach((file) => URL.revokeObjectURL(file.preview));
+      URL.revokeObjectURL(game.coverImage.preview);
       game.images.forEach((file) => URL.revokeObjectURL(file.preview));
       game.videos.forEach((file) => URL.revokeObjectURL(file.preview));
     };
-  }, [game.coverImages, game.images, game.videos]);
+  }, [game.coverImage, game.images, game.videos]);
 
-  const coverImages = game.coverImages.map((image, index) => (
-    <div className="col-2 mt-2" key={index}>
-      <img src={image.url || image.preview} alt={image.name} className="img-fluid" />
-    </div>
-  ));
   const images = game.images.map((image, index) => (
     <div className="col-2 mt-2" key={index}>
       <img src={image.url || image.preview} alt={image.name} className="img-fluid" />
@@ -265,7 +258,7 @@ const UpdateGame = (props) => {
 
   return (
     <>
-      <div className="add-game-wrapper">
+      <div className="update-game-wrapper">
         <h1>Update Game</h1>
         <div className="d-flex flex-column gap-4">
           <div className="d-flex flex-column gap-2">
@@ -514,81 +507,91 @@ const UpdateGame = (props) => {
             </div>
           )}
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="cover-images">Cover Images</label>
-            <Dropzone onDrop={uploadCoverImages} onReject={(files) => console.log("rejected files", files)} maxSize={5 * 1024 ** 2} accept={IMAGE_MIME_TYPE} {...props}>
-              <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
-                <Dropzone.Accept>
-                  <FaUpload style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
-                </Dropzone.Accept>
-                <Dropzone.Reject>
-                  <MdClose style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
-                </Dropzone.Reject>
-                <Dropzone.Idle>
-                  <FaImages style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
-                </Dropzone.Idle>
+            <label htmlFor="cover-image">Cover Image</label>
+            {Object.keys(game.coverImage).length === 0 && (
+              <Dropzone onDrop={uploadCoverImage} onReject={(files) => console.log("rejected files", files)} maxSize={5 * 1024 ** 2} accept={IMAGE_MIME_TYPE} {...props}>
+                <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
+                  <Dropzone.Accept>
+                    <FaUpload style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
+                  </Dropzone.Accept>
+                  <Dropzone.Reject>
+                    <MdClose style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
+                  </Dropzone.Reject>
+                  <Dropzone.Idle>
+                    <FaImages style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
+                  </Dropzone.Idle>
 
-                <div>
-                  <Text size="xl" inline>
-                    Drag cover images here or click to select files
-                  </Text>
-                  <Text size="sm" c="dimmed" inline mt={7}>
-                    Attach as many files as you like, each file should not exceed 5mb
-                  </Text>
-                </div>
-              </Group>
-            </Dropzone>
-            <div className="row">{coverImages}</div>
+                  <div>
+                    <Text size="xl" inline>
+                      Drag cover images here or click to select files
+                    </Text>
+                    <Text size="sm" c="dimmed" inline mt={7}>
+                      Attach as many files as you like, each file should not exceed 5mb
+                    </Text>
+                  </div>
+                </Group>
+              </Dropzone>
+            )}
+            <div className="row">
+              <div className="col-2 mt-2">
+                <img src={game.coverImage.url || game.coverImage.preview} alt={game.coverImage.name} className="img-fluid" />
+              </div>
+            </div>
           </div>
           <div className="d-flex flex-column gap-2">
             <label htmlFor="images">Images</label>
-            <Dropzone onDrop={uploadImages} onReject={(files) => console.log("rejected files", files)} maxSize={5 * 1024 ** 2} accept={IMAGE_MIME_TYPE} {...props}>
-              <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
-                <Dropzone.Accept>
-                  <FaUpload style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
-                </Dropzone.Accept>
-                <Dropzone.Reject>
-                  <MdClose style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
-                </Dropzone.Reject>
-                <Dropzone.Idle>
-                  <FaImages style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
-                </Dropzone.Idle>
+            {game.images.length < 15 && (
+              <Dropzone onDrop={uploadImages} onReject={(files) => console.log("rejected files", files)} maxSize={5 * 1024 ** 2} accept={IMAGE_MIME_TYPE} {...props}>
+                <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
+                  <Dropzone.Accept>
+                    <FaUpload style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
+                  </Dropzone.Accept>
+                  <Dropzone.Reject>
+                    <MdClose style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
+                  </Dropzone.Reject>
+                  <Dropzone.Idle>
+                    <FaImages style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
+                  </Dropzone.Idle>
 
-                <div>
-                  <Text size="xl" inline>
-                    Drag images here or click to select files
-                  </Text>
-                  <Text size="sm" c="dimmed" inline mt={7}>
-                    Attach as many files as you like, each file should not exceed 5mb
-                  </Text>
-                </div>
-              </Group>
-            </Dropzone>
+                  <div>
+                    <Text size="xl" inline>
+                      Drag images here or click to select files
+                    </Text>
+                    <Text size="sm" c="dimmed" inline mt={7}>
+                      Attach as many files as you like, each file should not exceed 5mb
+                    </Text>
+                  </div>
+                </Group>
+              </Dropzone>
+            )}
             <div className="row">{images}</div>
           </div>
           <div className="d-flex flex-column gap-2">
             <label htmlFor="videos">Videos</label>
-            <Dropzone onDrop={uploadVideos} onReject={(files) => console.log("rejected files", files)} maxSize={200 * 1024 ** 2} accept={[MIME_TYPES.mp4]} {...props}>
-              <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
-                <Dropzone.Accept>
-                  <FaUpload style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
-                </Dropzone.Accept>
-                <Dropzone.Reject>
-                  <MdClose style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
-                </Dropzone.Reject>
-                <Dropzone.Idle>
-                  <FaVideo style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
-                </Dropzone.Idle>
+            {game.videos.length < 10 && (
+              <Dropzone onDrop={uploadVideos} onReject={(files) => console.log("rejected files", files)} maxSize={200 * 1024 ** 2} accept={[MIME_TYPES.mp4]} {...props}>
+                <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
+                  <Dropzone.Accept>
+                    <FaUpload style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
+                  </Dropzone.Accept>
+                  <Dropzone.Reject>
+                    <MdClose style={{ width: rem(52), height: rem(52) }} stroke={1.5} />
+                  </Dropzone.Reject>
+                  <Dropzone.Idle>
+                    <FaVideo style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
+                  </Dropzone.Idle>
 
-                <div>
-                  <Text size="xl" inline>
-                    Drag videos here or click to select files
-                  </Text>
-                  <Text size="sm" c="dimmed" inline mt={7}>
-                    Attach as many files as you like, each file should not exceed 2gb
-                  </Text>
-                </div>
-              </Group>
-            </Dropzone>
+                  <div>
+                    <Text size="xl" inline>
+                      Drag videos here or click to select files
+                    </Text>
+                    <Text size="sm" c="dimmed" inline mt={7}>
+                      Attach as many files as you like, each file should not exceed 2gb
+                    </Text>
+                  </div>
+                </Group>
+              </Dropzone>
+            )}
             <div className="row">{videos}</div>
           </div>
           <div className="d-flex flex-column gap-2">

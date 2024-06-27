@@ -21,6 +21,8 @@ import Game from "./pages/Game";
 import VerifyOTP from "./pages/VerifyOTP";
 import AddUserInformation from "./pages/AddUserInformation";
 import NotFound from "./pages/NotFound";
+import ChangePassword from "./pages/ChangePassword";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
@@ -38,9 +40,11 @@ const App = () => {
             <Route path="collection/new-release" element={<NewReleaseCollection />} />
             <Route path="cart" element={<Cart />} />
             <Route path="wishlist" element={<Wishlist />} />
-            <Route path="game/id" element={<GameDetail />} />
+            <Route path="game/:title" element={<GameDetail />} />
             <Route path="blog/id" element={<BlogDetail />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="change-password" element={<ChangePassword />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

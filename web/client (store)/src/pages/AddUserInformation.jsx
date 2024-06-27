@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Meta from "../components/Meta";
 import { AuthContext } from "../context/AuthContext";
 import { modals } from "@mantine/modals";
@@ -9,10 +9,15 @@ const AddUserInformation = () => {
   const { id } = useParams();
   const [username, setUsername] = useState("");
   const [fullname, setFullname] = useState("");
-  const { addUserInformation, error } = useContext(AuthContext);
+  const { addUserInformation } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (error) {
+  const handleAddUserInfo = async () => {
+    const userData = {
+      username,
+      fullname,
+    };
+    const response = await addUserInformation(id, userData);
+    if (!response.success) {
       return modals.open({
         radius: "md",
         size: "xs",
@@ -23,7 +28,7 @@ const AddUserInformation = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">{error}</p>
+            <p className="text-center">{response.message}</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
@@ -39,17 +44,8 @@ const AddUserInformation = () => {
           </>
         ),
       });
-    }
-  }, [error]);
-
-  const handleAddUserInfo = async () => {
-    const userData = {
-      username,
-      fullname,
-    };
-    const data = await addUserInformation(id, userData);
-    if (data) {
-      sessionStorage.setItem("user", JSON.stringify(data));
+    } else {
+      sessionStorage.setItem("user", JSON.stringify(response.data));
       location.href = "/";
     }
   };

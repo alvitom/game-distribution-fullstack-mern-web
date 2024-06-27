@@ -42,9 +42,36 @@ export const Navbar = () => {
   ));
 
   const handleLogout = async () => {
-    await logout();
-    sessionStorage.removeItem("user");
-    location.reload();
+    const response = await logout();
+    if (!response.success) {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      sessionStorage.removeItem("user");
+      location.href = "/login";
+    }
   };
 
   const openLogoutModal = () =>

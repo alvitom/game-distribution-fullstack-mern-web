@@ -24,6 +24,8 @@ import AddLanguage from "./pages/AddLanguage";
 import UpdateLanguage from "./pages/UpdateLanguage";
 import UpdatePromotion from "./pages/UpdatePromotion";
 import AddPromotion from "./pages/AddPromotion";
+import ChangePassword from "./pages/ChangePassword";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
@@ -51,10 +53,12 @@ const App = () => {
             <Route path="languages" element={<Languages />} />
             <Route path="languages/add" element={<AddLanguage />} />
             <Route path="languages/update/:id" element={<UpdateLanguage />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="change-password" element={<ChangePassword />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
     </>

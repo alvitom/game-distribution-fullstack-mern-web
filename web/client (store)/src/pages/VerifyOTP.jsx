@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Meta from "../components/Meta";
 import { PinInput } from "@mantine/core";
 import { AuthContext } from "../context/AuthContext";
@@ -9,10 +9,14 @@ import { MdClose } from "react-icons/md";
 const VerifyOTP = () => {
   const { id } = useParams();
   const [otp, setOTP] = useState(null);
-  const { verifyOTP, error } = useContext(AuthContext);
+  const { verifyOTP } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (error) {
+  const handleVerify = async () => {
+    const userData = {
+      otp: otp,
+    };
+    const response = await verifyOTP(id, userData);
+    if (!response.success) {
       return modals.open({
         radius: "md",
         size: "xs",
@@ -23,7 +27,7 @@ const VerifyOTP = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">{error}</p>
+            <p className="text-center">{response.message}</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
@@ -38,15 +42,7 @@ const VerifyOTP = () => {
           </>
         ),
       });
-    }
-  }, [error]);
-
-  const handleVerify = async () => {
-    const userData = {
-      otp: +otp,
-    };
-    const data = await verifyOTP(id, userData);
-    if (data) {
+    } else {
       location.href = `/add-user-information/${id}`;
     }
   };

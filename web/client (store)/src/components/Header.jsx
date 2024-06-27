@@ -1,11 +1,13 @@
 import { Avatar, Menu, UnstyledButton } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import React, { useContext, useEffect, useState } from "react";
-import { FaShoppingCart, FaSearch, FaHeart, FaTrash } from "react-icons/fa";
+import React, { useContext, useState } from "react";
+import { FaShoppingCart, FaSearch, FaHeart, FaTrash, FaExchangeAlt } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { MdLogout } from "react-icons/md";
+import { MdClose, MdLogout, MdManageAccounts, MdAccountCircle, MdOutlineSettings } from "react-icons/md";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import { WishlistContext } from "../context/WishlistContext";
+import { CartContext } from "../context/CartContext";
 
 const user = JSON.parse(sessionStorage.getItem("user"));
 
@@ -13,7 +15,7 @@ const UserButton = () => {
   return (
     <div className="account d-flex gap-2 align-items-center">
       <div className="account-image">
-        <Avatar size="md" radius="sm" src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png" />
+        {user.image ? <Avatar size="md" radius="sm" src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png" /> : <MdAccountCircle style={{ width: 40 + "px", height: 40 + "px" }} />}
       </div>
       <div className="account-details d-flex flex-column">
         <span className="name">{user.username}</span>
@@ -26,10 +28,13 @@ const UserButton = () => {
 
 const Header = () => {
   const [active, setActive] = useState("Home");
-  const { logout, deleteAccount, error } = useContext(AuthContext);
+  const { logout, deleteAccount } = useContext(AuthContext);
+  const { wishlists } = useContext(WishlistContext);
+  const { carts } = useContext(CartContext);
 
-  useEffect(() => {
-    if (error) {
+  const handleLogout = async () => {
+    const response = await logout();
+    if (!response.success) {
       return modals.open({
         radius: "md",
         size: "xs",
@@ -40,7 +45,7 @@ const Header = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">{error}</p>
+            <p className="text-center">{response.message}</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
@@ -54,13 +59,10 @@ const Header = () => {
           </>
         ),
       });
+    } else {
+      sessionStorage.removeItem("user");
+      location.href = "/";
     }
-  }, [error]);
-
-  const handleLogout = async () => {
-    await logout();
-    sessionStorage.removeItem("user");
-    location.href = "/";
   };
 
   const openLogoutModal = () =>
@@ -84,9 +86,36 @@ const Header = () => {
     });
 
   const handleDeleteAccount = async () => {
-    await deleteAccount(user._id);
-    sessionStorage.removeItem("user");
-    location.href = "/";
+    const response = await deleteAccount();
+    if (!response.success) {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      sessionStorage.removeItem("user");
+      location.href = "/";
+    }
   };
 
   const openDeleteAccountModal = () =>
@@ -142,11 +171,16 @@ const Header = () => {
                   </Menu.Target>
 
                   <Menu.Dropdown>
-                    <Menu.Item /* leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />} */>Akun Saya</Menu.Item>
-                    <Menu.Item /* leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />} */>Pengaturan</Menu.Item>
+                    <Menu.Item leftSection={<MdManageAccounts />} onClick={() => (location.href = "/profile")}>
+                      My Profile
+                    </Menu.Item>
+                    {/* <Menu.Item leftSection={<MdOutlineSettings />}>Settings</Menu.Item> */}
+                    <Menu.Item leftSection={<FaExchangeAlt />} onClick={() => (location.href = "/change-password")}>
+                      Change Password
+                    </Menu.Item>
                     <Menu.Divider />
                     <Menu.Item color="red" leftSection={<FaTrash />} onClick={openDeleteAccountModal}>
-                      Hapus Akun
+                      Delete Account
                     </Menu.Item>
                     <Menu.Item color="red" leftSection={<MdLogout />} onClick={openLogoutModal}>
                       Logout
@@ -218,7 +252,7 @@ const Header = () => {
                   }}
                 >
                   <FaHeart className="fs-3" />
-                  {user && <span className="wishlist-badge position-absolute bg-danger">0</span>}
+                  {user && <span className="wishlist-badge position-absolute bg-danger">{wishlists.length}</span>}
                 </Link>
               </div>
               <div className="cart">
@@ -231,7 +265,7 @@ const Header = () => {
                   }}
                 >
                   <FaShoppingCart className="fs-3" />
-                  {user && <span className="cart-badge position-absolute bg-danger">0</span>}
+                  {user && <span className="cart-badge position-absolute bg-danger">{carts.length}</span>}
                 </Link>
               </div>
             </div>

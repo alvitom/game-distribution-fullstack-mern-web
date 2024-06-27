@@ -2,10 +2,10 @@ import React, { useContext } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Avatar, UnstyledButton } from "@mantine/core";
 import { Menu } from "@mantine/core";
-import { MdClose, MdLogout } from "react-icons/md";
+import { MdClose, MdLogout, MdManageAccounts } from "react-icons/md";
 import { AuthContext } from "../context/AuthContext";
 import { modals } from "@mantine/modals";
-import { FaTrash, FaCheck } from "react-icons/fa";
+import { FaTrash, FaCheck, FaExchangeAlt } from "react-icons/fa";
 
 const user = JSON.parse(sessionStorage.getItem("user"));
 
@@ -28,9 +28,36 @@ const Header = () => {
   const { logout, deleteAccount } = useContext(AuthContext);
 
   const handleLogout = async () => {
-    await logout();
-    sessionStorage.removeItem("user");
-    location.reload();
+    const response = await logout();
+    if (!response.success) {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      sessionStorage.removeItem("user");
+      location.href = "/login";
+    }
   };
 
   const openLogoutModal = () =>
@@ -54,36 +81,9 @@ const Header = () => {
     });
 
   const handleDeleteAccount = async () => {
-    const data = await deleteAccount(user._id);
-    if (data) {
-      modals.open({
-        radius: "md",
-        size: "xs",
-        centered: true,
-        withCloseButton: false,
-        children: (
-          <>
-            <div className="d-flex justify-content-center mb-2">
-              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
-            </div>
-            <p className="text-center">Delete account success</p>
-            <div className="d-flex justify-content-center">
-              <button
-                className="btn btn-light"
-                onClick={() => {
-                  modals.closeAll();
-                  sessionStorage.removeItem("user");
-                  location.reload();
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </>
-        ),
-      });
-    } else {
-      modals.open({
+    const response = await deleteAccount();
+    if (!response.success) {
+      return modals.open({
         radius: "md",
         size: "xs",
         centered: true,
@@ -93,12 +93,39 @@ const Header = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">Delete account failed</p>
+            <p className="text-center">{response.message}</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                  sessionStorage.removeItem("user");
+                  location.href = "/login";
                 }}
               >
                 Close
@@ -152,11 +179,16 @@ const Header = () => {
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Item /* leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />} */>Akun Saya</Menu.Item>
-                <Menu.Item /* leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />} */>Pengaturan</Menu.Item>
+                <Menu.Item leftSection={<MdManageAccounts />} onClick={() => (location.href = "/profile")}>
+                  My Profile
+                </Menu.Item>
+                {/* <Menu.Item leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>Pengaturan</Menu.Item> */}
+                <Menu.Item leftSection={<FaExchangeAlt />} onClick={() => (location.href = "/change-password")}>
+                  Change Password
+                </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item color="red" leftSection={<FaTrash />} onClick={openDeleteAccountModal}>
-                  Hapus Akun
+                  Delete Account
                 </Menu.Item>
                 <Menu.Item color="red" leftSection={<MdLogout />} onClick={openLogoutModal}>
                   Logout

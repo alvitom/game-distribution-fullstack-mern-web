@@ -36,18 +36,45 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     try {
       const response = await axiosInstance.post(`/user/login-admin`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      console.error("Login admin failed:", error);
+      return error.response.data;
     }
   };
 
   const logout = async () => {
     try {
-      await axiosInstance.get(`/user/logout`);
+      const response = await axiosInstance.get(`/user/logout`);
+      return response.data;
     } catch (error) {
-      console.error("Logout failed:", error);
+      return error.response.data;
+    }
+  };
+
+  const forgotPassword = async (userData) => {
+    try {
+      const response = await axiosInstance.post(`/user/forgot-password-token`, userData);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  };
+
+  const resetPassword = async (token, userData) => {
+    try {
+      const response = await axiosInstance.put(`/user/reset-password/${token}`, userData);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  };
+
+  const changePassword = async (userData) => {
+    try {
+      const response = await axiosInstance.put(`/user/change-password`, userData);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
     }
   };
 
@@ -61,77 +88,45 @@ export const AuthProvider = ({ children }) => {
           keyword: debouncedKeyword,
         },
       });
-      const data = await response.data;
-      setUsers(data.users);
-      setTotalPages(data.totalPages);
+      const datas = await response.data;
+      setUsers(datas.data.users);
+      setTotalPages(datas.data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching users:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
   const blockUser = async (id) => {
     try {
       const response = await axiosInstance.put(`/user/block/${id}`);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      console.error("Error blocking users:", error);
+      return error.response.data;
     }
   };
 
   const unblockUser = async (id) => {
     try {
       const response = await axiosInstance.put(`/user/unblock/${id}`);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      console.error("Error unblocking users:", error);
+      return error.response.data;
     }
   };
 
-  const deleteAccount = async (id) => {
+  const deleteAccount = async () => {
     try {
-      const response = await axiosInstance.delete(`/user/${id}`);
-      const data = await response.data;
-      return data;
+      const response = await axiosInstance.delete(`/user`);
+      return response.data;
     } catch (error) {
-      console.error("Error deleting account:", error);
-    }
-  };
-
-  const createGame = async (game) => {
-    try {
-      const response = await axiosInstance.post("/game", game);
-      const data = await response.data;
-      setGames([...games, data]);
-    } catch (error) {
-      console.error("Error creating game:", error);
-    }
-  };
-
-  const updateGame = async (id, updatedGame) => {
-    try {
-      const response = await axiosInstance.put(`/game/${id}`, updatedGame);
-      const data = await response.data;
-      setGames(games.map((game) => (game._id === id ? data : game)));
-    } catch (error) {
-      console.error("Error updating game:", error);
-    }
-  };
-
-  const deleteGame = async (id) => {
-    try {
-      await axiosInstance.delete(`/game/${id}`);
-      setGames(games.filter((game) => game._id !== id));
-    } catch (error) {
-      console.error("Error deleting game:", error);
+      return error.response.data;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ users, setUsers, loading, setLoading, page, setPage, totalPages, limit, keyword, setKeyword, debouncedKeyword, setDebouncedKeyword, fetchAllUsers, login, logout, blockUser, unblockUser, deleteAccount }}>
+    <AuthContext.Provider value={{ users, setUsers, loading, setLoading, page, setPage, totalPages, limit, keyword, setKeyword, debouncedKeyword, setDebouncedKeyword, fetchAllUsers, login, logout, forgotPassword, resetPassword, changePassword, blockUser, unblockUser, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

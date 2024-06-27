@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import Meta from "../components/Meta";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -7,10 +7,23 @@ import "swiper/css/navigation";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import GameCard from "../components/GameCard";
 import BtnSlider from "../components/BtnSlider";
+import { GameContext } from "../context/GameContext";
+import { Link } from "react-router-dom";
 
 const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Home = () => {
+  const { fetchAllGames, games, loading } = useContext(GameContext);
+  const limit = 4;
+
+  useEffect(() => {
+    fetchAllGames(null, limit);
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   const handleAddToWishlist = () => {
     if (!user) {
       location.href = "/login";
@@ -36,154 +49,45 @@ const Home = () => {
               modules={[Autoplay, Pagination]}
               className="mySwiper"
             >
-              <SwiperSlide>
-                <div className="carousel-wrapper row">
-                  <div className="col-8">
-                    <img src="/images/easportsfc24standardedition-eacanada-s1-2560x1440-b8f47ad67d72.avif" alt="" className="img-fluid" />
-                  </div>
-                  <div className="col-4">
-                    <div className="d-flex flex-wrap gap-3">
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-03-1920x1080-6f38923efc79.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-04-1920x1080-888c9f17f2e1.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-05-1920x1080-332cc58b6aed.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-06-1920x1080-8799703619bf.avif" alt="" className="img-fluid" />
-                      </button>
+              {games.map((game, index) => (
+                <SwiperSlide key={index}>
+                  <div className="carousel-wrapper row">
+                    <div className="col-8">
+                      <img src={game.images.reverse()[0]?.url} alt="" className="img-fluid" />
                     </div>
-                    <div className="details d-flex flex-column justify-content-between mt-4">
-                      <p className="text-start">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, quo perspiciatis nisi optio esse qui in adipisci rem numquam debitis saepe eveniet molestias ipsa a cupiditate consequuntur iste maiores commodi!
-                      </p>
-                      <p className="text-start price">IDR 300,750</p>
-                      <div className="btn-action d-flex gap-3">
-                        <a href="/game/id" className="btn btn-success">
-                          Beli Sekarang
-                        </a>
-                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
-                          Tambah ke Wishlist
-                        </button>
+                    <div className="col-4">
+                      <div className="d-flex flex-wrap gap-3">
+                        {game.images.slice(0, 4).reverse().map((image, index) => (
+                          <>
+                            <button className="border-0" key={index}>
+                              <img src={image.url} alt={image.url} className="img-fluid" />
+                            </button>
+                          </>
+                        ))}
+                      </div>
+                      <div className="details d-flex flex-column justify-content-between mt-4">
+                        <h3 className="text-start mb-2">{game.title}</h3>
+                        <p className="text-start">{game.description}</p>
+                        <p className="text-start price">
+                          {new Intl.NumberFormat("id-ID", {
+                            style: "currency",
+                            currency: "IDR",
+                            minimumFractionDigits: 0,
+                          }).format(game.price)}
+                        </p>
+                        <div className="btn-action d-flex gap-3">
+                          <Link to={`/game/${game.slug}`} className="btn btn-success">
+                            Beli Sekarang
+                          </Link>
+                          <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
+                            Tambah ke Wishlist
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </SwiperSlide>
-              <SwiperSlide>
-                <div className="carousel-wrapper row">
-                  <div className="col-8">
-                    <img src="/images/easportsfc24standardedition-eacanada-s1-2560x1440-b8f47ad67d72.avif" alt="" className="img-fluid" />
-                  </div>
-                  <div className="col-4">
-                    <div className="d-flex flex-wrap gap-3">
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-03-1920x1080-6f38923efc79.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-04-1920x1080-888c9f17f2e1.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-05-1920x1080-332cc58b6aed.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-06-1920x1080-8799703619bf.avif" alt="" className="img-fluid" />
-                      </button>
-                    </div>
-                    <div className="details d-flex flex-column justify-content-between mt-4">
-                      <p className="text-start">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, quo perspiciatis nisi optio esse qui in adipisci rem numquam debitis saepe eveniet molestias ipsa a cupiditate consequuntur iste maiores commodi!
-                      </p>
-                      <p className="text-start price">IDR 300,750</p>
-                      <div className="btn-action d-flex gap-3">
-                        <a href="/game/id" className="btn btn-success">
-                          Beli Sekarang
-                        </a>
-                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
-                          Tambah ke Wishlist
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-              <SwiperSlide>
-                <div className="carousel-wrapper row">
-                  <div className="col-8">
-                    <img src="/images/easportsfc24standardedition-eacanada-s1-2560x1440-b8f47ad67d72.avif" alt="" className="img-fluid" />
-                  </div>
-                  <div className="col-4">
-                    <div className="d-flex flex-wrap gap-3">
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-03-1920x1080-6f38923efc79.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-04-1920x1080-888c9f17f2e1.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-05-1920x1080-332cc58b6aed.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-06-1920x1080-8799703619bf.avif" alt="" className="img-fluid" />
-                      </button>
-                    </div>
-                    <div className="details d-flex flex-column justify-content-between mt-4">
-                      <p className="text-start">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, quo perspiciatis nisi optio esse qui in adipisci rem numquam debitis saepe eveniet molestias ipsa a cupiditate consequuntur iste maiores commodi!
-                      </p>
-                      <p className="text-start price">IDR 300,750</p>
-                      <div className="btn-action d-flex gap-3">
-                        <a href="/game/id" className="btn btn-success">
-                          Beli Sekarang
-                        </a>
-                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
-                          Tambah ke Wishlist
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-              <SwiperSlide>
-                <div className="carousel-wrapper row">
-                  <div className="col-8">
-                    <img src="/images/easportsfc24standardedition-eacanada-s1-2560x1440-b8f47ad67d72.avif" alt="" className="img-fluid" />
-                  </div>
-                  <div className="col-4">
-                    <div className="d-flex flex-wrap gap-3">
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-03-1920x1080-6f38923efc79.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-04-1920x1080-888c9f17f2e1.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-05-1920x1080-332cc58b6aed.avif" alt="" className="img-fluid" />
-                      </button>
-                      <button className="border-0">
-                        <img src="/images/egs-easportsfc24standardedition-eacanada-g1a-06-1920x1080-8799703619bf.avif" alt="" className="img-fluid" />
-                      </button>
-                    </div>
-                    <div className="details d-flex flex-column justify-content-between mt-4">
-                      <p className="text-start">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, quo perspiciatis nisi optio esse qui in adipisci rem numquam debitis saepe eveniet molestias ipsa a cupiditate consequuntur iste maiores commodi!
-                      </p>
-                      <p className="text-start price">IDR 300,750</p>
-                      <div className="btn-action d-flex gap-3">
-                        <a href="/game/id" className="btn btn-success">
-                          Beli Sekarang
-                        </a>
-                        <button className="btn btn-outline-light" onClick={handleAddToWishlist}>
-                          Tambah ke Wishlist
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
+                </SwiperSlide>
+              ))}
             </Swiper>
           </section>
           <section className="discount-section py-4">
@@ -252,12 +156,9 @@ const Home = () => {
                   Lihat Semua
                 </a>
               </div>
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
+              {games.map((game) => (
+                <GameCard page="home" data={game} key={game._id} />
+              ))}
             </div>
           </section>
           <section className="most-played-section py-4">
@@ -268,12 +169,9 @@ const Home = () => {
                   Lihat Semua
                 </a>
               </div>
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
+              {games.map((game) => (
+                <GameCard page="home" data={game} key={game._id} />
+              ))}
             </div>
           </section>
           <section className="upcoming-section py-4">
@@ -284,12 +182,9 @@ const Home = () => {
                   Lihat Semua
                 </a>
               </div>
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
+              {games.map((game) => (
+                <GameCard page="home" data={game} key={game._id} />
+              ))}
             </div>
           </section>
           <section className="trending-section py-4">
@@ -300,12 +195,9 @@ const Home = () => {
                   Lihat Semua
                 </a>
               </div>
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
+              {games.map((game) => (
+                <GameCard page="home" data={game} key={game._id} />
+              ))}
             </div>
           </section>
           <section className="new-release-section py-4">
@@ -316,12 +208,9 @@ const Home = () => {
                   Lihat Semua
                 </a>
               </div>
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
-              <GameCard />
+              {games.map((game) => (
+                <GameCard page="home" data={game} key={game._id} />
+              ))}
             </div>
           </section>
           <section className="most-popular-section py-4">

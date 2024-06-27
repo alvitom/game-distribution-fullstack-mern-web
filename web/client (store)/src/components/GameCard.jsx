@@ -1,9 +1,9 @@
 import React from "react";
 
-const GameCard = ({ discount, collection, page }) => {
+const GameCard = ({ discount, collection, page, data }) => {
   return (
     <div className={collection || page === "game" ? "col-3 my-4" : "col-2"}>
-      <a href="/game/id" className="game-card position-relative">
+      <a href={`/game/${data?.slug}`} className="game-card position-relative">
         {discount ? (
           <>
             <div className="game-image">
@@ -32,15 +32,17 @@ const GameCard = ({ discount, collection, page }) => {
         ) : (
           <>
             <div className="game-image">
-              <img
-                src="https://cdn1.epicgames.com/0584d2013f0149a791e7b9bad0eec102/offer/GTAV_EGS_Artwork_1200x1600_Portrait%20Store%20Banner-1200x1600-382243057711adf80322ed2aeea42191.jpg?h=480&quality=medium&resize=1&w=360"
-                alt=""
-                className="img-fluid"
-              />
+              <img src={data.coverImage.url} alt={data.title} className="img-fluid" />
             </div>
             <div className="game-detail p-2 text-white">
-              <p className="title mb-1">Grand Theft Auto V: Premium Edition</p>
-              <p className="price mb-0">IDR 300,750</p>
+              <p className="title mb-1">{data.title}</p>
+              <p className="price mb-0">
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  minimumFractionDigits: 0,
+                }).format(data.price)}
+              </p>
             </div>
             <div className="action-btn position-absolute">
               <button className="border-white text-white btn btn-dark">+</button>

@@ -1,8 +1,158 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import Meta from "../components/Meta";
 import { FaWindows, FaApple, FaShoppingCart, FaTrash } from "react-icons/fa";
+import { WishlistContext } from "../context/WishlistContext";
+import { MdClose } from "react-icons/md";
+import { modals } from "@mantine/modals";
+import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
+
+const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Wishlist = () => {
+  const { wishlists, setWishlists, loading, fetchWishlist, removeWishlist } = useContext(WishlistContext);
+  const { addCart, carts, setCarts } = useContext(CartContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
+
+  const handleRemoveWishlist = async (id) => {
+    const response = await removeWishlist(id);
+    if (!response.success) {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      setWishlists(wishlists.filter((item) => item._id !== id));
+      modals.closeAll();
+    }
+  };
+
+  const openRemoveWishlistModal = (id) =>
+    modals.open({
+      radius: "md",
+      title: "Remove from wishlist",
+      centered: true,
+      children: (
+        <>
+          <p>Are you sure you want to remove this game from your wishlist?</p>
+          <div className="d-flex justify-content-end gap-3">
+            <button className="btn btn-light" onClick={() => modals.closeAll()}>
+              Cancel
+            </button>
+            <button className="btn btn-danger" onClick={() => handleRemoveWishlist(id)}>
+              Remove
+            </button>
+          </div>
+        </>
+      ),
+    });
+
+  const handleAddToCart = async (id, gameId) => {
+    const response = await addCart({ gameId });
+    const responseRemove = await removeWishlist(id);
+
+    if (!response.success || !responseRemove.success) {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      setWishlists(wishlists.filter((item) => item._id !== id));
+      setCarts([response.data, ...carts]);
+      modals.closeAll();
+    }
+  };
+
+  const openAddToCartModal = (id, gameId) =>
+    modals.open({
+      radius: "md",
+      title: "Add to cart",
+      centered: true,
+      children: (
+        <>
+          <p>Are you sure you want to add this game to your cart?</p>
+          <div className="d-flex justify-content-end gap-3">
+            <button className="btn btn-light" onClick={() => modals.closeAll()}>
+              Cancel
+            </button>
+            <button className="btn btn-danger" onClick={() => handleAddToCart(id, gameId)}>
+              Move
+            </button>
+          </div>
+        </>
+      ),
+    });
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (wishlists.length === 0) {
+    return (
+      <div className="wishlist-wrapper">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 my-2">
+              <h1>Wishlist</h1>
+            </div>
+            <div className="col-12">
+              <h3 className="text-center">Wishlist is empty</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <Meta title="Wishlist" />
@@ -13,64 +163,38 @@ const Wishlist = () => {
               <h1>Wishlist</h1>
             </div>
             <div className="col-12">
-              <div className="wishlist-item my-4 d-flex justify-content-between align-items-center">
-                <div className="d-flex gap-3 align-items-center">
-                  <div className="game-image">
-                    <img
-                      src="https://cdn1.epicgames.com/offer/610a546d4e204215a0b9a1c8a382bacb/EGS_FootballManager2024_SportsInteractive_S2_1200x1600-d59e8b3545615cbc8a51d8acd316dd60?h=480&quality=medium&resize=1&w=360"
-                      alt=""
-                      className="img-fluid"
-                    />
-                  </div>
-                  <div className="game-detail">
-                    <h5>Football Manager 2024</h5>
-                    <p>IDR 649,999</p>
-                    <div className="d-flex align-items-center gap-2 platform-support">
-                      <FaWindows />
-                      <FaApple />
+              {wishlists?.map((wishlist, index) => (
+                <div className="wishlist-item my-4 d-flex justify-content-between align-items-center" key={index}>
+                  <div className="d-flex gap-3 align-items-center">
+                    <div className="game-image">
+                      <img src={wishlist.gameId.coverImage?.url} alt={wishlist.gameId.title} className="img-fluid" />
+                    </div>
+                    <div className="game-detail">
+                      <h5>{wishlist.gameId.title}</h5>
+                      <p>
+                        {new Intl.NumberFormat("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                          minimumFractionDigits: 0,
+                        }).format(wishlist.gameId.price)}
+                      </p>
+                      <div className="d-flex align-items-center gap-2 platform-support">
+                        {wishlist.gameId.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="action-btn d-flex gap-3 align-items-center">
-                  <button className="btn btn-outline-light d-flex align-items-center gap-2">
-                    <FaShoppingCart />
-                    <span>Tambah ke Keranjang</span>
-                  </button>
-                  <button className="btn btn-danger d-flex align-items-center gap-2">
-                    <FaTrash />
-                    <span>Hapus</span>
-                  </button>
-                </div>
-              </div>
-              <div className="wishlist-item my-4 d-flex justify-content-between align-items-center">
-                <div className="d-flex gap-3 align-items-center">
-                  <div className="game-image">
-                    <img
-                      src="https://cdn1.epicgames.com/offer/610a546d4e204215a0b9a1c8a382bacb/EGS_FootballManager2024_SportsInteractive_S2_1200x1600-d59e8b3545615cbc8a51d8acd316dd60?h=480&quality=medium&resize=1&w=360"
-                      alt=""
-                      className="img-fluid"
-                    />
-                  </div>
-                  <div className="game-detail">
-                    <h5>Football Manager 2024</h5>
-                    <p>IDR 649,999</p>
-                    <div className="d-flex align-items-center gap-2 platform-support">
-                      <FaWindows />
-                      <FaApple />
-                    </div>
+                  <div className="action-btn d-flex gap-3 align-items-center">
+                    <button className="btn btn-outline-light d-flex align-items-center gap-2" onClick={() => openAddToCartModal(wishlist._id, wishlist.gameId._id)}>
+                      <FaShoppingCart />
+                      <span>Add to Cart</span>
+                    </button>
+                    <button className="btn btn-danger d-flex align-items-center gap-2" onClick={() => openRemoveWishlistModal(wishlist._id)}>
+                      <FaTrash />
+                      <span>Delete</span>
+                    </button>
                   </div>
                 </div>
-                <div className="action-btn d-flex gap-3 align-items-center">
-                  <button className="btn btn-outline-light d-flex align-items-center gap-2">
-                    <FaShoppingCart />
-                    <span>Tambah ke Keranjang</span>
-                  </button>
-                  <button className="btn btn-danger d-flex align-items-center gap-2">
-                    <FaTrash />
-                    <span>Hapus</span>
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

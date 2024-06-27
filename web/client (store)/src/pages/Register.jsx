@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Meta from "../components/Meta";
 import { AuthContext } from "../context/AuthContext";
 import { modals } from "@mantine/modals";
@@ -8,77 +8,45 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { register, error } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (error) {
-      return modals.open({
-        radius: "md",
-        size: "xs",
-        centered: true,
-        withCloseButton: false,
-        children: (
-          <>
-            <div className="d-flex justify-content-center mb-2">
-              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
-            </div>
-            <p className="text-center">{error}</p>
-            <div className="d-flex justify-content-center">
-              <button
-                className="btn btn-light"
-                onClick={() => {
-                  modals.closeAll();
-                  setEmail("");
-                  setPassword("");
-                  setConfirmPassword("");
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </>
-        ),
-      });
-    }
-  }, [error]);
+  const { register } = useContext(AuthContext);
 
   const handleRegister = async () => {
-    if (confirmPassword !== password) {
-      return modals.open({
-        radius: "md",
-        size: "xs",
-        centered: true,
-        withCloseButton: false,
-        children: (
-          <>
-            <div className="d-flex justify-content-center mb-2">
-              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
-            </div>
-            <p className="text-center">Password and confirm password not equal</p>
-            <div className="d-flex justify-content-center">
-              <button
-                className="btn btn-light"
-                onClick={() => {
-                  modals.closeAll();
-                  setEmail("");
-                  setPassword("");
-                  setConfirmPassword("");
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </>
-        ),
-      });
-    }
     const userData = {
       email,
       password,
+      confirmPassword,
     };
-    const data = await register(userData);
-    if (data) {
-      location.href = `/verify-otp/${data.id}`;
+    const response = await register(userData);
+    if (!response.success) {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                  setEmail("");
+                  setPassword("");
+                  setConfirmPassword("");
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      location.href = `/verify-otp/${response.data.id}`;
     }
   };
 

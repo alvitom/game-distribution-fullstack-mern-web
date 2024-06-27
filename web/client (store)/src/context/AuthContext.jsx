@@ -4,7 +4,6 @@ import { createContext, useState } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const axiosInstance = axios.create({
@@ -31,80 +30,83 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await axiosInstance.post(`/user/register`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
   const verifyOTP = async (id, userData) => {
     try {
       const response = await axiosInstance.post(`/user/verify-otp/${id}`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
   const addUserInformation = async (id, userData) => {
     try {
       const response = await axiosInstance.post(`/user/add-user-information/${id}`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
   const login = async (userData) => {
     try {
       const response = await axiosInstance.post(`/user/login`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
   const logout = async () => {
     try {
-      await axiosInstance.get(`/user/logout`);
+      const response = await axiosInstance.get(`/user/logout`);
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
   const forgotPassword = async (userData) => {
     try {
       const response = await axiosInstance.post(`/user/forgot-password-token`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
   const resetPassword = async (token, userData) => {
     try {
       const response = await axiosInstance.put(`/user/reset-password/${token}`, userData);
-      const data = await response.data;
-      return data;
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
-  const deleteAccount = async (id) => {
+  const changePassword = async (userData) => {
     try {
-      const response = await axiosInstance.delete(`/user/${id}`);
-      const data = await response.data;
-      return data;
+      const response = await axiosInstance.put(`/user/change-password`, userData);
+      return response.data;
     } catch (error) {
-      setError(error.response.data.msg);
+      return error.response.data;
     }
   };
 
-  return <AuthContext.Provider value={{ error, loading, setLoading, register, verifyOTP, addUserInformation, login, logout, forgotPassword, resetPassword, deleteAccount }}>{children}</AuthContext.Provider>;
+  const deleteAccount = async () => {
+    try {
+      const response = await axiosInstance.delete(`/user`);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  };
+
+  return <AuthContext.Provider value={{ loading, setLoading, register, verifyOTP, addUserInformation, login, logout, forgotPassword, resetPassword, changePassword, deleteAccount }}>{children}</AuthContext.Provider>;
 };

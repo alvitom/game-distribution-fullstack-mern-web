@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import Meta from "../components/Meta";
 import GameCard from "../components/GameCard";
+import { GameContext } from "../context/GameContext";
+import { Pagination } from "@mantine/core";
 
 const Game = () => {
+  const { fetchAllGames, page, setPage, games, loading, totalPages, genre, feature, platform } = useContext(GameContext);
+  const limit = 40;
+
+  useEffect(() => {
+    fetchAllGames(page, limit, genre, feature, platform);
+  }, [page]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <>
       <Meta title="Game Terbaru" />
@@ -30,18 +43,9 @@ const Game = () => {
                 </div>
               </div> */}
           <div className="row">
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
-            <GameCard page="game" />
+            {games.map((game) => (
+              <GameCard page="game" data={game} key={game._id} />
+            ))}
           </div>
           {/* </div> */}
           {/* <div className="col-2">
@@ -57,6 +61,9 @@ const Game = () => {
             </div> */}
           {/* </div> */}
           {/* </section> */}
+          <div className="d-flex justify-content-center align-items-center">
+            <Pagination total={totalPages} value={page} onChange={setPage} mt="xl" />
+          </div>
         </div>
       </div>
     </>
