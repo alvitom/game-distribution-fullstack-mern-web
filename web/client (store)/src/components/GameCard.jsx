@@ -32,16 +32,16 @@ const GameCard = ({ discount, collection, page, data }) => {
         ) : (
           <>
             <div className="game-image">
-              <img src={data.coverImage.url} alt={data.title} className="img-fluid" />
+              <img src={data?.coverImage.url} alt={data?.title} className="img-fluid" />
             </div>
             <div className="game-detail p-2 text-white">
-              <p className="title mb-1">{data.title}</p>
+              <p className="title mb-1">{data?.title}</p>
               <p className="price mb-0">
                 {new Intl.NumberFormat("id-ID", {
                   style: "currency",
                   currency: "IDR",
                   minimumFractionDigits: 0,
-                }).format(data.price)}
+                }).format(data?.price)}
               </p>
             </div>
             <div className="action-btn position-absolute">
