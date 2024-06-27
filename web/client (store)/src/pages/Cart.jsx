@@ -165,7 +165,6 @@ const Cart = () => {
     };
     setCheckout(summary);
     navigate("/checkout");
-    console.log(summary);
   };
   return (
     <>

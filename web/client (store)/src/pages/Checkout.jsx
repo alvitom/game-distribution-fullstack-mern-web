@@ -52,7 +52,6 @@ const Checkout = () => {
     } else {
       window.snap.pay(response.data.token, {
         onSuccess: async function (result) {
-          console.log("payment success:", result);
           const response = await updateTransaction(result);
           if (!response.success) {
             return modals.open({
@@ -80,20 +79,73 @@ const Checkout = () => {
               ),
             });
           } else {
-            location.href = result?.pdf_url;
+            console.log(result);
           }
         },
-        onPending: function (result) {
-          console.log("payment pending:", result);
-          // Lakukan tindakan setelah pembayaran pending
+        onPending: async function (result) {
+          const response = await updateTransaction(result);
+          if (!response.success) {
+            return modals.open({
+              radius: "md",
+              size: "xs",
+              centered: true,
+              withCloseButton: false,
+              children: (
+                <>
+                  <div className="d-flex justify-content-center mb-2">
+                    <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+                  </div>
+                  <p className="text-center">{response.message}</p>
+                  <div className="d-flex justify-content-center">
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        modals.closeAll();
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              ),
+            });
+          } else {
+            console.log(result);
+          }
         },
-        onError: function (result) {
-          console.error("payment error:", result);
-          // Lakukan tindakan setelah pembayaran gagal
+        onError: async function (result) {
+          const response = await updateTransaction(result);
+          if (!response.success) {
+            return modals.open({
+              radius: "md",
+              size: "xs",
+              centered: true,
+              withCloseButton: false,
+              children: (
+                <>
+                  <div className="d-flex justify-content-center mb-2">
+                    <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+                  </div>
+                  <p className="text-center">{response.message}</p>
+                  <div className="d-flex justify-content-center">
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        modals.closeAll();
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              ),
+            });
+          } else {
+            location.href = "/";
+          }
         },
         onClose: function () {
-          console.log("payment popup closed");
-          // Lakukan tindakan setelah pengguna menutup popup pembayaran
+          // location.href = "/";
         },
       });
     }

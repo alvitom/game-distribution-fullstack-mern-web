@@ -9,7 +9,7 @@ export const TransactionProvider = ({ children }) => {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "Access-Control-Allow-Origin": "*",
+      "User-Agent": "Veritrans",
     },
   });
 
