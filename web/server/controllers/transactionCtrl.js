@@ -31,6 +31,7 @@ const createTransaction = asyncHandler(async (req, res) => {
         name: item.title,
         quantity: 1,
       })),
+      notification_url: `${process.env.API_BASE_URL}/api/midtrans/notification`,
     });
 
     await Transaction.create({
@@ -40,7 +41,6 @@ const createTransaction = asyncHandler(async (req, res) => {
       orderId,
     });
 
-    
     await Cart.deleteMany({ userId: id, gameId: { $in: items.map((item) => item._id) } });
 
     const body = `Dear customer, your payment for the order ${orderId} is currently pending. Please complete your payment to process your order. Thank you!`;
