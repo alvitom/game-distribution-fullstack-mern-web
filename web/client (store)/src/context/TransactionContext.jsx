@@ -30,5 +30,14 @@ export const TransactionProvider = ({ children }) => {
     }
   };
 
-  return <TransactionContext.Provider value={{ createTransaction }}>{children}</TransactionContext.Provider>;
+  const updateTransaction = async (data) => {
+    try {
+      const response = await axiosInstance.post(`/midtrans/notification`, data);
+      return response.data;
+    } catch (error) {
+      return error.response.data;
+    }
+  };
+
+  return <TransactionContext.Provider value={{ createTransaction, updateTransaction }}>{children}</TransactionContext.Provider>;
 };

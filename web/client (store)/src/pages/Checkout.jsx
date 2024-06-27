@@ -9,7 +9,7 @@ import { MdClose } from "react-icons/md";
 
 const Checkout = () => {
   const { checkout } = useContext(CheckoutContext);
-  const { createTransaction } = useContext(TransactionContext);
+  const { createTransaction, updateTransaction } = useContext(TransactionContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,9 +51,37 @@ const Checkout = () => {
       });
     } else {
       window.snap.pay(response.data.token, {
-        onSuccess: function (result) {
+        onSuccess: async function (result) {
           console.log("payment success:", result);
-          // Lakukan tindakan setelah pembayaran berhasil
+          const response = await updateTransaction(result);
+          if (!response.success) {
+            return modals.open({
+              radius: "md",
+              size: "xs",
+              centered: true,
+              withCloseButton: false,
+              children: (
+                <>
+                  <div className="d-flex justify-content-center mb-2">
+                    <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
+                  </div>
+                  <p className="text-center">{response.message}</p>
+                  <div className="d-flex justify-content-center">
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        modals.closeAll();
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              ),
+            });
+          } else {
+            location.href = result?.pdf_url;
+          }
         },
         onPending: function (result) {
           console.log("payment pending:", result);
@@ -95,9 +123,7 @@ const Checkout = () => {
                             minimumFractionDigits: 0,
                           }).format(item?.price)}
                         </p>
-                        <div className="d-flex align-items-center gap-2 platform-support">
-                          {item?.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : null))}
-                        </div>
+                        <div className="d-flex align-items-center gap-2 platform-support">{item?.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : null))}</div>
                       </div>
                     </div>
                   ))}

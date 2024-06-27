@@ -24,6 +24,15 @@ const transactionSchema = new mongoose.Schema(
       enum: ["success", "pending", "failed"],
       default: "pending",
     },
+    paymentType: {
+      type: String,
+    },
+    transactionTime: {
+      type: Date,
+    },
+    transactionId: {
+      type: String,
+    },
   },
   {
     timestamps: true,
