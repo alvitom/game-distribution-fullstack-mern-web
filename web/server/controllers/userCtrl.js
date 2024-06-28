@@ -4,10 +4,10 @@ const { generateToken } = require("../config/jwtToken");
 const { generateRefreshToken } = require("../config/refreshToken");
 const { validateMongodbId, validateEmail, validatePassword, validateOTP, validateUsername } = require("../utils/validations");
 const { generateOTP } = require("../utils/generateOTP");
-const sendEmail = require("../utils/nodemailer");
 const crypto = require("crypto");
 const { errorResponse, successResponse } = require("../utils/response");
 const { clearRefreshTokenCookie, createRefreshTokenCookie } = require("../utils/cookie");
+const sendEmail = require("../utils/sendgrid");
 
 const registerUser = asyncHandler(async (req, res) => {
   const { email, password, confirmPassword } = req.body;
@@ -82,7 +82,7 @@ const verifyOTP = asyncHandler(async (req, res) => {
 
   try {
     const user = await User.findById(id).select("+otp +otpExpires");
-    
+
     if (!user) {
       return errorResponse(res, 404, "User not found");
     }
@@ -341,10 +341,14 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     await user.save();
 
     const resetURL = `${storeBaseURL}/reset-password/${resetToken}`;
+
+    const body = `Hey User, click the link below to reset your password. This link will expire in 10 minutes. ${resetURL}`;
+
     const data = {
       to: email,
       subject: "Reset Password Link",
-      text: `Hey User, click the link below to reset your password. This link will expire in 10 minutes. ${resetURL}`,
+      text: body,
+      htm: body,
     };
 
     sendEmail(data);
