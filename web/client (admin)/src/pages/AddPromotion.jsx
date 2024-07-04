@@ -1,4 +1,4 @@
-import { Input, NumberInput, Switch } from "@mantine/core";
+import { Input, NumberInput } from "@mantine/core";
 import React, { useContext, useState } from "react";
 import { modals } from "@mantine/modals";
 import { FaCheck } from "react-icons/fa";
@@ -9,46 +9,18 @@ import { DatePickerInput } from "@mantine/dates";
 
 const AddPromotion = () => {
   const navigate = useNavigate();
-  const { promotions, setPromotions, createPromotion } = useContext(PromotionContext);
+  const { createPromotion, loading } = useContext(PromotionContext);
 
   const [promotion, setPromotion] = useState({
     game: "",
-    discount: null,
+    discount: "",
     endDate: null,
-    isActive: false,
   });
 
   const handleCreatePromotion = async () => {
-    const data = await createPromotion(promotion);
-    if (data) {
-      modals.open({
-        radius: "md",
-        size: "xs",
-        centered: true,
-        withCloseButton: false,
-        children: (
-          <>
-            <div className="d-flex justify-content-center mb-2">
-              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
-            </div>
-            <p className="text-center">Add promotion success</p>
-            <div className="d-flex justify-content-center">
-              <button
-                className="btn btn-light"
-                onClick={() => {
-                  modals.closeAll();
-                  navigate("/promotions");
-                  setPromotions([...promotions, data]);
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </>
-        ),
-      });
-    } else {
-      modals.open({
+    const response = await createPromotion(promotion);
+    if (!response.success) {
+      return modals.open({
         radius: "md",
         size: "xs",
         centered: true,
@@ -58,13 +30,39 @@ const AddPromotion = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">Add promotion failed</p>
+            <p className="text-center">{response.message}</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setPromotion({ game: "", discount: null, endDate: null });
+                  setPromotion({ game: "", discount: "", endDate: null });
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                  navigate("/promotions");
                 }}
               >
                 Close
@@ -92,13 +90,9 @@ const AddPromotion = () => {
             <label htmlFor="end-date">End Date</label>
             <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={promotion.endDate} onChange={(date) => setPromotion((prevPromotion) => ({ ...prevPromotion, endDate: date }))} size="md" id="end-date" />
           </div>
-          <div className="d-flex flex-column gap-2">
-            <label htmlFor="status">Status</label>
-            <Switch checked={promotion.isActive} onChange={(event) => setPromotion((prevPromotion) => ({ ...prevPromotion, isActive: event.target.checked }))} label={promotion.isActive ? "Active" : "Not Active"} size="md" />
-          </div>
-          <div className="d-flex justify-content-center align-items-center">
-            <button className="btn btn-success w-25" onClick={handleCreatePromotion}>
-              Add Promotion
+          <div className="d-flex justify-content-center align-items-center mt-4">
+            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleCreatePromotion}>
+              {loading ? "Loading..." : "Add Promotion"}
             </button>
           </div>
         </div>

@@ -1,16 +1,25 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Meta from "../components/Meta";
 import { AuthContext } from "../context/AuthContext";
 import { modals } from "@mantine/modals";
 import { MdClose } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+const user = JSON.parse(sessionStorage.getItem("user"));
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { changePassword } = useContext(AuthContext);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user]);
   const handleChangePassword = async () => {
     const userData = {
       currentPassword,
@@ -21,7 +30,7 @@ const ChangePassword = () => {
     const response = await changePassword(userData);
 
     if (!response.success) {
-      const errorMessage = response.message
+      const errorMessage = response.message;
       showErrorModal(errorMessage);
     } else {
       showSuccessModal(response.message);

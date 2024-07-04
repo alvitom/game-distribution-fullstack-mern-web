@@ -1,7 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
-const { createGame, getGame, updateGame, deleteGame, getAllGames, uploadImages, deleteImages, uploadMedia } = require("../controllers/gameCtrl");
+const {
+  createGame,
+  getGame,
+  updateGame,
+  deleteGame,
+  getAllGames,
+  uploadImages,
+  deleteImages,
+  uploadMedia,
+  getTopSellerGames,
+  getMostPlayedGames,
+  getNewReleaseGames,
+  getTrendingGames,
+  getUpcomingGames,
+  createSaleGame,
+  getSaleGames,
+} = require("../controllers/gameCtrl");
 const { upload, gameImgResize } = require("../middlewares/uploadImage");
 
 router.post(
@@ -15,7 +31,14 @@ router.post(
   ]),
   createGame
 );
+router.post("/sale", authMiddleware, isAdmin, createSaleGame);
 router.get("/", getAllGames);
+router.get("/sale", getSaleGames);
+router.get("/top-seller", getTopSellerGames);
+router.get("/most-played", getMostPlayedGames);
+router.get("/new-release", getNewReleaseGames);
+router.get("/trending", getTrendingGames);
+router.get("/upcoming", getUpcomingGames);
 router.get("/:title", getGame);
 router.put(
   "/:id",

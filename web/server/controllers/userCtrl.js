@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const { generateToken } = require("../config/jwtToken");
 const { generateRefreshToken } = require("../config/refreshToken");
-const { validateMongodbId, validateEmail, validatePassword, validateOTP, validateUsername } = require("../utils/validations");
+const { validateMongodbId, validateEmail, validatePassword, validateOTP, validateUsername, validateFullname, validatePage, validateLimit } = require("../utils/validations");
 const { generateOTP } = require("../utils/generateOTP");
 const sendEmail = require("../utils/nodemailer");
 const crypto = require("crypto");
@@ -12,24 +12,15 @@ const { clearRefreshTokenCookie, createRefreshTokenCookie } = require("../utils/
 const registerUser = asyncHandler(async (req, res) => {
   const { email, password, confirmPassword } = req.body;
 
+  validateEmail(res, email);
+  validatePassword(res, password);
+
   if (!email || !password || !confirmPassword) {
     return errorResponse(res, 400, "Email, password, and confirm password are required");
   }
 
-  if (!validateEmail(email)) {
-    return errorResponse(res, 400, "Invalid email address");
-  }
-
   if (password !== confirmPassword) {
-    return errorResponse(res, 400, "Password and confirm password do not match");
-  }
-
-  if (password.length < 6 || password.length > 20) {
-    return errorResponse(res, 400, "Password must be between 6 and 20 characters");
-  }
-
-  if (!validatePassword(password)) {
-    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
+    return errorResponse(res, 400, "Passwords do not match");
   }
 
   try {
@@ -68,21 +59,12 @@ const verifyOTP = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { otp } = req.body;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
-
-  if (!otp) {
-    return errorResponse(res, 400, "OTP is required");
-  }
-
-  if (!validateOTP(otp)) {
-    return errorResponse(res, 400, "Invalid OTP");
-  }
+  validateMongodbId(res, id);
+  validateOTP(res, otp);
 
   try {
     const user = await User.findById(id).select("+otp +otpExpires");
-    
+
     if (!user) {
       return errorResponse(res, 404, "User not found");
     }
@@ -111,20 +93,12 @@ const addUserInformation = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { username, fullname } = req.body;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
+  validateUsername(res, username);
+  validateFullname(res, fullname);
 
   if (!username || !fullname) {
     return errorResponse(res, 400, "Username and fullname are required");
-  }
-
-  if (username.length < 3 || username.length > 20) {
-    return errorResponse(res, 400, "Username must be between 3 and 20 characters");
-  }
-
-  if (fullname.length < 3 || fullname.length > 50) {
-    return errorResponse(res, 400, "Fullname must be between 3 and 50 characters");
   }
 
   if (username.toLowerCase() === fullname.toLowerCase()) {
@@ -133,10 +107,6 @@ const addUserInformation = asyncHandler(async (req, res) => {
 
   if (username.toLowerCase() === "admin" || fullname.toLowerCase() === "admin") {
     return errorResponse(res, 400, "Username and fullname cannot be 'admin'");
-  }
-
-  if (!validateUsername(username)) {
-    return errorResponse(res, 400, "Username must contain only letters, numbers, and underscores");
   }
 
   try {
@@ -180,10 +150,6 @@ const loginUser = async (req, res) => {
 
   if (!email || !password) {
     return errorResponse(res, 400, "Email and password are required");
-  }
-
-  if (!validateEmail(email) || !validatePassword(password)) {
-    return errorResponse(res, 400, "Invalid email or password");
   }
 
   try {
@@ -269,9 +235,9 @@ const changePassword = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { currentPassword, newPassword, confirmPassword } = req.body;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
+  validatePassword(res, newPassword);
+  validatePassword(res, confirmPassword);
 
   if (!newPassword || !currentPassword || !confirmPassword) {
     return errorResponse(res, 400, "Please provide all required fields.");
@@ -283,14 +249,6 @@ const changePassword = asyncHandler(async (req, res) => {
 
   if (newPassword === currentPassword) {
     return errorResponse(res, 400, "New password cannot be the same as the current password.");
-  }
-
-  if (newPassword.length < 6 || newPassword.length > 20) {
-    return errorResponse(res, 400, "Password must be between 6 and 20 characters long.");
-  }
-
-  if (!validatePassword(newPassword)) {
-    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
   }
 
   try {
@@ -319,10 +277,6 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
 
   if (!email) {
     return errorResponse(res, 400, "Email is required");
-  }
-
-  if (!validateEmail(email)) {
-    return errorResponse(res, 400, "Invalid email address");
   }
 
   try {
@@ -363,16 +317,10 @@ const resetPassword = asyncHandler(async (req, res) => {
     return errorResponse(res, 400, "Password and confirm password are required");
   }
 
-  if (password.length < 6 || password.length > 20) {
-    return errorResponse(res, 400, "Password must be between 6 and 20 characters long");
-  }
+  validatePassword(res, password);
 
   if (password !== confirmPassword) {
     return errorResponse(res, 400, "Passwords do not match");
-  }
-
-  if (!validatePassword(password)) {
-    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
   }
 
   try {
@@ -413,9 +361,7 @@ const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { refreshToken } = req.cookies;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
 
   if (!refreshToken) {
     return errorResponse(res, 400, "No refresh token found");
@@ -481,10 +427,6 @@ const loginAdmin = async (req, res) => {
     return errorResponse(res, 400, "Email and password are required");
   }
 
-  if (!validateEmail(email) || !validatePassword(password)) {
-    return errorResponse(res, 400, "Invalid email or password");
-  }
-
   try {
     const user = await User.findOne({ email }).select("+password");
 
@@ -527,27 +469,25 @@ const loginAdmin = async (req, res) => {
 };
 
 const getAllUsers = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, keyword } = req.query;
-  const sanitizedPage = parseInt(page);
-  const sanitizedLimit = parseInt(limit);
+  const { page, limit, keyword } = req.query;
 
-  if (Number.isNaN(sanitizedPage) || sanitizedPage < 1) {
-    return errorResponse(res, 400, "Invalid page parameter");
+  if (page) {
+    validatePage(res, page);
   }
 
-  if (Number.isNaN(sanitizedLimit) || sanitizedLimit < 1) {
-    return errorResponse(res, 400, "Invalid limit parameter");
+  if (limit) {
+    validateLimit(res, limit);
   }
 
-  const skip = (sanitizedPage - 1) * sanitizedLimit;
+  const skip = (page - 1) * limit;
   const query = keyword ? { fullname: { $regex: keyword, $options: "i" } } : {};
 
   try {
-    const users = await User.find(query).skip(skip).limit(sanitizedLimit).select("-password");
+    const users = await User.find(query).skip(skip).limit(limit).select("-password");
     const total = await User.countDocuments(query);
-    const totalPages = Math.ceil(total / sanitizedLimit);
+    const totalPages = Math.ceil(total / limit);
 
-    successResponse(res, { users, total, page: sanitizedPage, totalPages }, "Users fetched successfully", 200);
+    successResponse(res, { users, total, page, totalPages }, "Users fetched successfully", 200);
   } catch (error) {
     errorResponse(res, 500, "Failed to fetch users");
   }
@@ -556,9 +496,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 const blockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
 
   try {
     const user = await User.findByIdAndUpdate(id, { isBlocked: true }, { new: true }).select("-password");
@@ -576,9 +514,7 @@ const blockUser = asyncHandler(async (req, res) => {
 const unblockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
 
   try {
     const user = await User.findByIdAndUpdate(id, { isBlocked: false }, { new: true }).select("-password");
@@ -597,9 +533,7 @@ const changeRole = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
 
   if (!role) {
     return errorResponse(res, 400, "Role is required");

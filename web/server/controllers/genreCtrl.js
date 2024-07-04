@@ -1,75 +1,95 @@
 const asyncHandler = require("express-async-handler");
 const Genre = require("../models/genreModel");
-const { validateMongodbId } = require("../utils/validations");
+const { validateMongodbId, validatePage, validateLimit, } = require("../utils/validations");
+const { successResponse, errorResponse } = require("../utils/response");
 
 const createGenre = asyncHandler(async (req, res) => {
+  const { genre } = req.body;
+
+  if (!genre) {
+    return errorResponse(res, 400, "Genre is required");
+  }
+
   try {
+    const genre = await Genre.findOne({ genre });
+
+    if (genre) {
+      return errorResponse(res, 400, "Genre already exists");
+    }
+
     const newGenre = await Genre.create(req.body);
-    res.json(newGenre);
+    successResponse(res, newGenre, "Genre created successfully", 201);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to create genre");
   }
 });
 
 const getAllGenres = asyncHandler(async (req, res) => {
+  const { page, limit, keyword } = req.query;
+  
+  if (page) {
+    validatePage(res, page);
+  }
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const skip = (page - 1) * limit;
+  const query = keyword ? { genre: { $regex: keyword, $options: "i" } } : {};
+
   try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const keyword = req.query.keyword;
-    const skip = (page - 1) * limit;
-    const query = {};
-
-    if (keyword) {
-      query.genre = { $regex: keyword, $options: "i" };
-    }
-
     const genres = await Genre.find(query).skip(skip).limit(limit);
     const total = await Genre.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
 
-    res.json({
-      genres,
-      total,
-      page,
-      totalPages,
-    });
+    successResponse(res, { genres, total, page, totalPages }, "Genres fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch genres");
   }
 });
 
 const getGenre = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+  validateMongodbId(res, id);
+
   try {
     const genre = await Genre.findById(id);
-    res.json(genre);
+    successResponse(res, genre, "Genre fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch genre");
   }
 });
 
 const updateGenre = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+  validateMongodbId(res, id);
+  const { genre } = req.body;
+
+  if (!genre) {
+    return errorResponse(res, 400, "Genre is required");
+  }
+
   try {
     const updateGenre = await Genre.findByIdAndUpdate(id, req.body, {
       new: true,
     });
-    res.json(updateGenre);
+    
+    successResponse(res, updateGenre, "Genre updated successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to update genre");
   }
 });
 
 const deleteGenre = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+  validateMongodbId(res, id);
+
   try {
     const deleteGenre = await Genre.findByIdAndDelete(id);
-    res.json(deleteGenre);
+    successResponse(res, deleteGenre, "Genre deleted successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to delete genre");
   }
 });
 

@@ -23,6 +23,7 @@ import AddUserInformation from "./pages/AddUserInformation";
 import NotFound from "./pages/NotFound";
 import ChangePassword from "./pages/ChangePassword";
 import Profile from "./pages/Profile";
+import Transaction from "./pages/Transaction";
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
             <Route path="blog/id" element={<BlogDetail />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="transactions" element={<Transaction />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
           <Route path="/login" element={<Login />} />

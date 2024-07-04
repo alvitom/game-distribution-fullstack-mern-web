@@ -6,14 +6,8 @@ const { errorResponse, successResponse } = require("../utils/response");
 const addCartItem = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { gameId } = req.body;
-
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
-
-  if (!validateMongodbId(gameId)) {
-    return errorResponse(res, 400, "Invalid game ID");
-  }
+  validateMongodbId(res, id);
+  validateMongodbId(res, gameId);
 
   try {
     const existingCartItem = await Cart.find({ gameId, userId: id });
@@ -32,21 +26,29 @@ const addCartItem = asyncHandler(async (req, res) => {
 
 const getCartItem = asyncHandler(async (req, res) => {
   const { id } = req.user;
-
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
 
   try {
     const cart = await Cart.find({ userId: id }).populate("gameId");
 
-    const totalPrice = cart.reduce((acc, item) => {
+    const totalNetPrice = cart.reduce((acc, item) => {
       acc += item.gameId.price;
       return acc;
     }, 0);
 
+    const totalPrice = cart.reduce((acc, item) => {
+      acc += item.gameId.discount.isActive ? item.gameId.price - ((item.gameId.discount.percentage / 100) * item.gameId.price).toFixed(0) : item.gameId.price;
+      return acc;
+    }, 0);
+
+    const totalDiscount = totalPrice - totalNetPrice;
+
+    const serviceFee = 1000;
+
+    const total = totalPrice + serviceFee;
+
     const cartLength = cart.length;
-    successResponse(res, { cart, cartLength, totalPrice }, "Cart fetched successfully", 200);
+    successResponse(res, { cart, cartLength, totalNetPrice, totalPrice, totalDiscount, serviceFee, total }, "Cart fetched successfully", 200);
   } catch (error) {
     errorResponse(res, 500, "Failed to fetch cart");
   }
@@ -56,18 +58,12 @@ const deleteCartItem = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { cartItemId } = req.params;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
-
-  if (!validateMongodbId(cartItemId)) {
-    return errorResponse(res, 400, "Invalid cart item ID");
-  }
+  validateMongodbId(res, id);
+  validateMongodbId(res, cartItemId);
 
   try {
-    
     const cart = await Cart.deleteOne({ userId: id, _id: cartItemId });
-    
+
     if (cart.deletedCount <= 0) {
       return errorResponse(res, 404, "Cart item not found");
     }
@@ -75,7 +71,7 @@ const deleteCartItem = asyncHandler(async (req, res) => {
     const carts = await Cart.find({ userId: id }).populate("gameId");
 
     const totalPrice = carts.reduce((acc, item) => {
-      acc += item.gameId.price;
+      acc += item.gameId.discount.isActive ? item.gameId.price - ((item.gameId.discount.percentage / 100) * item.gameId.price).toFixed(0) : item.gameId.price;
       return acc;
     }, 0);
 

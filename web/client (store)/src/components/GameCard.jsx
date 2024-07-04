@@ -1,26 +1,54 @@
-import React from "react";
+import React, { useContext } from "react";
+import { WishlistContext } from "../context/WishlistContext";
 
-const GameCard = ({ discount, collection, page, data }) => {
+const user = JSON.parse(sessionStorage.getItem("user"));
+
+const GameCard = ({ collection, page, data }) => {
+  const { addWishlist, wishlists, setWishlists } = useContext(WishlistContext);
+
+  const handleAddToWishlist = async (gameId) => {
+    if (!user) {
+      location.href = "/login";
+      return;
+    }
+    const response = await addWishlist({ gameId });
+    if (!response.success) {
+      return notifications.show({
+        message: response.message,
+        color: "blue",
+        withCloseButton: false,
+        icon: <MdClose />,
+      });
+    } else {
+      setWishlists([response.data, ...wishlists]);
+      return notifications.show({
+        message: response.message,
+        color: "green",
+        withCloseButton: false,
+        icon: <FaCheck />,
+      });
+    }
+  };
   return (
-    <div className={collection || page === "game" ? "col-3 my-4" : "col-2"}>
-      <a href={`/game/${data?.slug}`} className="game-card position-relative">
-        {discount ? (
-          <>
+    <div className={collection || page === "game" ? "col-lg-3 col-md-4 col-sm-6 col-12 my-4" : "col-lg-2 col-md-3 col-sm-4 col-6"}>
+      {data?.discount.isActive ? (
+        <>
+          <a href={`/game/${data?.slug}`} className="game-card position-relative">
             <div className="game-image">
-              <img src="https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_TheLegendofHeroesTrailstoAzure_NihonFalcom_S2_1200x1600-9f7d6b01de4e9f8527d8def616af108d?h=480&quality=medium&resize=1&w=360" alt="" className="img-fluid" />
+              <img src={data?.coverImage.url} alt={data?.title} className="img-fluid" />
             </div>
             <div className="game-detail p-2 text-white">
-              <span className="title">The Legend of Heroes: Trails to Azure</span>
+              <span className="title">{data?.title}</span>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="dicount-percentage">
-                  <span>50%</span>
+                  <span className="badge bg-success p-2 fs-6">-{data?.discount.percentage}%</span>
                 </div>
                 <div className="d-flex flex-column price">
                   <div className="old-price">
-                    <span className="text-decoration-line-through">445,999</span>
+                    <span className="text-decoration-line-through">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(data?.price)}</span>
                   </div>
                   <div className="new-price">
-                    <span>356,799</span>
+                    <span>{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(data?.price - ((data?.discount.percentage / 100) * data?.price).toFixed(0))}</span>
                   </div>
                 </div>
               </div>
@@ -28,9 +56,11 @@ const GameCard = ({ discount, collection, page, data }) => {
                 <button className="border-white text-white btn btn-dark">+</button>
               </div>
             </div>
-          </>
-        ) : (
-          <>
+          </a>
+        </>
+      ) : (
+        <>
+          <a href={`/game/${data?.slug}`} className="game-card position-relative">
             <div className="game-image">
               <img src={data?.coverImage.url} alt={data?.title} className="img-fluid" />
             </div>
@@ -45,11 +75,13 @@ const GameCard = ({ discount, collection, page, data }) => {
               </p>
             </div>
             <div className="action-btn position-absolute">
-              <button className="border-white text-white btn btn-dark">+</button>
+              <button className="border-white text-white btn btn-dark" onClick={() => handleAddToWishlist(data?._id)}>
+                +
+              </button>
             </div>
-          </>
-        )}
-      </a>
+          </a>
+        </>
+      )}
     </div>
   );
 };

@@ -658,8 +658,8 @@ const AddGame = (props) => {
             <NumberInput placeholder="Price" prefix="Rp" mb="xl" size="md" id="price" allowNegative={false} thousandSeparator="," value={game.price} onChange={(value) => setGame((prevGame) => ({ ...prevGame, price: value }))} />
           </div>
           <div className="d-flex justify-content-center align-items-center">
-            <button className="btn btn-success w-25" onClick={handleCreateGame}>
-              Add Game
+            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleCreateGame}>
+              {loading ? "Loading..." : "Add Game"}
             </button>
           </div>
         </div>

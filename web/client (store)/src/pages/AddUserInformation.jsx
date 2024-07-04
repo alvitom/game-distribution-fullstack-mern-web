@@ -9,7 +9,7 @@ const AddUserInformation = () => {
   const { id } = useParams();
   const [username, setUsername] = useState("");
   const [fullname, setFullname] = useState("");
-  const { addUserInformation } = useContext(AuthContext);
+  const { addUserInformation, loading } = useContext(AuthContext);
 
   const handleAddUserInfo = async () => {
     const userData = {
@@ -57,8 +57,8 @@ const AddUserInformation = () => {
           <h1>Add Your Information</h1>
           <input type="text" className="w-100" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           <input type="text" className="w-100" placeholder="Full Name" value={fullname} onChange={(e) => setFullname(e.target.value)} />
-          <button className="btn btn-success w-100" onClick={handleAddUserInfo}>
-            Submit
+          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleAddUserInfo}>
+            {loading ? "Loading..." : "Submit"}
           </button>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { MdClose } from "react-icons/md";
 const VerifyOTP = () => {
   const { id } = useParams();
   const [otp, setOTP] = useState(null);
-  const { verifyOTP } = useContext(AuthContext);
+  const { verifyOTP, loading } = useContext(AuthContext);
 
   const handleVerify = async () => {
     const userData = {
@@ -54,8 +54,8 @@ const VerifyOTP = () => {
           <h1>Verification</h1>
           <p>OTP code has been sent to your email. Please enter the code you received to continue.</p>
           <PinInput length={6} type="number" value={otp} onChange={(value) => setOTP(value)} />
-          <button className="btn btn-success w-100" onClick={handleVerify}>
-            Next
+          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleVerify}>
+            {loading ? "Verifying..." : "Verify"}
           </button>
         </div>
       </div>

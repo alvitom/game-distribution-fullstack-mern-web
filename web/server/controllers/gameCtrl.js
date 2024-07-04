@@ -1,21 +1,21 @@
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const Game = require("../models/gameModel");
-const { validateMongodbId, validatePageAndLimit } = require("../utils/validations");
+const { validateMongodbId, validatePage, validateLimit } = require("../utils/validations");
 const { uploadToCloudinary, cloudinaryDeleteImg } = require("../utils/cloudinary");
 const { successResponse, errorResponse } = require("../utils/response");
 
 const createGame = asyncHandler(async (req, res) => {
+  const systemRequirements = JSON.parse(req.body.systemRequirements);
+  const coverImage = req.files.coverImage || [];
+  const images = req.files.images || [];
+  const videos = req.files.videos || [];
+
+  let urlCoverImage = {};
+  const urlImages = [];
+  const urlVideos = [];
+
   try {
-    const systemRequirements = JSON.parse(req.body.systemRequirements);
-    const coverImage = req.files.coverImage || [];
-    const images = req.files.images || [];
-    const videos = req.files.videos || [];
-
-    let urlCoverImage = {};
-    const urlImages = [];
-    const urlVideos = [];
-
     for (const image of coverImage) {
       const { path } = image;
       const newPath = await uploadToCloudinary(path, {
@@ -65,27 +65,47 @@ const createGame = asyncHandler(async (req, res) => {
     });
     successResponse(res, newGame, "Game created successfully", 201);
   } catch (error) {
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((value) => value.message);
-      return errorResponse(res, 400, messages);
-    }
     errorResponse(res, 500, "Failed to create game");
+  }
+});
+
+const createSaleGame = asyncHandler(async (req, res) => {
+  const { title, percentage, endDate } = req.body;
+
+  if (!title || !percentage || !endDate) {
+    return errorResponse(res, 400, "All fields are required");
+  }
+
+  try {
+    const game = await Game.findOne({ title });
+
+    if (!game) {
+      return errorResponse(res, 404, "Game not found");
+    }
+
+    if (game.discount.isActive) {
+      return errorResponse(res, 400, "Game already on sale");
+    }
+
+    await Game.updateOne({ _id: game._id }, { $set: { discount: { percentage, endDate, isActive: true } } }, { new: true });
+
+    successResponse(res, null, "Sale game created successfully", 201);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to create sale game");
     console.log(error);
   }
 });
 
 const getAllGames = asyncHandler(async (req, res) => {
   const { page, limit, keyword, genre, feature, platform } = req.query;
-  const sanitizedPage = parseInt(page);
-  const sanitizedLimit = parseInt(limit);
 
-  // if (Number.isNaN(sanitizedPage) || sanitizedPage < 1) {
-  //   errorResponse(res, 400, "Invalid page parameter");
-  // }
+  if (page) {
+    validatePage(res, page);
+  }
 
-  // if (Number.isNaN(sanitizedLimit) || sanitizedLimit < 1) {
-  //   errorResponse(res, 400, "Invalid limit parameter");
-  // }
+  if (limit) {
+    validateLimit(res, limit);
+  }
 
   const query = {};
 
@@ -102,29 +122,160 @@ const getAllGames = asyncHandler(async (req, res) => {
     query.platform = platform;
   }
 
-  const skip = (sanitizedPage - 1) * sanitizedLimit;
+  const skip = (page - 1) * limit;
 
   try {
-    const games = await Game.find(query).skip(skip).limit(sanitizedLimit);
+    const games = await Game.find(query).skip(skip).limit(limit);
     const total = await Game.countDocuments(query);
-    const totalPages = Math.ceil(total / sanitizedLimit);
+    const totalPages = Math.ceil(total / limit);
 
-    successResponse(res, { games, total, page: sanitizedPage, totalPages }, "Games fetched successfully", 200);
+    successResponse(res, { games, total, page, totalPages }, "Games fetched successfully", 200);
   } catch (error) {
     errorResponse(res, 500, "Failed to fetch games");
+  }
+});
+
+const getSaleGames = asyncHandler(async (req, res) => {
+  const { page, limit, keyword } = req.query;
+
+  if (page) {
+    validatePage(res, page);
+  }
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const skip = (page - 1) * limit;
+  const query = keyword ? { title: { $regex: keyword, $options: "i" } } : {};
+
+  query["discount.isActive"] = true;
+
+  try {
+    const saleGames = await Game.find(query).skip(skip).limit(limit);
+    const total = await Game.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+    successResponse(res, { saleGames, total, page, totalPages }, "Sale games retrieved successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to retrieve sale games");
+  }
+});
+
+const getTopSellerGames = asyncHandler(async (req, res) => {
+  const { limit } = req.query;
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const query = { sales: { $gt: 2000 } };
+
+  try {
+    const topSellerGames = await Game.find(query).limit(limit).sort({ sales: -1 });
+    const total = await Game.countDocuments(query);
+    successResponse(res, { topSellerGames, total }, "Top seller games retrieved successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to retrieve top seller games");
+  }
+});
+
+const getMostPlayedGames = asyncHandler(async (req, res) => {
+  const { limit } = req.query;
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const query = { playCount: { $gt: 30000 } };
+
+  try {
+    const mostPlayedGames = await Game.find(query).limit(limit).sort({ playCount: -1 });
+    const total = await Game.countDocuments(query);
+    successResponse(res, { mostPlayedGames, total }, "Most played games retrieved successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to retrieve most played games");
+  }
+});
+
+const getNewReleaseGames = asyncHandler(async (req, res) => {
+  const { limit } = req.query;
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const pastDate = new Date();
+  pastDate.setMonth(new Date().getMonth() - 3);
+  const query = { releaseDate: { $gte: pastDate, $lte: new Date() } };
+  try {
+    const newReleaseGames = await Game.find(query).limit(limit).sort({ releaseDate: -1 });
+    const total = await Game.countDocuments(query);
+    successResponse(res, { newReleaseGames, total }, "New release games retrieved successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to retrieve new release games");
+  }
+});
+
+const getTrendingGames = asyncHandler(async (req, res) => {
+  const { limit } = req.query;
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const query = { trendScore: { $gt: 50 } };
+
+  try {
+    const trendingGames = await Game.find(query).limit(limit).sort({ trendScore: -1 });
+    const total = await Game.countDocuments(query);
+    successResponse(res, { trendingGames, total }, "Trending games retrieved successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to retrieve trending games");
+  }
+});
+
+const getUpcomingGames = asyncHandler(async (req, res) => {
+  const { limit } = req.query;
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const query = { releaseDate: { $gt: new Date() } };
+
+  try {
+    const upcomingGames = await Game.find(query).limit(limit).sort({ releaseDate: 1 });
+    const total = await Game.countDocuments(query);
+    successResponse(res, { upcomingGames, total }, "Upcoming games retrieved successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to retrieve upcoming games");
   }
 });
 
 const getGame = asyncHandler(async (req, res) => {
   const { title } = req.params;
 
-  if (!title) {
-    errorResponse(res, 404, "Game not found");
-  }
-
   try {
     const game = await Game.findOne({ slug: title }).populate("genres").populate("features");
-    successResponse(res, game, "Game fetched successfully", 200);
+
+    if (!game) {
+      return errorResponse(res, 404, "Game not found");
+    }
+
+    const totalNetPrice = game.price;
+
+    let newPrice = 0;
+    if (game.discount.isActive) {
+      newPrice += game.price - ((game.discount.percentage / 100) * game.price).toFixed(0);
+    }
+
+    const totalDiscount = newPrice - totalNetPrice;
+
+    const serviceFee = 1000;
+
+    const total = game.discount.isActive ? newPrice + serviceFee : totalNetPrice + serviceFee;
+
+    successResponse(res, { game, totalNetPrice, totalDiscount, newPrice, serviceFee, total }, "Game fetched successfully", 200);
   } catch (error) {
     errorResponse(res, 500, "Failed to fetch game");
   }
@@ -132,10 +283,7 @@ const getGame = asyncHandler(async (req, res) => {
 
 const updateGame = asyncHandler(async (req, res) => {
   const { id } = req.params;
-
-  if (!validateMongodbId(id)) {
-    errorResponse(res, 404, "Game not found");
-  }
+  validateMongodbId(res, id);
 
   if (req.body.title) {
     req.body.slug = slugify(req.body.title);
@@ -189,14 +337,11 @@ const updateGame = asyncHandler(async (req, res) => {
 
 const deleteGame = asyncHandler(async (req, res) => {
   const { id } = req.params;
-
-  if (!validateMongodbId(id)) {
-    errorResponse(res, 404, "Game not found");
-  }
+  validateMongodbId(res, id);
 
   try {
-    await Game.findByIdAndDelete(id);
-    successResponse(res, null, "Game deleted successfully", 200);
+    const deleteGame = await Game.findByIdAndDelete(id);
+    successResponse(res, deleteGame, "Game deleted successfully", 200);
   } catch (error) {
     errorResponse(res, 500, "Failed to delete game");
   }
@@ -246,4 +391,4 @@ const deleteImages = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createGame, getAllGames, getGame, updateGame, deleteGame, /* uploadImages,  */ deleteImages };
+module.exports = { createGame, createSaleGame, getAllGames, getSaleGames, getTopSellerGames, getMostPlayedGames, getNewReleaseGames, getTrendingGames, getUpcomingGames, getGame, updateGame, deleteGame, /* uploadImages,  */ deleteImages };

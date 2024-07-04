@@ -1,18 +1,15 @@
 const Transaction = require("../models/transactionModel");
 const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
-const { validateMongodbId } = require("../utils/validations");
+const { validateMongodbId, validatePage, validateLimit } = require("../utils/validations");
 const { successResponse, errorResponse } = require("../utils/response");
 const { snap } = require("../utils/midtrans");
 const sendEmail = require("../utils/nodemailer");
 
 const createTransaction = asyncHandler(async (req, res) => {
   const { id, email } = req.user;
-  const { items, total } = req.body;
-
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  const { items, serviceFee, total } = req.body;
+  validateMongodbId(res, id);
 
   try {
     const orderId = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -25,12 +22,20 @@ const createTransaction = asyncHandler(async (req, res) => {
       customer_details: {
         user_id: id,
       },
-      item_details: items.map((item) => ({
-        id: item._id,
-        price: item.price,
-        name: item.title,
-        quantity: 1,
-      })),
+      item_details: [
+        ...items.map((item) => ({
+          id: item._id,
+          price: item.discount.isActive ? item.price - ((item.discount.percentage / 100) * item.price).toFixed(0) : item.price,
+          name: item.title,
+          quantity: 1,
+        })),
+        {
+          id: "service_fee",
+          price: serviceFee,
+          name: "Service Fee",
+          quantity: 1,
+        },
+      ],
     });
 
     await Transaction.create({
@@ -51,21 +56,60 @@ const createTransaction = asyncHandler(async (req, res) => {
     };
     sendEmail(data);
 
-    successResponse(res, transaction, "Transaction created successfully", 201);
+    successResponse(res, { transaction, orderId }, "Transaction created successfully", 201);
   } catch (error) {
-    console.log(error);
     errorResponse(res, 500, "Failed to create transaction");
+    console.log(error);
+  }
+});
+
+const getAllTransactionUsers = asyncHandler(async (req, res) => {
+  const { page, limit } = req.query;
+
+  if (page) {
+    validatePage(res, page);
+  }
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const skip = (page - 1) * limit;
+  try {
+    const transactions = await Transaction.find().populate("userId").sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const total = await Transaction.countDocuments();
+    const totalPages = Math.ceil(total / limit);
+
+    successResponse(res, { transactions, total, page, totalPages }, "All transaction users fetched successfully", 200);
+  } catch (error) {
+    errorResponse(res, 500, "Failed to fetch all transaction users");
   }
 });
 
 const getAllTransactions = asyncHandler(async (req, res) => {
   const { id } = req.user;
-  validateMongodbId(id);
+  const { page, limit } = req.query;
+
+  validateMongodbId(res, id);
+
+  if (page) {
+    validatePage(res, page);
+  }
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const skip = (page - 1) * limit;
+
   try {
-    const transactions = await Transaction.find({ userId: id }).populate("items");
-    res.json(transactions);
+    const transactions = await Transaction.find({ userId: id }).skip(skip).limit(limit).populate("items").sort({ createdAt: -1 });
+    const total = await Transaction.countDocuments({ userId: id });
+    const totalPages = Math.ceil(total / limit);
+
+    successResponse(res, { transactions, total, page, totalPages }, "Transactions fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch transactions");
   }
 });
 
@@ -102,4 +146,4 @@ const updateTransactionStatus = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createTransaction, getAllTransactions, getDetailTransaction, updateTransactionStatus };
+module.exports = { createTransaction, getAllTransactionUsers, getAllTransactions, getDetailTransaction, updateTransactionStatus };

@@ -34,46 +34,61 @@ export const AuthProvider = ({ children }) => {
   );
 
   const login = async (userData) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post(`/user/login-admin`, userData);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const logout = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.get(`/user/logout`);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const forgotPassword = async (userData) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post(`/user/forgot-password-token`, userData);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const resetPassword = async (token, userData) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/user/reset-password/${token}`, userData);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const changePassword = async (userData) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/user/change-password`, userData);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
@@ -99,28 +114,37 @@ export const AuthProvider = ({ children }) => {
   };
 
   const blockUser = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/user/block/${id}`);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const unblockUser = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/user/unblock/${id}`);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const deleteAccount = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.delete(`/user`);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };

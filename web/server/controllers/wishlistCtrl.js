@@ -7,13 +7,8 @@ const addWishlist = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { gameId } = req.body;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
-
-  if (!validateMongodbId(gameId)) {
-    return errorResponse(res, 400, "Invalid game ID");
-  }
+  validateMongodbId(res, id);
+  validateMongodbId(res, gameId);
 
   try {
     const existingWishlistItem = await Wishlist.find({ gameId, userId: id });
@@ -32,9 +27,7 @@ const addWishlist = asyncHandler(async (req, res) => {
 const getWishlist = asyncHandler(async (req, res) => {
   const { id } = req.user;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
+  validateMongodbId(res, id);
 
   try {
     const wishlist = await Wishlist.find({ userId: id }).populate("gameId");
@@ -49,18 +42,14 @@ const getWishlist = asyncHandler(async (req, res) => {
 
 const deleteWishlist = asyncHandler(async (req, res) => {
   const { id } = req.user;
+  const { wishlistItemId } = req.params;
 
-  if (!validateMongodbId(id)) {
-    return errorResponse(res, 400, "Invalid user ID");
-  }
-
-  if (!validateMongodbId(req.params.wishlistItemId)) {
-    return errorResponse(res, 400, "Invalid wishlist item ID");
-  }
+  validateMongodbId(res, id);
+  validateMongodbId(res, wishlistItemId);
 
   try {
-    const wishlist = await Wishlist.deleteOne({ userId: id, _id: req.params.wishlistItemId });
-    
+    const wishlist = await Wishlist.deleteOne({ userId: id, _id: wishlistItemId });
+
     if (wishlist.deletedCount <= 0) {
       return errorResponse(res, 404, "Wishlist item not found");
     }

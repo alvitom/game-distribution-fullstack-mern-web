@@ -1,44 +1,78 @@
 const mongoose = require("mongoose");
 const { errorResponse } = require("./response");
 
-const validateMongodbId = (id) => {
+const validateMongodbId = (res, id) => {
   const isValid = mongoose.Types.ObjectId.isValid(id);
-  return isValid;
+
+  if (!isValid) {
+    return errorResponse(res, 400, "Invalid ID");
+  }
 };
 
-const validateEmail = (email) => {
+const validateEmail = (res, email) => {
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  return emailRegex.test(email);
+
+  if (!emailRegex.test(email)) {
+    return errorResponse(res, 400, "Invalid email");
+  }
 };
 
-const validatePassword = (password) => {
+const validatePassword = (res, password) => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%^*?&()\-_=+[{\]};:,<.>|~]).{6,20}$/;
-  return passwordRegex.test(password);
+
+  if (!passwordRegex.test(password)) {
+    return errorResponse(res, 400, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+  }
+
+  if (password.length < 6 || password.length > 20) {
+    return errorResponse(res, 400, "Password must be between 6 and 20 characters");
+  }
 };
 
-const validateUsername = (username) => {
-  const usernameRegex = /^[a-zA-Z0-9_]+$/;
-  return usernameRegex.test(username);
-};
-
-const validateOTP = (otp) => {
+const validateOTP = (res, otp) => {
   const otpRegex = /^\d{6}$/;
-  return otpRegex.test(otp);
+
+  if (!otpRegex.test(otp)) {
+    return errorResponse(res, 400, "Invalid OTP");
+  }
+
+  if (!otp) {
+    return errorResponse(res, 400, "OTP is required");
+  }
 };
 
-const validatePageAndLimit = (page, limit) => {
+const validateUsername = (res, username) => {
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+
+  if (!usernameRegex.test(username)) {
+    return errorResponse(res, 400, "Username can only contain letters, numbers, and underscores");
+  }
+
+  if (username.length < 3 || username.length > 20) {
+    return errorResponse(res, 400, "Username must be between 3 and 20 characters");
+  }
+};
+
+const validateFullname = (res, fullname) => {
+  if (fullname.length < 3 || fullname.length > 50) {
+    return errorResponse(res, 400, "Fullname must be between 3 and 50 characters");
+  }
+};
+
+const validatePage = (res, page) => {
   const sanitizedPage = parseInt(page);
-  const sanitizedLimit = parseInt(limit);
 
   if (Number.isNaN(sanitizedPage) || sanitizedPage < 1) {
-    errorResponse(res, 400, "Invalid page parameter");
+    return errorResponse(res, 400, "Invalid page parameter");
   }
-
-  if (Number.isNaN(sanitizedLimit) || sanitizedLimit < 1) {
-    errorResponse(res, 400, "Invalid limit parameter");
-  }
-
-  return { sanitizedPage, sanitizedLimit };
 };
 
-module.exports = { validateMongodbId, validateEmail, validatePassword, validateUsername, validateOTP, validatePageAndLimit };
+const validateLimit = (res, limit) => {
+  const sanitizedLimit = parseInt(limit);
+
+  if (Number.isNaN(sanitizedLimit) || sanitizedLimit < 1) {
+    return errorResponse(res, 400, "Invalid limit parameter");
+  }
+};
+
+module.exports = { validateMongodbId, validateEmail, validatePassword, validateOTP, validateUsername, validateFullname, validatePage, validateLimit };

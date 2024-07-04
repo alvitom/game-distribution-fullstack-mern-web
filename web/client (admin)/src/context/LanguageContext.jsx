@@ -45,8 +45,8 @@ export const LanguageProvider = ({ children }) => {
       setTotalPages(data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching languages:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
@@ -58,38 +58,47 @@ export const LanguageProvider = ({ children }) => {
       setSelectedLanguage(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching language:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
   const createLanguage = async (language) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/language", language);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error creating language:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const updateLanguage = async (id, updatedLanguage) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/language/${id}`, updatedLanguage);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error updating language:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const deleteLanguage = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.delete(`/language/${id}`);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error deleting language:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 

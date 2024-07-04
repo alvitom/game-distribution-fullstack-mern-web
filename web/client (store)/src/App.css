@@ -21,6 +21,7 @@ a {
 /* Header */
 header .logo {
   color: #fff;
+  font-size: 24px;
 }
 
 header a {
@@ -85,6 +86,101 @@ header a:hover {
   border-radius: 50%;
   text-align: center;
 }
+
+.btn-hamburger {
+  background: none;
+  border: none;
+  color: #fff;
+}
+
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.mobile-menu .link {
+  font-size: 18px;
+  color: #aeaeae;
+}
+
+.mobile-menu .link:hover {
+  color: #fff;
+  transition: 0.2s;
+}
+
+@media (max-width: 575.98px) {
+  .header-top .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-top .d-flex .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-bottom .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-bottom .search-wrapper {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .header-bottom .wishlist,
+  .header-bottom .cart {
+    margin-top: 10px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .header-top .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-top .d-flex .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-bottom .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-bottom .search-wrapper {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .header-bottom .wishlist,
+  .header-bottom .cart {
+    margin-top: 10px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .header-bottom .search-wrapper {
+    width: 100%;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .header-bottom .search-wrapper {
+    width: 300px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .header-bottom .search-wrapper {
+    width: 350px;
+  }
+}
 /* End Header */
 
 /* Footer */
@@ -101,11 +197,156 @@ footer a {
 footer a:hover {
   color: #fff;
 }
+
+@media (max-width: 575.98px) {
+  .footer-top .container {
+    padding: 0 15px;
+  }
+
+  .footer-top .row {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-top .col-4 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .footer-top .col-4 h1,
+  .footer-top .col-4 h4 {
+    text-align: center;
+  }
+
+  .footer-top .footer-links {
+    align-items: center;
+  }
+
+  .footer-top .footer-links a {
+    margin-bottom: 10px;
+  }
+
+  .footer-top .d-flex {
+    justify-content: center;
+  }
+
+  .footer-bottom .container {
+    text-align: center;
+  }
+
+  .footer-bottom .d-flex {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-bottom p {
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .footer-top .container {
+    padding: 0 15px;
+  }
+
+  .footer-top .row {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-top .col-4 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .footer-top .col-4 h1,
+  .footer-top .col-4 h4 {
+    text-align: center;
+  }
+
+  .footer-top .footer-links {
+    align-items: center;
+  }
+
+  .footer-top .footer-links a {
+    margin-bottom: 10px;
+  }
+
+  .footer-top .d-flex {
+    justify-content: center;
+  }
+
+  .footer-bottom .container {
+    text-align: center;
+  }
+
+  .footer-bottom .d-flex {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-bottom p {
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .footer-top .container {
+    padding: 0 30px;
+  }
+
+  .footer-top .row {
+    text-align: left;
+  }
+
+  .footer-top .col-4 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .footer-bottom .container {
+    text-align: center;
+  }
+
+  .footer-bottom .d-flex {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-bottom p {
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .footer-top .container {
+    padding: 0 60px;
+  }
+
+  .footer-top .row {
+    text-align: left;
+  }
+
+  .footer-bottom .container {
+    text-align: left;
+  }
+
+  .footer-bottom .d-flex {
+    flex-direction: row;
+  }
+
+  .footer-bottom p {
+    margin-bottom: 0;
+  }
+}
 /* End Footer */
 
 /* Game Card */
 .game-card {
   transition: 0.3s all;
+  margin-bottom: 20px;
 }
 
 .game-card .action-btn {
@@ -129,11 +370,47 @@ footer a:hover {
   display: block;
 }
 
+@media (max-width: 1200px) {
+  .game-card {
+    width: calc(33.333% - 20px);
+  }
+}
+
+@media (max-width: 992px) {
+  .game-card {
+    width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .game-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .game-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .game-card .game-detail {
+    padding: 10px;
+  }
+
+  .game-card .game-image img {
+    width: 100%;
+    height: auto;
+  }
+}
+
 /* End Game Card */
 
 .outlet {
   background-color: var(--color-121212);
   padding-bottom: 100px;
+  min-height: 48vh;
 }
 
 .mantine-Modal-content,
@@ -272,6 +549,14 @@ footer a:hover {
 .mantine-Select-dropdown {
   border: none !important;
 } */
+.game-wrapper {
+  padding: 20px;
+}
+
+.game-wrapper .mantine-Group-root {
+  gap: 15px !important;
+}
+
 /* End Game Page */
 
 /* Cart Page */
@@ -285,6 +570,75 @@ footer a:hover {
   width: 100px;
 }
 
+@media (max-width: 575.98px) {
+  .cart-wrapper .cart-item {
+    padding: 15px 20px;
+  }
+
+  .cart-wrapper .cart-item .game-detail h5 {
+    font-size: 16px;
+  }
+
+  .cart-wrapper .cart-item .game-detail p {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .cart-wrapper .cart-item {
+    padding: 18px 25px;
+  }
+
+  .cart-wrapper .cart-item .game-detail h5 {
+    font-size: 18px;
+  }
+
+  .cart-wrapper .cart-item .game-detail p {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .cart-wrapper .cart-item {
+    padding: 20px 30px;
+  }
+
+  .cart-wrapper .cart-item .game-detail h5 {
+    font-size: 20px;
+  }
+
+  .cart-wrapper .cart-item .game-detail p {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .cart-wrapper .cart-item {
+    padding: 22px 35px;
+  }
+
+  .cart-wrapper .cart-item .game-detail h5 {
+    font-size: 22px;
+  }
+
+  .cart-wrapper .cart-item .game-detail p {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .cart-wrapper .cart-item {
+    padding: 25px 40px;
+  }
+
+  .cart-wrapper .cart-item .game-detail h5 {
+    font-size: 24px;
+  }
+
+  .cart-wrapper .cart-item .game-detail p {
+    font-size: 18px;
+  }
+}
 /* End Cart Page */
 
 /* Wishlist Page */
@@ -298,6 +652,93 @@ footer a:hover {
   width: 100px;
 }
 
+@media (max-width: 575.98px) {
+  .wishlist-wrapper .wishlist-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-detail {
+    margin-top: 15px;
+  }
+
+  .wishlist-wrapper .wishlist-item .action-btn {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-image img {
+    width: 80px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .wishlist-wrapper .wishlist-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-detail {
+    margin-top: 15px;
+  }
+
+  .wishlist-wrapper .wishlist-item .action-btn {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-image img {
+    width: 80px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .wishlist-wrapper .wishlist-item {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-detail {
+    margin-left: 20px;
+  }
+
+  .wishlist-wrapper .wishlist-item .action-btn {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-image img {
+    width: 90px;
+  }
+}
+
+@media (min-width: 992px) {
+  .wishlist-wrapper .wishlist-item {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-detail {
+    margin-left: 30px;
+  }
+
+  .wishlist-wrapper .wishlist-item .action-btn {
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+  }
+
+  .wishlist-wrapper .wishlist-item .game-image img {
+    width: 100px;
+  }
+}
 /* End Wishlist Page */
 
 /* Change Password Page */
@@ -380,13 +821,15 @@ footer a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 .auth-wrapper .login-card {
   background-color: #222;
   border-radius: 10px;
   padding: 50px;
-  width: 31%;
+  width: 100%;
+  max-width: 400px;
 }
 
 .auth-wrapper .login-card input {
@@ -424,6 +867,101 @@ footer a:hover {
 
 .auth-wrapper .login-card .forgot-password:hover {
   color: #fff;
+}
+
+@media (max-width: 575.98px) {
+  .auth-wrapper .login-card {
+    padding: 30px;
+    width: 100%;
+  }
+
+  .auth-wrapper .login-card h1 {
+    font-size: 24px;
+  }
+
+  .auth-wrapper .login-card h3 {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .auth-wrapper .login-card {
+    padding: 35px;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .auth-wrapper .login-card h1 {
+    font-size: 26px;
+  }
+
+  .auth-wrapper .login-card h3 {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .auth-wrapper .login-card {
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .auth-wrapper .login-card h1 {
+    font-size: 28px;
+  }
+
+  .auth-wrapper .login-card h3 {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .auth-wrapper .login-card {
+    padding: 45px;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .auth-wrapper .login-card h1 {
+    font-size: 30px;
+  }
+
+  .auth-wrapper .login-card h3 {
+    font-size: 19px;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .auth-wrapper .login-card {
+    padding: 50px;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .auth-wrapper .login-card h1 {
+    font-size: 32px;
+  }
+
+  .auth-wrapper .login-card h3 {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .auth-wrapper .login-card {
+    padding: 55px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .auth-wrapper .login-card h1 {
+    font-size: 34px;
+  }
+
+  .auth-wrapper .login-card h3 {
+    font-size: 22px;
+  }
 }
 
 /* End Login Page */
@@ -576,3 +1114,22 @@ footer a:hover {
 }
 
 /* End Verify Page */
+
+/* Transaction Page */
+.transactions-container {
+  padding: 20px;
+  background-color: var(--color-252429);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.transactions-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.transactions-container .mantine-Group-root {
+  gap: 15px !important;
+}
+
+/* End Transaction Page */

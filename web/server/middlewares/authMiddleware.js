@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
+const { errorResponse } = require("../utils/response");
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
   let token;
@@ -14,10 +15,10 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
         next();
       }
     } catch (error) {
-      throw new Error("Not authorized token expired, please login again");
+      errorResponse(res, 401, "Not authorized token expired, please login again");
     }
   } else {
-    throw new Error("There is no token attached to header");
+    errorResponse(res, 401, "There is no token attached to header");
   }
 });
 
@@ -25,7 +26,7 @@ const isAdmin = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const user = await User.findOne({ username });
   if (user.role !== "admin") {
-    throw new Error("You are not an admin");
+    errorResponse(res, 401, "You are not an admin");
   } else {
     next();
   }

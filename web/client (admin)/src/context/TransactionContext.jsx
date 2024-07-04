@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { createContext, useState } from "react";
+import { createContext, useState } from "react";
 
 export const TransactionContext = createContext();
 
@@ -26,35 +26,11 @@ export const TransactionProvider = ({ children }) => {
     }
   );
 
-  const createTransaction = async (data) => {
+  const fetchAllTransactionUsers = async (page, limit) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.post(`/transaction`, data);
-      setLoading(false);
-      return response.data;
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
-    }
-  };
-
-  const updateTransaction = async (data) => {
-    try {
-      const response = await axiosInstance.post(`/midtrans/notification`, data);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
-    }
-  };
-
-  const fetchAllTransactions = async (page, limit) => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get(`/transaction`, {
-        params: {
-          page,
-          limit,
-        },
+      const response = await axiosInstance.get(`/transaction/all-users`, {
+        params: { page, limit },
       });
       const datas = await response.data;
       setTransactions(datas.data.transactions);
@@ -66,5 +42,20 @@ export const TransactionProvider = ({ children }) => {
     }
   };
 
-  return <TransactionContext.Provider value={{ createTransaction, updateTransaction, fetchAllTransactions, transactions, loading, page, totalPages, setPage }}>{children}</TransactionContext.Provider>;
+  return (
+    <TransactionContext.Provider
+      value={{
+        transactions,
+        setTransactions,
+        loading,
+        setLoading,
+        page,
+        setPage,
+        totalPages,
+        fetchAllTransactionUsers,
+      }}
+    >
+      {children}
+    </TransactionContext.Provider>
+  );
 };

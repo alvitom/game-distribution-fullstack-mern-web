@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Pagination, Table, TextInput } from "@mantine/core";
+import { Pagination, Skeleton, Table, TextInput } from "@mantine/core";
 import { FaSearch, FaCheck } from "react-icons/fa";
 import { GameContext } from "../context/GameContext";
 import { modals } from "@mantine/modals";
@@ -28,10 +28,6 @@ const Games = () => {
       clearTimeout(handler);
     };
   }, [keyword]);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
   const handleDeleteGame = async (id) => {
     const response = await deleteGame(id);
@@ -129,7 +125,7 @@ const Games = () => {
       </Table.Td>
       <Table.Td>
         <div className="d-flex gap-2">
-          <Link to={`update/${game._id}`} className="btn btn-primary">
+          <Link to={`update/${game.slug}`} className="btn btn-primary">
             Update
           </Link>
           <button className="btn btn-danger" onClick={() => openDeleteModal(game._id, game.title)}>
@@ -159,24 +155,69 @@ const Games = () => {
               <TextInput leftSectionPointerEvents="none" leftSection={<FaSearch />} placeholder="Keywords" id="filters" ref={inputRef} value={keyword} onChange={handleSearch} />
             </div>
           </div>
-          <Table verticalSpacing="sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>No.</Table.Th>
-                <Table.Th>Image</Table.Th>
-                <Table.Th>Title</Table.Th>
-                <Table.Th>Price</Table.Th>
-                <Table.Th>Actions</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-          <div className="d-flex justify-content-center align-items-center">
-            <Pagination total={totalPages} value={page} onChange={setPage} mt="xl" />
-          </div>
+          {loading ? (
+            <SkeletonTable rows={limit} />
+          ) : games.length === 0 ? (
+            <p className="text-center">No games found</p>
+          ) : (
+            <>
+              <Table verticalSpacing="sm">
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>No.</Table.Th>
+                    <Table.Th>Image</Table.Th>
+                    <Table.Th>Title</Table.Th>
+                    <Table.Th>Price</Table.Th>
+                    <Table.Th>Actions</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+              <div className="d-flex justify-content-center align-items-center">
+                <Pagination total={totalPages} value={page} onChange={setPage} mt="xl" />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
+  );
+};
+
+const SkeletonTable = ({ rows }) => {
+  const skeletonRows = Array.from({ length: rows }, (_, index) => (
+    <Table.Tr key={index}>
+      <Table.Td>
+        <Skeleton height={20} width="100%" />
+      </Table.Td>
+      <Table.Td>
+        <Skeleton height={50} width={50} />
+      </Table.Td>
+      <Table.Td>
+        <Skeleton height={20} width="80%" />
+      </Table.Td>
+      <Table.Td>
+        <Skeleton height={20} width="60%" />
+      </Table.Td>
+      <Table.Td>
+        <Skeleton height={20} width="100%" />
+      </Table.Td>
+    </Table.Tr>
+  ));
+
+  return (
+    <Table verticalSpacing="sm">
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>No.</Table.Th>
+          <Table.Th>Image</Table.Th>
+          <Table.Th>Title</Table.Th>
+          <Table.Th>Price</Table.Th>
+          <Table.Th>Actions</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>{skeletonRows}</Table.Tbody>
+    </Table>
   );
 };
 

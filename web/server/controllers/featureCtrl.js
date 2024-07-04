@@ -1,75 +1,95 @@
 const asyncHandler = require("express-async-handler");
 const Feature = require("../models/featureModel");
-const { validateMongodbId } = require("../utils/validations");
+const { validateMongodbId, validatePage, validateLimit } = require("../utils/validations");
+const { errorResponse, successResponse } = require("../utils/response");
 
 const createFeature = asyncHandler(async (req, res) => {
+  const { feature } = req.body;
+
+  if (!feature) {
+    return errorResponse(res, 400, "Feature is required");
+  }
+
   try {
+    const feature = await Feature.findOne({ feature });
+
+    if (feature) {
+      return errorResponse(res, 400, "Feature already exists");
+    }
+
     const newFeature = await Feature.create(req.body);
-    res.json(newFeature);
+    successResponse(res, newFeature, "Feature created successfully", 201);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to create feature");
   }
 });
 
 const getAllFeatures = asyncHandler(async (req, res) => {
+  const { page, limit, keyword } = req.query;
+
+  if (page) {
+    validatePage(res, page);
+  }
+
+  if (limit) {
+    validateLimit(res, limit);
+  }
+
+  const skip = (page - 1) * limit;
+  const query = keyword ? { feature: { $regex: keyword, $options: "i" } } : {};
+
   try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const keyword = req.query.keyword;
-    const skip = (page - 1) * limit;
-    const query = {};
-
-    if (keyword) {
-      query.feature = { $regex: keyword, $options: "i" };
-    }
-
     const features = await Feature.find(query).skip(skip).limit(limit);
     const total = await Feature.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
 
-    res.json({
-      features,
-      total,
-      page,
-      totalPages,
-    });
+    successResponse(res, { features, total, page, totalPages }, "All features fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch features");
   }
 });
 
 const getFeature = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+  validateMongodbId(res, id);
+
   try {
     const feature = await Feature.findById(id);
-    res.json(feature);
+    successResponse(res, feature, "Feature fetched successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to fetch feature");
   }
 });
 
 const updateFeature = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+  validateMongodbId(res, id);
+  const { feature } = req.body;
+
+  if (!feature) {
+    return errorResponse(res, 400, "Feature is required");
+  }
+
   try {
     const updateFeature = await Feature.findByIdAndUpdate(id, req.body, {
       new: true,
     });
-    res.json(updateFeature);
+
+    successResponse(res, updateFeature, "Feature updated successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to update feature");
   }
 });
 
 const deleteFeature = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id);
+  validateMongodbId(res, id);
+
   try {
     const deleteFeature = await Feature.findByIdAndDelete(id);
-    res.json(deleteFeature);
+    successResponse(res, deleteFeature, "Feature deleted successfully", 200);
   } catch (error) {
-    throw new Error(error);
+    errorResponse(res, 500, "Failed to delete feature");
   }
 });
 

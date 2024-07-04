@@ -40,13 +40,13 @@ export const FeatureProvider = ({ children }) => {
           keyword: debouncedKeyword,
         },
       });
-      const data = await response.data;
-      setFeatures(data.features);
-      setTotalPages(data.totalPages);
+      const datas = await response.data;
+      setFeatures(datas.data.features);
+      setTotalPages(datas.data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching features:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
@@ -54,43 +54,52 @@ export const FeatureProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/feature/${id}`);
-      const data = await response.data;
-      setSelectedFeature(data);
+      const datas = await response.data;
+      setSelectedFeature(datas.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching feature:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
   const createFeature = async (feature) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/feature", feature);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error creating feature:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const updateFeature = async (id, updatedFeature) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/feature/${id}`, updatedFeature);
       const data = await response.data;
       setFeatures(features.map((feature) => (feature._id === id ? data : feature)));
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error updating feature:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const deleteFeature = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.delete(`/feature/${id}`);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error deleting feature:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 

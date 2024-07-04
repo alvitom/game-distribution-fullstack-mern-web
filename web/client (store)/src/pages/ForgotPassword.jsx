@@ -7,7 +7,7 @@ import { FaCheck } from "react-icons/fa";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const { forgotPassword } = useContext(AuthContext);
+  const { forgotPassword, loading } = useContext(AuthContext);
 
   const handleForgotPassword = async () => {
     const response = await forgotPassword({ email });
@@ -73,8 +73,8 @@ const ForgotPassword = () => {
           <h1>Forgot Password</h1>
           <p>Please enter your email address</p>
           <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <button className="btn btn-success w-100" onClick={handleForgotPassword}>
-            Submit
+          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleForgotPassword}>
+            {loading ? "Loading..." : "Submit"}
           </button>
         </div>
       </div>

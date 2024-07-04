@@ -10,11 +10,11 @@ import { MdClose } from "react-icons/md";
 const UpdatePromotion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { promotions, setPromotions, selectedPromotion, fetchPromotion, updatePromotion } = useContext(PromotionContext);
+  const { selectedPromotion, fetchPromotion, updatePromotion, loading } = useContext(PromotionContext);
 
   const [promotion, setPromotion] = useState({
     game: "",
-    discount: null,
+    discount: "",
     endDate: null,
     isActive: false,
   });
@@ -35,40 +35,13 @@ const UpdatePromotion = () => {
   }, [selectedPromotion]);
 
   const handleUpdatePromotion = async () => {
-    const data = await updatePromotion(id, {
+    const response = await updatePromotion(id, {
       discount: promotion.discount,
       endDate: promotion.endDate,
       isActive: promotion.isActive,
     });
-    if (data) {
-      modals.open({
-        radius: "md",
-        size: "xs",
-        centered: true,
-        withCloseButton: false,
-        children: (
-          <>
-            <div className="d-flex justify-content-center mb-2">
-              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
-            </div>
-            <p className="text-center">Update promotion success</p>
-            <div className="d-flex justify-content-center">
-              <button
-                className="btn btn-light"
-                onClick={() => {
-                  modals.closeAll();
-                  navigate("/promotions");
-                  setPromotions(promotions.map((promotion) => (promotion._id === id ? data : promotion)));
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </>
-        ),
-      });
-    } else {
-      modals.open({
+    if (!response.success) {
+      return modals.open({
         radius: "md",
         size: "xs",
         centered: true,
@@ -78,13 +51,39 @@ const UpdatePromotion = () => {
             <div className="d-flex justify-content-center mb-2">
               <MdClose style={{ width: 100 + "px", height: 100 + "px", color: "rgb(220, 53, 69)" }} />
             </div>
-            <p className="text-center">Update promotion failed</p>
+            <p className="text-center">{response.message}</p>
             <div className="d-flex justify-content-center">
               <button
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
                   setPromotion({ game: selectedPromotion.game.title, discount: selectedPromotion.discount, endDate: selectedPromotion.endDate, isActive: selectedPromotion.isActive });
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ),
+      });
+    } else {
+      return modals.open({
+        radius: "md",
+        size: "xs",
+        centered: true,
+        withCloseButton: false,
+        children: (
+          <>
+            <div className="d-flex justify-content-center mb-2">
+              <FaCheck style={{ width: 100 + "px", height: 100 + "px", color: "rgb(25, 135, 84)" }} />
+            </div>
+            <p className="text-center">{response.message}</p>
+            <div className="d-flex justify-content-center">
+              <button
+                className="btn btn-light"
+                onClick={() => {
+                  modals.closeAll();
+                  navigate("/promotions");
                 }}
               >
                 Close
@@ -117,8 +116,8 @@ const UpdatePromotion = () => {
             <Switch checked={promotion.isActive} onChange={(event) => setPromotion((prevPromotion) => ({ ...prevPromotion, isActive: event.target.checked }))} label={promotion.isActive ? "Active" : "Not Active"} size="md" />
           </div>
           <div className="d-flex justify-content-center align-items-center">
-            <button className="btn btn-success w-25" onClick={handleUpdatePromotion}>
-              Update Promotion
+            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleUpdatePromotion}>
+              {loading ? "Updating..." : "Update Promotion"}
             </button>
           </div>
         </div>

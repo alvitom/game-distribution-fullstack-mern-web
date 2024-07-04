@@ -37,6 +37,22 @@ const gameSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  discount: {
+    percentage: {
+      type: Number,
+      default: 0,
+    },
+    startDate: {
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+  },
   genres: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -68,7 +84,11 @@ const gameSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  players: {
+  playCount: {
+    type: Number,
+    default: 0,
+  },
+  trendScore: {
     type: Number,
     default: 0,
   },

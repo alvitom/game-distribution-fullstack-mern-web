@@ -40,13 +40,13 @@ export const GenreProvider = ({ children }) => {
           keyword: debouncedKeyword,
         },
       });
-      const data = await response.data;
-      setGenres(data.genres);
-      setTotalPages(data.totalPages);
+      const datas = await response.data;
+      setGenres(datas.data.genres);
+      setTotalPages(datas.data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching genres:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
@@ -54,42 +54,51 @@ export const GenreProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/genre/${id}`);
-      const data = await response.data;
-      setSelectedGenre(data);
+      const datas = await response.data;
+      setSelectedGenre(datas.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching genre:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
   const createGenre = async (genre) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/genre", genre);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error creating genre:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const updateGenre = async (id, updatedGenre) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/genre/${id}`, updatedGenre);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error updating genre:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const deleteGenre = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.delete(`/genre/${id}`);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error deleting genre:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 

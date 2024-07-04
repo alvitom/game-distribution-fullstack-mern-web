@@ -40,13 +40,13 @@ export const PromotionProvider = ({ children }) => {
           keyword: debouncedKeyword,
         },
       });
-      const data = await response.data;
-      setPromotions(data.promotions);
-      setTotalPages(data.totalPages);
+      const datas = await response.data;
+      setPromotions(datas.data.promotions);
+      setTotalPages(datas.data.totalPages);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching promotions:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
@@ -54,42 +54,51 @@ export const PromotionProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/promotion/${id}`);
-      const data = await response.data;
-      setSelectedPromotion(data);
+      const datas = await response.data;
+      setSelectedPromotion(datas.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching promotion:", error);
       setLoading(false);
+      return error.response.data;
     }
   };
 
   const createPromotion = async (promotion) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/promotion", promotion);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error creating promotion:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const updatePromotion = async (id, updatedPromotion) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/promotion/${id}`, updatedPromotion);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error updating promotion:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 
   const deletePromotion = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.delete(`/promotion/${id}`);
       const data = await response.data;
+      setLoading(false);
       return data;
     } catch (error) {
-      console.error("Error deleting promotion:", error);
+      setLoading(false);
+      return error.response.data;
     }
   };
 

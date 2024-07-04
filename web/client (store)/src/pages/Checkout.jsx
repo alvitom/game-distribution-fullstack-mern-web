@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { TransactionContext } from "../context/TransactionContext";
 import { modals } from "@mantine/modals";
 import { MdClose } from "react-icons/md";
+import { CartContext } from "../context/CartContext";
 
 const Checkout = () => {
   const { checkout } = useContext(CheckoutContext);
-  const { createTransaction, updateTransaction } = useContext(TransactionContext);
+  const { createTransaction, updateTransaction, loading } = useContext(TransactionContext);
+  const { setCarts } = useContext(CartContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +23,8 @@ const Checkout = () => {
   const handlePlaceOrder = async () => {
     const data = {
       items: checkout?.items,
-      total: checkout?.subtotal,
+      serviceFee: checkout?.prices.serviceFee,
+      total: checkout?.prices.total,
     };
     const response = await createTransaction(data);
     if (!response.success) {
@@ -50,7 +53,9 @@ const Checkout = () => {
         ),
       });
     } else {
-      window.snap.pay(response.data.token, {
+      const { token } = response.data.transaction;
+      const { orderId } = response.data;
+      window.snap.pay(token, {
         onSuccess: async function (result) {
           const response = await updateTransaction(result);
           if (!response.success) {
@@ -78,9 +83,8 @@ const Checkout = () => {
                 </>
               ),
             });
-          } else {
-            console.log(response.data);
           }
+          navigate("/transactions");
         },
         onPending: async function (result) {
           const response = await updateTransaction(result);
@@ -109,9 +113,9 @@ const Checkout = () => {
                 </>
               ),
             });
-          } else {
-            console.log(response.data);
           }
+          localStorage.setItem(result.order_id, JSON.stringify(token));
+          navigate("/transactions");
         },
         onError: async function (result) {
           const response = await updateTransaction(result);
@@ -140,14 +144,15 @@ const Checkout = () => {
                 </>
               ),
             });
-          } else {
-            location.href = "/";
           }
+          navigate("/transactions");
         },
         onClose: function () {
-          // location.href = "/";
+          localStorage.setItem(orderId, JSON.stringify(token));
+          navigate("/transactions");
         },
       });
+      setCarts([]);
     }
   };
   return (
@@ -168,34 +173,76 @@ const Checkout = () => {
                       </div>
                       <div className="game-detail">
                         <h5>{item?.title}</h5>
-                        <p>
-                          {new Intl.NumberFormat("id-ID", {
-                            style: "currency",
-                            currency: "IDR",
-                            minimumFractionDigits: 0,
-                          }).format(item?.price)}
-                        </p>
+                        {item?.discount?.isActive ? (
+                          <div className="discount d-flex flex-column my-3">
+                            <div className="price d-flex align-items-center justify-content-center gap-3">
+                              <span className="badge bg-success">-{item?.discount.percentage}%</span>
+                              <p className="old-price text-decoration-line-through text-secondary mb-0">
+                                {new Intl.NumberFormat("id-ID", {
+                                  style: "currency",
+                                  currency: "IDR",
+                                  minimumFractionDigits: 0,
+                                }).format(item?.price)}
+                              </p>
+                              <p className="new-price mb-0">
+                                {new Intl.NumberFormat("id-ID", {
+                                  style: "currency",
+                                  currency: "IDR",
+                                  minimumFractionDigits: 0,
+                                }).format(item?.price - ((item?.discount.percentage / 100) * item?.price).toFixed(0))}
+                              </p>
+                            </div>
+                            <div className="end-date">
+                              <span>Sale ends at {new Date(item?.discount.endDate).toLocaleDateString("en-US")}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p>
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                            }).format(item?.price)}
+                          </p>
+                        )}
                         <div className="d-flex align-items-center gap-2 platform-support">{item?.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : null))}</div>
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="prices my-4">
-                  <div className="price d-flex justify-content-between">
-                    <p>Subtotal</p>
-                    <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.subtotal)}</p>
-                  </div>
-                  <div className="discount d-flex justify-content-between">
-                    <p>Diskon</p>
-                    <p className="value">80% (-IDR 607,200)</p>
+                  {checkout?.prices?.totalDiscount < 0 ? (
+                    <>
+                      <div className="subtotal d-flex justify-content-between">
+                        <p>Subtotal</p>
+                        <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.prices.totalNetPrice)}</p>
+                      </div>
+                      <div className="total-discount d-flex justify-content-between">
+                        <p>Total Discount</p>
+                        <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.prices.totalDiscount)}</p>
+                      </div>
+                      <div className="total-after-discount d-flex justify-content-between">
+                        <p>Total After Discount</p>
+                        <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.prices.totalPrice)}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="subtotal d-flex justify-content-between">
+                      <p>Subtotal</p>
+                      <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.prices.totalPrice)}</p>
+                    </div>
+                  )}
+                  <div className="service-fee d-flex justify-content-between">
+                    <p>Service Fee</p>
+                    <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.prices.serviceFee)}</p>
                   </div>
                   <div className="total d-flex justify-content-between">
                     <p>Total</p>
-                    <p className="value">IDR 151,800</p>
+                    <p className="value">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(checkout?.prices.total)}</p>
                   </div>
                 </div>
-                <button className="btn btn-success w-100" onClick={handlePlaceOrder}>
-                  Place Order
+                <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handlePlaceOrder}>
+                  {loading ? "Loading..." : "Place Order"}
                 </button>
               </div>
             </div>

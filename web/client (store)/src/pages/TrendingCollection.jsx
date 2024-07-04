@@ -1,30 +1,32 @@
-import React from 'react'
-import Meta from '../components/Meta'
-import GameCard from '../components/GameCard'
+import React, { useContext, useEffect } from "react";
+import Meta from "../components/Meta";
+import GameCard from "../components/GameCard";
+import { GameContext } from "../context/GameContext";
 
 const TrendingCollection = () => {
+  const { fetchTrendingGames, trendingGames } = useContext(GameContext);
+  const limit = 50;
+
+  useEffect(() => {
+    fetchTrendingGames(limit);
+  }, []);
   return (
     <>
-      <Meta title="Game Yang Sedang Tren" />
+      <Meta title="Trending Games" />
       <div className="trending-wrapper">
         <div className="container">
           <div className="row">
             <div className="col-12 my-4">
-              <h1>Sedang Tren</h1>
+              <h1>Trending</h1>
             </div>
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
-            <GameCard collection="trending" />
+            {trendingGames.map((game, index) => (
+              <GameCard collection="trending" data={game} key={index} />
+            ))}
           </div>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default TrendingCollection
+export default TrendingCollection;

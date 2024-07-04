@@ -10,7 +10,7 @@ const ResetPassword = () => {
   const { token } = useParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { resetPassword } = useContext(AuthContext);
+  const { resetPassword, loading } = useContext(AuthContext);
 
   const handleResetPassword = async () => {
     const userData = {
@@ -81,8 +81,8 @@ const ResetPassword = () => {
           <h1>Reset Password</h1>
           <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           <input type="password" className="w-100" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-          <button className="btn btn-success w-100" onClick={handleResetPassword}>
-            Reset
+          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleResetPassword}>
+            {loading ? "Loading..." : "Reset"}
           </button>
         </div>
       </div>

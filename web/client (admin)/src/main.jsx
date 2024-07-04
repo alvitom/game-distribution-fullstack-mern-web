@@ -14,6 +14,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
 import { ModalsProvider } from "@mantine/modals";
 import { PromotionProvider } from "./context/PromotionContext.jsx";
+import { TransactionProvider } from "./context/TransactionContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -25,7 +26,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <AuthProvider>
                 <LanguageProvider>
                   <PromotionProvider>
-                    <App />
+                    <TransactionProvider>
+                      <App />
+                    </TransactionProvider>
                   </PromotionProvider>
                 </LanguageProvider>
               </AuthProvider>

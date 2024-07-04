@@ -59,10 +59,10 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  const fetchGame = async (id) => {
+  const fetchGame = async (title) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/game/${id}`);
+      const response = await axiosInstance.get(`/game/${title}`);
       const datas = await response.data;
       setSelectedGame(datas.data);
       setLoading(false);
@@ -73,28 +73,37 @@ export const GameProvider = ({ children }) => {
   };
 
   const createGame = async (gameData) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/game", gameData);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const updateGame = async (id, updatedGame) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.put(`/game/${id}`, updatedGame);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };
 
   const deleteGame = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.delete(`/game/${id}`);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error.response.data;
     }
   };

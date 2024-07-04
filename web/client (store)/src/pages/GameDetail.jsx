@@ -15,7 +15,7 @@ const user = JSON.parse(sessionStorage.getItem("user"));
 
 const GameDetail = () => {
   const { title } = useParams();
-  const { selectedGame, fetchGame } = useContext(GameContext);
+  const { selectedGame, totalNetPrice, totalDiscount, newPrice, serviceFee, totalPrice, fetchGame } = useContext(GameContext);
   const { addWishlist, wishlists, setWishlists } = useContext(WishlistContext);
   const { addCart, carts, setCarts } = useContext(CartContext);
   const [images, setImages] = useState([]);
@@ -59,7 +59,19 @@ const GameDetail = () => {
     }
     const summary = {
       items: [selectedGame],
-      subtotal: selectedGame.price,
+      prices: selectedGame.discount.isActive
+        ? {
+            totalNetPrice,
+            totalDiscount,
+            totalPrice: newPrice,
+            serviceFee,
+            total: totalPrice,
+          }
+        : {
+            totalPrice: totalNetPrice,
+            serviceFee,
+            total: totalPrice,
+          },
     };
     setCheckout(summary);
     navigate("/checkout");
@@ -328,13 +340,38 @@ const GameDetail = () => {
               <div className="game-image-original mt-3 text-center">
                 <img src={selectedGame?.coverImage.url} alt={selectedGame?.coverImage.original_filename} className="img-fluid" />
               </div>
-              <h5 className="game-price fw-bold text-center my-4">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  minimumFractionDigits: 0,
-                }).format(selectedGame?.price)}
-              </h5>
+              {selectedGame?.discount.isActive ? (
+                <div className="discount d-flex flex-column align-items-center my-4 gap-3">
+                  <div className="price d-flex align-items-center justify-content-center gap-3">
+                    <span className="badge bg-success p-2 fs-6">-{selectedGame?.discount.percentage}%</span>
+                    <h5 className="old-price text-decoration-line-through text-secondary mb-0">
+                      {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                      }).format(selectedGame?.price)}
+                    </h5>
+                    <h5 className="new-price mb-0">
+                      {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                      }).format(newPrice)}
+                    </h5>
+                  </div>
+                  <div className="end-date">
+                    <span>Sale ends at {new Date(selectedGame?.discount.endDate).toLocaleDateString("en-US")}</span>
+                  </div>
+                </div>
+              ) : (
+                <h5 className="price text-center my-4">
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                  }).format(selectedGame?.price)}
+                </h5>
+              )}
               <div className="action-btn d-flex flex-column gap-3 w-75 mx-auto">
                 <button className="btn btn-success w-100" onClick={handleCheckout}>
                   Beli Sekarang

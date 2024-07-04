@@ -175,7 +175,7 @@ const UpdateGame = (props) => {
     game.videos.forEach((video) => {
       formData.append(`videos`, video);
     });
-    await updateGame(id, formData);
+    await updateGame(selectedGame._id, formData);
   };
 
   const uploadCoverImage = (files) => {

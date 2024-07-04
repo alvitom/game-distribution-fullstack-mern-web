@@ -5,7 +5,11 @@ export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [carts, setCarts] = useState([]);
+  const [totalNetPrice, setTotalNetPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [serviceFee, setServiceFee] = useState(0);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -17,7 +21,7 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
   });
 
   axiosInstance.interceptors.request.use(
@@ -48,7 +52,11 @@ export const CartProvider = ({ children }) => {
       const response = await axiosInstance.get(`cart`);
       const datas = await response.data;
       setCarts(datas.data.cart);
+      setTotalNetPrice(datas.data.totalNetPrice);
       setTotalPrice(datas.data.totalPrice);
+      setTotalDiscount(datas.data.totalDiscount);
+      setServiceFee(datas.data.serviceFee);
+      setTotal(datas.data.total);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -71,7 +79,10 @@ export const CartProvider = ({ children }) => {
         carts,
         setCarts,
         totalPrice,
-        setTotalPrice,
+        totalNetPrice,
+        totalDiscount,
+        serviceFee,
+        total,
         loading,
         setLoading,
         addCart,

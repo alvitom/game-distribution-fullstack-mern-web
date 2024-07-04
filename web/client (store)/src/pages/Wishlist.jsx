@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Wishlist = () => {
-  const { wishlists, setWishlists, loading, fetchWishlist, removeWishlist } = useContext(WishlistContext);
+  const { wishlists, loading, fetchWishlist, removeWishlist } = useContext(WishlistContext);
   const { addCart, carts, setCarts } = useContext(CartContext);
   const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ const Wishlist = () => {
         ),
       });
     } else {
-      setWishlists(wishlists.filter((item) => item._id !== id));
+      fetchWishlist();
       modals.closeAll();
     }
   };
@@ -107,8 +107,8 @@ const Wishlist = () => {
         ),
       });
     } else {
-      setWishlists(wishlists.filter((item) => item._id !== id));
       setCarts([response.data, ...carts]);
+      fetchWishlist();
       modals.closeAll();
     }
   };
@@ -136,23 +136,6 @@ const Wishlist = () => {
   if (loading) {
     return <p>Loading...</p>;
   }
-
-  if (wishlists.length === 0) {
-    return (
-      <div className="wishlist-wrapper">
-        <div className="container">
-          <div className="row">
-            <div className="col-12 my-2">
-              <h1>Wishlist</h1>
-            </div>
-            <div className="col-12">
-              <h3 className="text-center">Wishlist is empty</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
   return (
     <>
       <Meta title="Wishlist" />
@@ -162,40 +145,71 @@ const Wishlist = () => {
             <div className="col-12 my-2">
               <h1>Wishlist</h1>
             </div>
-            <div className="col-12">
-              {wishlists?.map((wishlist, index) => (
-                <div className="wishlist-item my-4 d-flex justify-content-between align-items-center" key={index}>
-                  <div className="d-flex gap-3 align-items-center">
-                    <div className="game-image">
-                      <img src={wishlist.gameId.coverImage?.url} alt={wishlist.gameId.title} className="img-fluid" />
-                    </div>
-                    <div className="game-detail">
-                      <h5>{wishlist.gameId.title}</h5>
-                      <p>
-                        {new Intl.NumberFormat("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                          minimumFractionDigits: 0,
-                        }).format(wishlist.gameId.price)}
-                      </p>
-                      <div className="d-flex align-items-center gap-2 platform-support">
-                        {wishlist.gameId.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
+            {wishlists.length < 1 ? (
+              <div className="col-12">
+                <h3 className="text-center">Wishlist is empty</h3>
+              </div>
+            ) : (
+              <div className="col-12">
+                {wishlists?.map((wishlist, index) => (
+                  <div className="wishlist-item my-4 d-flex justify-content-between align-items-center" key={index}>
+                    <div className="d-flex gap-3 align-items-center">
+                      <div className="game-image">
+                        <img src={wishlist.gameId.coverImage?.url} alt={wishlist.gameId.title} className="img-fluid" />
+                      </div>
+                      <div className="game-detail">
+                        <h5>{wishlist.gameId.title}</h5>
+                        {wishlist.gameId.discount?.isActive ? (
+                          <div className="discount d-flex flex-column my-3">
+                            <div className="price d-flex align-items-center justify-content-center gap-3">
+                              <span className="badge bg-success">-{wishlist.gameId.discount.percentage}%</span>
+                              <p className="old-price text-decoration-line-through text-secondary mb-0">
+                                {new Intl.NumberFormat("id-ID", {
+                                  style: "currency",
+                                  currency: "IDR",
+                                  minimumFractionDigits: 0,
+                                }).format(wishlist.gameId.price)}
+                              </p>
+                              <p className="new-price mb-0">
+                                {new Intl.NumberFormat("id-ID", {
+                                  style: "currency",
+                                  currency: "IDR",
+                                  minimumFractionDigits: 0,
+                                }).format(wishlist.gameId.price - ((wishlist.gameId.discount.percentage / 100) * wishlist.gameId.price).toFixed(0))}
+                              </p>
+                            </div>
+                            <div className="end-date">
+                              <span>Sale ends at {new Date(wishlist.gameId.discount.endDate).toLocaleDateString("en-US")}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p>
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                            }).format(wishlist.gameId.price)}
+                          </p>
+                        )}
+                        <div className="d-flex align-items-center gap-2 platform-support">
+                          {wishlist.gameId.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
+                        </div>
                       </div>
                     </div>
+                    <div className="action-btn d-flex gap-3 align-items-center">
+                      <button className="btn btn-outline-light d-flex align-items-center gap-2" onClick={() => openAddToCartModal(wishlist._id, wishlist.gameId._id)}>
+                        <FaShoppingCart />
+                        <span>Add to Cart</span>
+                      </button>
+                      <button className="btn btn-danger d-flex align-items-center gap-2" onClick={() => openRemoveWishlistModal(wishlist._id)}>
+                        <FaTrash />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </div>
-                  <div className="action-btn d-flex gap-3 align-items-center">
-                    <button className="btn btn-outline-light d-flex align-items-center gap-2" onClick={() => openAddToCartModal(wishlist._id, wishlist.gameId._id)}>
-                      <FaShoppingCart />
-                      <span>Add to Cart</span>
-                    </button>
-                    <button className="btn btn-danger d-flex align-items-center gap-2" onClick={() => openRemoveWishlistModal(wishlist._id)}>
-                      <FaTrash />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
