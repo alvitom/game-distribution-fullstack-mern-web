@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const limit = 10;
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     withCredentials: true,
     headers: {
       "Content-Type": "application/json",

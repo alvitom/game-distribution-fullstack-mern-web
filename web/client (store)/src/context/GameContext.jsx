@@ -27,7 +27,7 @@ export const GameProvider = ({ children }) => {
   const [platform, setPlatform] = useState("");
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
   });
 
   const fetchAllGames = async (page, limit, genre, feature, platform) => {

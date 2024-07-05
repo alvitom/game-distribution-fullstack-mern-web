@@ -18,7 +18,7 @@ export const GameProvider = ({ children }) => {
   const limit = 10;
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
       "Content-Type": "multipart/form-data",
     },

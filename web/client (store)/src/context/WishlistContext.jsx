@@ -16,7 +16,7 @@ export const WishlistProvider = ({ children }) => {
   }, []);
 
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL_DEV,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
   });
 
   axiosInstance.interceptors.request.use(
