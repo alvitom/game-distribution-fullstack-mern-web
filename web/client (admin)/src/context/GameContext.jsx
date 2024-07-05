@@ -5,6 +5,7 @@ export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
   const [games, setGames] = useState([]);
+  const [saleGames, setSaleGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -59,12 +60,35 @@ export const GameProvider = ({ children }) => {
     }
   };
 
+  const fetchSaleGames = async (page, limit, debouncedKeyword, genre, feature, platform) => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/game/sale`, {
+        params: {
+          page,
+          limit,
+          keyword: debouncedKeyword,
+          genre,
+          feature,
+          platform,
+        },
+      });
+      const datas = await response.data;
+      setSaleGames(datas.data.saleGames);
+      setTotalPages(datas.data.totalPages);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      return error.response.data;
+    }
+  };
+
   const fetchGame = async (title) => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/game/${title}`);
       const datas = await response.data;
-      setSelectedGame(datas.data);
+      setSelectedGame(datas.data.game);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -84,12 +108,50 @@ export const GameProvider = ({ children }) => {
     }
   };
 
+  const createSaleGame = async (gameData) => {
+    setLoading(true);
+    const userData = JSON.parse(sessionStorage.getItem("user"));
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL_DEV}/game/sale`, gameData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData.token}`,
+        },
+      });
+      const data = await response.data;
+      setLoading(false);
+      return data;
+    } catch (error) {
+      setLoading(false);
+      return error.response.data;
+    }
+  };
+
   const updateGame = async (id, updatedGame) => {
     setLoading(true);
     try {
       const response = await axiosInstance.put(`/game/${id}`, updatedGame);
       setLoading(false);
       return response.data;
+    } catch (error) {
+      setLoading(false);
+      return error.response.data;
+    }
+  };
+
+  const updateSaleGame = async (id, updatedGame) => {
+    setLoading(true);
+    const userData = JSON.parse(sessionStorage.getItem("user"));
+    try {
+      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL_DEV}/game/sale/${id}`, updatedGame, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData.token}`,
+        },
+      });
+      const data = await response.data;
+      setLoading(false);
+      return data;
     } catch (error) {
       setLoading(false);
       return error.response.data;
@@ -113,6 +175,7 @@ export const GameProvider = ({ children }) => {
       value={{
         games,
         setGames,
+        saleGames,
         selectedGame,
         loading,
         setLoading,
@@ -128,9 +191,12 @@ export const GameProvider = ({ children }) => {
         feature,
         platform,
         fetchAllGames,
+        fetchSaleGames,
         fetchGame,
         createGame,
+        createSaleGame,
         updateGame,
+        updateSaleGame,
         deleteGame,
       }}
     >

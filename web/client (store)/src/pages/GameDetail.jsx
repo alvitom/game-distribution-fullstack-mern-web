@@ -365,24 +365,32 @@ const GameDetail = () => {
                 </div>
               ) : (
                 <h5 className="price text-center my-4">
-                  {new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                    minimumFractionDigits: 0,
-                  }).format(selectedGame?.price)}
+                  {!(selectedGame?.releaseDate === null && selectedGame?.price === 0) &&
+                    new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      minimumFractionDigits: 0,
+                    }).format(selectedGame?.price)}
+                  {selectedGame?.price === 0 && !(selectedGame?.releaseDate === null) && "Free"}
                 </h5>
               )}
               <div className="action-btn d-flex flex-column gap-3 w-75 mx-auto">
-                <button className="btn btn-success w-100" onClick={handleCheckout}>
-                  Beli Sekarang
-                </button>
-                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToCart}>
-                  <FaShoppingCart />
-                  <span>Tambah ke Keranjang</span>
-                </button>
+                {selectedGame?.releaseDate === null ? (
+                  <button className="btn btn-outline-light w-100 disabled">Coming Soon</button>
+                ) : (
+                  <button className={`${new Date(selectedGame?.releaseDate) > new Date() ? "btn btn-primary" : "btn btn-success"} w-100`} onClick={handleCheckout}>
+                    {new Date(selectedGame?.releaseDate) > new Date() ? "Pre-purchase" : "Buy Now"}
+                  </button>
+                )}
+                {!(selectedGame?.releaseDate === null) && (
+                  <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToCart}>
+                    <FaShoppingCart />
+                    <span>Add to Cart</span>
+                  </button>
+                )}
                 <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToWishlist}>
                   <FaHeart />
-                  <span>Tambah ke Wishlist</span>
+                  <span>Add to Wishlist</span>
                 </button>
               </div>
               <div className="d-flex flex-column mt-4 gap-2">
@@ -395,14 +403,31 @@ const GameDetail = () => {
                   <span className="publisher-name">{selectedGame?.publisher}</span>
                 </div>
                 <div className="release-date d-flex justify-content-between align-items-center border-bottom p-2">
-                  <span className="release-date">Release Date</span>
-                  <span className="release-date-info">
-                    {new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
-                      year: "2-digit",
-                      month: "2-digit",
-                      day: "2-digit",
-                    })}
-                  </span>
+                  {new Date(selectedGame?.releaseDate) > new Date() || selectedGame?.releaseDate === null ? (
+                    <>
+                      <span className="release-date">Available</span>
+                      <span className="release-date-info">
+                        {selectedGame?.releaseDate === null
+                          ? "Coming Soon"
+                          : new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
+                              year: "2-digit",
+                              month: "2-digit",
+                              day: "2-digit",
+                            })}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="release-date">Release Date</span>
+                      <span className="release-date-info">
+                        {new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
+                          year: "2-digit",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="platform d-flex justify-content-between align-items-center border-bottom p-2">
                   <span className="platform">Platform</span>

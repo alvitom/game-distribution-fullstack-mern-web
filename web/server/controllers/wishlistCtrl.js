@@ -6,7 +6,6 @@ const { successResponse, errorResponse } = require("../utils/response");
 const addWishlist = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { gameId } = req.body;
-
   validateMongodbId(res, id);
   validateMongodbId(res, gameId);
 
@@ -14,19 +13,18 @@ const addWishlist = asyncHandler(async (req, res) => {
     const existingWishlistItem = await Wishlist.find({ gameId, userId: id });
 
     if (existingWishlistItem.length > 0) {
-      return errorResponse(res, 400, "Game already in wishlist");
+      throw errorResponse(res, 400, "Game already in wishlist");
     }
 
     const wishlist = await Wishlist.create({ gameId, userId: id });
     successResponse(res, wishlist, "Game added to wishlist successfully", 201);
   } catch (error) {
-    errorResponse(res, 500, "Failed to add game to wishlist");
+    throw errorResponse(res, 500, `Failed to add game to wishlist: ${error.message}`);
   }
 });
 
 const getWishlist = asyncHandler(async (req, res) => {
   const { id } = req.user;
-
   validateMongodbId(res, id);
 
   try {
@@ -36,14 +34,13 @@ const getWishlist = asyncHandler(async (req, res) => {
 
     successResponse(res, { wishlist, wishlistLength }, "Wishlist fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch wishlist");
+    throw errorResponse(res, 500, `Failed to fetch wishlist: ${error.message}`);
   }
 });
 
 const deleteWishlist = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { wishlistItemId } = req.params;
-
   validateMongodbId(res, id);
   validateMongodbId(res, wishlistItemId);
 
@@ -51,12 +48,12 @@ const deleteWishlist = asyncHandler(async (req, res) => {
     const wishlist = await Wishlist.deleteOne({ userId: id, _id: wishlistItemId });
 
     if (wishlist.deletedCount <= 0) {
-      return errorResponse(res, 404, "Wishlist item not found");
+      throw errorResponse(res, 404, "Wishlist item not found");
     }
 
     successResponse(res, null, "Wishlist item deleted successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to delete wishlist item");
+    throw errorResponse(res, 500, `Failed to delete wishlist item: ${error.message}`);
   }
 });
 

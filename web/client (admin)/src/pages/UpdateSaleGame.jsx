@@ -1,44 +1,44 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PromotionContext } from "../context/PromotionContext";
 import { modals } from "@mantine/modals";
 import { Input, NumberInput, Switch } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+import { GameContext } from "../context/GameContext";
 
-const UpdatePromotion = () => {
+const UpdateSaleGame = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selectedPromotion, fetchPromotion, updatePromotion, loading } = useContext(PromotionContext);
+  const { selectedGame, fetchGame, updateSaleGame, loading } = useContext(GameContext);
 
-  const [promotion, setPromotion] = useState({
-    game: "",
-    discount: "",
+  const [saleGame, setSaleGame] = useState({
+    title: "",
+    percentage: "",
     endDate: null,
     isActive: false,
   });
 
   useEffect(() => {
-    fetchPromotion(id);
+    fetchGame(id);
   }, [id]);
 
   useEffect(() => {
-    if (selectedPromotion) {
-      setPromotion({
-        game: selectedPromotion.game.title,
-        discount: selectedPromotion.discount,
-        endDate: selectedPromotion.endDate,
-        isActive: selectedPromotion.isActive,
+    if (selectedGame) {
+      setSaleGame({
+        title: selectedGame.title,
+        percentage: selectedGame.discount.percentage,
+        endDate: selectedGame.discount.endDate,
+        isActive: selectedGame.discount.isActive,
       });
     }
-  }, [selectedPromotion]);
+  }, [selectedGame]);
 
-  const handleUpdatePromotion = async () => {
-    const response = await updatePromotion(id, {
-      discount: promotion.discount,
-      endDate: promotion.endDate,
-      isActive: promotion.isActive,
+  const handleUpdateSaleGame = async () => {
+    const response = await updateSaleGame(id, {
+      percentage: saleGame.percentage,
+      endDate: saleGame.endDate,
+      isActive: saleGame.isActive,
     });
     if (!response.success) {
       return modals.open({
@@ -57,7 +57,7 @@ const UpdatePromotion = () => {
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setPromotion({ game: selectedPromotion.game.title, discount: selectedPromotion.discount, endDate: selectedPromotion.endDate, isActive: selectedPromotion.isActive });
+                  setSaleGame({ percentage: selectedGame.discount.percentage, endDate: selectedGame.discount.endDate, isActive: selectedGame.discount.isActive });
                 }}
               >
                 Close
@@ -83,7 +83,7 @@ const UpdatePromotion = () => {
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  navigate("/promotions");
+                  navigate("/sale-games");
                 }}
               >
                 Close
@@ -96,28 +96,28 @@ const UpdatePromotion = () => {
   };
   return (
     <>
-      <div className="update-promotion-wrapper">
-        <h1>Update Promotion</h1>
+      <div className="update-sale-game-wrapper">
+        <h1>Update Sale Game</h1>
         <div className="d-flex flex-column gap-4">
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="game">Game</label>
-            <Input placeholder="Game" size="md" id="game" value={promotion.game} disabled />
+            <label htmlFor="title">Title</label>
+            <Input placeholder="Title" size="md" id="title" value={saleGame.title} disabled />
           </div>
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="discount">Discount</label>
-            <NumberInput placeholder="Discount" size="md" id="discount" allowNegative={false} suffix="%" value={promotion.discount} onChange={(value) => setPromotion((prevPromotion) => ({ ...prevPromotion, discount: value }))} />
+            <label htmlFor="discount-percentage">Discount Percentage</label>
+            <NumberInput placeholder="Discount Percentage" size="md" id="discount-percentage" allowNegative={false} suffix="%" value={saleGame.percentage} onChange={(value) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, percentage: value }))} />
           </div>
           <div className="d-flex flex-column gap-2">
             <label htmlFor="end-date">End Date</label>
-            <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={new Date(promotion.endDate)} onChange={(date) => setPromotion((prevPromotion) => ({ ...prevPromotion, endDate: date }))} size="md" id="end-date" />
+            <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={new Date(saleGame.endDate)} onChange={(date) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, endDate: date }))} size="md" id="end-date" />
           </div>
           <div className="d-flex flex-column gap-2">
             <label htmlFor="status">Status</label>
-            <Switch checked={promotion.isActive} onChange={(event) => setPromotion((prevPromotion) => ({ ...prevPromotion, isActive: event.target.checked }))} label={promotion.isActive ? "Active" : "Not Active"} size="md" />
+            <Switch checked={saleGame.isActive} onChange={(event) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, isActive: event.target.checked }))} label={saleGame.isActive ? "Active" : "Not Active"} size="md" />
           </div>
           <div className="d-flex justify-content-center align-items-center">
-            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleUpdatePromotion}>
-              {loading ? "Updating..." : "Update Promotion"}
+            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleUpdateSaleGame}>
+              {loading ? "Updating..." : "Update Sale Game"}
             </button>
           </div>
         </div>
@@ -126,4 +126,4 @@ const UpdatePromotion = () => {
   );
 };
 
-export default UpdatePromotion;
+export default UpdateSaleGame;

@@ -4,21 +4,21 @@ import { modals } from "@mantine/modals";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { PromotionContext } from "../context/PromotionContext";
 import { DatePickerInput } from "@mantine/dates";
+import { GameContext } from "../context/GameContext";
 
-const AddPromotion = () => {
+const AddSaleGame = () => {
   const navigate = useNavigate();
-  const { createPromotion, loading } = useContext(PromotionContext);
+  const { createSaleGame, loading } = useContext(GameContext);
 
-  const [promotion, setPromotion] = useState({
-    game: "",
-    discount: "",
+  const [saleGame, setSaleGame] = useState({
+    title: "",
+    percentage: "",
     endDate: null,
   });
 
-  const handleCreatePromotion = async () => {
-    const response = await createPromotion(promotion);
+  const handleCreateSaleGame = async () => {
+    const response = await createSaleGame(saleGame);
     if (!response.success) {
       return modals.open({
         radius: "md",
@@ -36,7 +36,7 @@ const AddPromotion = () => {
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setPromotion({ game: "", discount: "", endDate: null });
+                  setSaleGame({ title: "", percentage: "", endDate: null });
                 }}
               >
                 Close
@@ -62,7 +62,7 @@ const AddPromotion = () => {
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  navigate("/promotions");
+                  navigate("/sale-games");
                 }}
               >
                 Close
@@ -75,24 +75,24 @@ const AddPromotion = () => {
   };
   return (
     <>
-      <div className="add-promotion-wrapper">
-        <h1>Add New Promotion</h1>
+      <div className="add-sale-game-wrapper">
+        <h1>Add Sale Game</h1>
         <div className="d-flex flex-column gap-4">
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="game">Game</label>
-            <Input placeholder="Game" size="md" id="game" value={promotion.game} onChange={(e) => setPromotion((prevPromotion) => ({ ...prevPromotion, game: e.target.value }))} />
+            <label htmlFor="title">Title</label>
+            <Input placeholder="Title" size="md" id="title" value={saleGame.title} onChange={(e) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, title: e.target.value }))} />
           </div>
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="discount">Discount</label>
-            <NumberInput placeholder="Discount" size="md" id="discount" allowNegative={false} suffix="%" value={promotion.discount} onChange={(value) => setPromotion((prevPromotion) => ({ ...prevPromotion, discount: value }))} />
+            <label htmlFor="discount-percentage">Discount Percentage</label>
+            <NumberInput placeholder="Discount Percentage" size="md" id="discount-percentage" allowNegative={false} suffix="%" value={saleGame.percentage} onChange={(value) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, percentage: value }))} />
           </div>
           <div className="d-flex flex-column gap-2">
             <label htmlFor="end-date">End Date</label>
-            <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={promotion.endDate} onChange={(date) => setPromotion((prevPromotion) => ({ ...prevPromotion, endDate: date }))} size="md" id="end-date" />
+            <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={saleGame.endDate} onChange={(date) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, endDate: date }))} size="md" id="end-date" />
           </div>
           <div className="d-flex justify-content-center align-items-center mt-4">
-            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleCreatePromotion}>
-              {loading ? "Loading..." : "Add Promotion"}
+            <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleCreateSaleGame}>
+              {loading ? "Loading..." : "Add Sale Game"}
             </button>
           </div>
         </div>
@@ -101,4 +101,4 @@ const AddPromotion = () => {
   );
 };
 
-export default AddPromotion;
+export default AddSaleGame;

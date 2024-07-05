@@ -1,6 +1,7 @@
 const Transaction = require("../models/transactionModel");
 const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
+const cron = require("node-cron");
 const { validateMongodbId, validatePage, validateLimit } = require("../utils/validations");
 const { successResponse, errorResponse } = require("../utils/response");
 const { snap } = require("../utils/midtrans");
@@ -47,10 +48,10 @@ const createTransaction = asyncHandler(async (req, res) => {
 
     await Cart.deleteMany({ userId: id, gameId: { $in: items.map((item) => item._id) } });
 
-    const body = `Dear customer, your payment for the ${orderId} is currently pending. Please complete your payment to process your order. Thank you!`;
+    const body = `Dear customer, your payment for the ${orderId} is currently pending. Please complete your payment to process your order. Thank you.`;
     const data = {
       to: email,
-      subject: "Your payment is pending",
+      subject: "Payment Pending",
       text: body,
       htm: body,
     };
@@ -58,8 +59,7 @@ const createTransaction = asyncHandler(async (req, res) => {
 
     successResponse(res, { transaction, orderId }, "Transaction created successfully", 201);
   } catch (error) {
-    errorResponse(res, 500, "Failed to create transaction");
-    console.log(error);
+    throw errorResponse(res, 500, `Failed to create transaction: ${error.message}`);
   }
 });
 
@@ -82,7 +82,7 @@ const getAllTransactionUsers = asyncHandler(async (req, res) => {
 
     successResponse(res, { transactions, total, page, totalPages }, "All transaction users fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch all transaction users");
+    throw errorResponse(res, 500, `Failed to fetch all transaction users: ${error.message}`);
   }
 });
 
@@ -109,41 +109,42 @@ const getAllTransactions = asyncHandler(async (req, res) => {
 
     successResponse(res, { transactions, total, page, totalPages }, "Transactions fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch transactions");
-  }
-});
-
-const getDetailTransaction = asyncHandler(async (req, res) => {
-  const { id } = req.user;
-  validateMongodbId(id);
-  const { transactionId } = req.params;
-  validateMongodbId(transactionId);
-  try {
-    const transaction = await Transaction.findOne({ userId: id, _id: transactionId }).populate("items");
-    res.json(transaction);
-  } catch (error) {
-    throw new Error(error);
+    throw errorResponse(res, 500, `Failed to fetch transactions: ${error.message}`);
   }
 });
 
 const updateTransactionStatus = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
-  const { status } = req.body;
   try {
-    const updateStatus = await Transaction.findByIdAndUpdate(
-      id,
-      {
-        status,
-      },
-      {
-        new: true,
+    const currentDate = new Date();
+    const transactions = await Transaction.find({ status: "pending" })
+      .populate("userId")
+      .select("createdAt orderId status");
+
+    transactions.forEach(async (transaction) => {
+      const paymentDueDate = new Date(transaction.createdAt);
+      paymentDueDate.setHours(paymentDueDate.getHours() + 24);
+
+      if (currentDate > paymentDueDate) {
+        transaction.status = "failed";
+        await transaction.save();
+
+        const body = `Your payment for ${transaction.orderId} has been failed.`;
+        const data = {
+          to: transaction.userId.email,
+          subject: "Payment Failed",
+          text: body,
+          htm: body,
+        };
+        sendEmail(data);
       }
-    );
-    res.json(updateStatus);
+    });
   } catch (error) {
-    throw new Error(error);
+    throw errorResponse(res, 500, `Failed to update transaction status: ${error.message}`);
   }
 });
 
-module.exports = { createTransaction, getAllTransactionUsers, getAllTransactions, getDetailTransaction, updateTransactionStatus };
+cron.schedule("0 0 * * *", async () => {
+  updateTransactionStatus();
+});
+
+module.exports = { createTransaction, getAllTransactionUsers, getAllTransactions, updateTransactionStatus };

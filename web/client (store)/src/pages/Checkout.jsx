@@ -1,17 +1,15 @@
 import React, { useContext, useEffect } from "react";
 import Meta from "../components/Meta";
-import { FaApple, FaWindows } from "react-icons/fa";
+import { FaApple, FaWindows, FaInfoCircle } from "react-icons/fa";
 import { CheckoutContext } from "../context/CheckoutContext";
 import { useNavigate } from "react-router-dom";
 import { TransactionContext } from "../context/TransactionContext";
 import { modals } from "@mantine/modals";
 import { MdClose } from "react-icons/md";
-import { CartContext } from "../context/CartContext";
 
 const Checkout = () => {
   const { checkout } = useContext(CheckoutContext);
   const { createTransaction, updateTransaction, loading } = useContext(TransactionContext);
-  const { setCarts } = useContext(CartContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -152,7 +150,6 @@ const Checkout = () => {
           navigate("/transactions");
         },
       });
-      setCarts([]);
     }
   };
   return (
@@ -173,9 +170,10 @@ const Checkout = () => {
                       </div>
                       <div className="game-detail">
                         <h5>{item?.title}</h5>
+                        {new Date(item?.releaseDate) > Date.now() && <span className="available text-secondary">Available {new Date(item?.releaseDate).toLocaleDateString("en-US")}</span>}
                         {item?.discount?.isActive ? (
-                          <div className="discount d-flex flex-column my-3">
-                            <div className="price d-flex align-items-center justify-content-center gap-3">
+                          <div className="discount d-flex flex-column my-2">
+                            <div className="price d-flex align-items-center gap-3">
                               <span className="badge bg-success">-{item?.discount.percentage}%</span>
                               <p className="old-price text-decoration-line-through text-secondary mb-0">
                                 {new Intl.NumberFormat("id-ID", {
@@ -206,6 +204,12 @@ const Checkout = () => {
                           </p>
                         )}
                         <div className="d-flex align-items-center gap-2 platform-support">{item?.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : null))}</div>
+                        {new Date(item?.releaseDate) > Date.now() && (
+                          <span className="available text-warning" style={{ fontSize: "14px" }}>
+                            <FaInfoCircle />
+                            You won't be able to play this game until it's released.
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}

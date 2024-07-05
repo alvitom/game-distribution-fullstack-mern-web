@@ -147,7 +147,7 @@ const Wishlist = () => {
             </div>
             {wishlists.length < 1 ? (
               <div className="col-12">
-                <h3 className="text-center">Wishlist is empty</h3>
+                <h3 className="text-center">Your wishlist is empty</h3>
               </div>
             ) : (
               <div className="col-12">
@@ -159,8 +159,9 @@ const Wishlist = () => {
                       </div>
                       <div className="game-detail">
                         <h5>{wishlist.gameId.title}</h5>
+                        {new Date(wishlist.gameId.releaseDate) > Date.now() && <span className="available text-secondary">Available {new Date(wishlist.gameId.releaseDate).toLocaleDateString("en-US")}</span>}
                         {wishlist.gameId.discount?.isActive ? (
-                          <div className="discount d-flex flex-column my-3">
+                          <div className="discount d-flex flex-column my-2">
                             <div className="price d-flex align-items-center justify-content-center gap-3">
                               <span className="badge bg-success">-{wishlist.gameId.discount.percentage}%</span>
                               <p className="old-price text-decoration-line-through text-secondary mb-0">
@@ -184,11 +185,13 @@ const Wishlist = () => {
                           </div>
                         ) : (
                           <p>
-                            {new Intl.NumberFormat("id-ID", {
-                              style: "currency",
-                              currency: "IDR",
-                              minimumFractionDigits: 0,
-                            }).format(wishlist.gameId.price)}
+                            {!(wishlist.gameId.releaseDate === null && wishlist.gameId.price === 0) &&
+                              new Intl.NumberFormat("id-ID", {
+                                style: "currency",
+                                currency: "IDR",
+                                minimumFractionDigits: 0,
+                              }).format(wishlist.gameId.price)}
+                            {wishlist.gameId.price === 0 && !(wishlist.gameId.releaseDate === null) && "Free"}
                           </p>
                         )}
                         <div className="d-flex align-items-center gap-2 platform-support">
@@ -197,10 +200,16 @@ const Wishlist = () => {
                       </div>
                     </div>
                     <div className="action-btn d-flex gap-3 align-items-center">
-                      <button className="btn btn-outline-light d-flex align-items-center gap-2" onClick={() => openAddToCartModal(wishlist._id, wishlist.gameId._id)}>
-                        <FaShoppingCart />
-                        <span>Add to Cart</span>
-                      </button>
+                      {!(wishlist.gameId.releaseDate === null) ? (
+                        <button className="btn btn-outline-light d-flex align-items-center gap-2 w-100" onClick={() => openAddToCartModal(wishlist._id, wishlist.gameId._id)}>
+                          <FaShoppingCart />
+                          <span>Add to Cart</span>
+                        </button>
+                      ) : (
+                        <button className="btn btn-outline-light d-flex align-items-center gap-2 disabled w-100">
+                          <span>Coming Soon</span>
+                        </button>
+                      )}
                       <button className="btn btn-danger d-flex align-items-center gap-2" onClick={() => openRemoveWishlistModal(wishlist._id)}>
                         <FaTrash />
                         <span>Delete</span>

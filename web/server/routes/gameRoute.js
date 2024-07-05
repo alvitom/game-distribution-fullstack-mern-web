@@ -17,6 +17,7 @@ const {
   getUpcomingGames,
   createSaleGame,
   getSaleGames,
+  updateSaleGame,
 } = require("../controllers/gameCtrl");
 const { upload, gameImgResize } = require("../middlewares/uploadImage");
 
@@ -51,6 +52,7 @@ router.put(
   ]),
   updateGame
 );
+router.put("/sale/:title", authMiddleware, isAdmin, updateSaleGame);
 router.delete("/:id", authMiddleware, isAdmin, deleteGame);
 router.delete("/delete-img/:id", authMiddleware, isAdmin, deleteImages);
 

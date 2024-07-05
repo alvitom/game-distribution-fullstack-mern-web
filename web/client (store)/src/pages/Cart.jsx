@@ -164,7 +164,7 @@ const Cart = () => {
             </div>
             {carts.length < 1 ? (
               <div className="col-12">
-                <h3 className="text-center">Cart is empty</h3>
+                <h3 className="text-center">Your cart is empty</h3>
               </div>
             ) : (
               <>
@@ -177,9 +177,10 @@ const Cart = () => {
                         </div>
                         <div className="game-detail text-center text-sm-start">
                           <h5>{cart.gameId.title}</h5>
+                          {new Date(cart.gameId.releaseDate) > Date.now() && <span className="available text-secondary">Available {new Date(cart.gameId.releaseDate).toLocaleDateString("en-US")}</span>}
                           {cart.gameId.discount?.isActive ? (
-                            <div className="discount d-flex flex-column my-3">
-                              <div className="price d-flex align-items-center justify-content-center gap-3">
+                            <div className="discount d-flex flex-column my-2">
+                              <div className="price d-flex align-items-center gap-3">
                                 <span className="badge bg-success">-{cart.gameId.discount.percentage}%</span>
                                 <p className="old-price text-decoration-line-through text-secondary mb-0">
                                   {new Intl.NumberFormat("id-ID", {
@@ -212,6 +213,7 @@ const Cart = () => {
                           <div className="d-flex align-items-center gap-2 platform-support">
                             {cart.gameId.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
                           </div>
+                          {new Date(cart.gameId.releaseDate) > Date.now() && <span className="available text-warning" style={{ fontSize: "14px" }}>You won't be able to play this game until it's released.</span>}
                         </div>
                       </div>
                       <div className="action-btn d-flex gap-3 align-items-center mt-3 mt-lg-0">
@@ -229,8 +231,8 @@ const Cart = () => {
                 </div>
                 <div className="col-lg-3 col-12">
                   <div className="summary mt-4">
-                    <div className="d-flex justify-content-between">
-                      <p>Total</p>
+                    <div className="d-flex justify-content-between fs-5 fw-bold">
+                      <p>Subtotal</p>
                       <p>{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(totalPrice)}</p>
                     </div>
                     <button className="btn btn-success w-100" onClick={handleCheckout}>

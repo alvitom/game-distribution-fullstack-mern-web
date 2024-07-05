@@ -1,9 +1,32 @@
-import React from 'react'
+import React, { useContext, useEffect } from "react";
+import { GameContext } from "../context/GameContext";
+import GameCard from "../components/GameCard";
+import Meta from "../components/Meta";
 
 const SaleCollection = () => {
-  return (
-    <div>SaleCollection</div>
-  )
-}
+  const { fetchSaleGames, saleGames } = useContext(GameContext);
+  const limit = 50;
 
-export default SaleCollection
+  useEffect(() => {
+    fetchSaleGames(limit);
+  }, []);
+  return (
+    <>
+      <Meta title="Sale Games" />
+      <div className="sale-wrapper">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 my-4">
+              <h1>Games On Sale</h1>
+            </div>
+            {saleGames.map((game, index) => (
+              <GameCard collection="sale" data={game} key={index} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SaleCollection;

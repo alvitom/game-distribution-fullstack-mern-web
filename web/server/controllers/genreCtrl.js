@@ -7,20 +7,20 @@ const createGenre = asyncHandler(async (req, res) => {
   const { genre } = req.body;
 
   if (!genre) {
-    return errorResponse(res, 400, "Genre is required");
+    throw errorResponse(res, 400, "Genre is required");
   }
 
   try {
     const genre = await Genre.findOne({ genre });
 
     if (genre) {
-      return errorResponse(res, 400, "Genre already exists");
+      throw errorResponse(res, 400, "Genre already exists");
     }
 
     const newGenre = await Genre.create(req.body);
     successResponse(res, newGenre, "Genre created successfully", 201);
   } catch (error) {
-    errorResponse(res, 500, "Failed to create genre");
+    throw errorResponse(res, 500, `Failed to create genre: ${error.message}`);
   }
 });
 
@@ -45,7 +45,7 @@ const getAllGenres = asyncHandler(async (req, res) => {
 
     successResponse(res, { genres, total, page, totalPages }, "Genres fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch genres");
+    throw errorResponse(res, 500, `Failed to fetch genres: ${error.message}`);
   }
 });
 
@@ -57,17 +57,17 @@ const getGenre = asyncHandler(async (req, res) => {
     const genre = await Genre.findById(id);
     successResponse(res, genre, "Genre fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch genre");
+    throw errorResponse(res, 500, `Failed to fetch genre: ${error.message}`);
   }
 });
 
 const updateGenre = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(res, id);
   const { genre } = req.body;
+  validateMongodbId(res, id);
 
   if (!genre) {
-    return errorResponse(res, 400, "Genre is required");
+    throw errorResponse(res, 400, "Genre is required");
   }
 
   try {
@@ -77,7 +77,7 @@ const updateGenre = asyncHandler(async (req, res) => {
     
     successResponse(res, updateGenre, "Genre updated successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to update genre");
+    throw errorResponse(res, 500, `Failed to update genre: ${error.message}`);
   }
 });
 
@@ -89,7 +89,7 @@ const deleteGenre = asyncHandler(async (req, res) => {
     const deleteGenre = await Genre.findByIdAndDelete(id);
     successResponse(res, deleteGenre, "Genre deleted successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to delete genre");
+    throw errorResponse(res, 500, `Failed to delete genre: ${error.message}`);
   }
 });
 

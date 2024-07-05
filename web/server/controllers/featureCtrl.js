@@ -7,20 +7,20 @@ const createFeature = asyncHandler(async (req, res) => {
   const { feature } = req.body;
 
   if (!feature) {
-    return errorResponse(res, 400, "Feature is required");
+    throw errorResponse(res, 400, "Feature is required");
   }
 
   try {
     const feature = await Feature.findOne({ feature });
 
     if (feature) {
-      return errorResponse(res, 400, "Feature already exists");
+      throw errorResponse(res, 400, "Feature already exists");
     }
 
     const newFeature = await Feature.create(req.body);
     successResponse(res, newFeature, "Feature created successfully", 201);
   } catch (error) {
-    errorResponse(res, 500, "Failed to create feature");
+    throw errorResponse(res, 500, `Failed to create feature: ${error.message}`);
   }
 });
 
@@ -45,7 +45,7 @@ const getAllFeatures = asyncHandler(async (req, res) => {
 
     successResponse(res, { features, total, page, totalPages }, "All features fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch features");
+    throw errorResponse(res, 500, `Failed to fetch features: ${error.message}`);
   }
 });
 
@@ -57,17 +57,17 @@ const getFeature = asyncHandler(async (req, res) => {
     const feature = await Feature.findById(id);
     successResponse(res, feature, "Feature fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch feature");
+    throw errorResponse(res, 500, `Failed to fetch feature: ${error.message}`);
   }
 });
 
 const updateFeature = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(res, id);
   const { feature } = req.body;
+  validateMongodbId(res, id);
 
   if (!feature) {
-    return errorResponse(res, 400, "Feature is required");
+    throw errorResponse(res, 400, "Feature is required");
   }
 
   try {
@@ -77,7 +77,7 @@ const updateFeature = asyncHandler(async (req, res) => {
 
     successResponse(res, updateFeature, "Feature updated successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to update feature");
+    throw errorResponse(res, 500, `Failed to update feature: ${error.message}`);
   }
 });
 
@@ -89,7 +89,7 @@ const deleteFeature = asyncHandler(async (req, res) => {
     const deleteFeature = await Feature.findByIdAndDelete(id);
     successResponse(res, deleteFeature, "Feature deleted successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to delete feature");
+    throw errorResponse(res, 500, `Failed to delete feature: ${error.message}`);
   }
 });
 

@@ -161,10 +161,10 @@ const Header = () => {
               {!user ? (
                 <div className="d-flex align-items-center gap-2">
                   <a href="/register" className="btn btn-outline-light">
-                    Daftar
+                    Register
                   </a>
                   <a href="/login" className="btn btn-success">
-                    Masuk
+                    Login
                   </a>
                 </div>
               ) : (
@@ -176,9 +176,9 @@ const Header = () => {
                   </Menu.Target>
 
                   <Menu.Dropdown>
-                    <Menu.Item leftSection={<MdManageAccounts />} onClick={() => (location.href = "/profile")}>
+                    {/* <Menu.Item leftSection={<MdManageAccounts />} onClick={() => (location.href = "/profile")}>
                       Profile
-                    </Menu.Item>
+                    </Menu.Item> */}
                     <Menu.Item leftSection={<MdOutlineAccessTimeFilled />} onClick={() => (location.href = "/transactions")}>
                       Transactions
                     </Menu.Item>
@@ -237,7 +237,7 @@ const Header = () => {
                 >
                   Game
                 </Link>
-                <Link
+                {/* <Link
                   to="/blog"
                   className="link"
                   data-active={"Blog" === active || undefined}
@@ -246,7 +246,7 @@ const Header = () => {
                   }}
                 >
                   Blog
-                </Link>
+                </Link> */}
               </div>
             </div>
             <div className="d-flex align-items-center gap-4">

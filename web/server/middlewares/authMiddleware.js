@@ -15,10 +15,10 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
         next();
       }
     } catch (error) {
-      errorResponse(res, 401, "Not authorized token expired, please login again");
+      throw errorResponse(res, 401, "Not authorized token expired, please login again");
     }
   } else {
-    errorResponse(res, 401, "There is no token attached to header");
+    throw errorResponse(res, 401, "There is no token attached to header");
   }
 });
 
@@ -26,7 +26,7 @@ const isAdmin = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const user = await User.findOne({ username });
   if (user.role !== "admin") {
-    errorResponse(res, 401, "You are not an admin");
+    throw errorResponse(res, 401, "You are not an admin");
   } else {
     next();
   }

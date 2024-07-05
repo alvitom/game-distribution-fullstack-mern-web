@@ -13,14 +13,14 @@ const addCartItem = asyncHandler(async (req, res) => {
     const existingCartItem = await Cart.find({ gameId, userId: id });
 
     if (existingCartItem.length > 0) {
-      return errorResponse(res, 400, "Game already in cart");
+      throw errorResponse(res, 400, "Game already in cart");
     }
 
     const cart = await Cart.create({ gameId, userId: id });
 
     successResponse(res, cart, "Game added to cart successfully", 201);
   } catch (error) {
-    errorResponse(res, 500, "Failed to add game to cart");
+    throw errorResponse(res, 500, `Failed to add game to cart: ${error.message}`);
   }
 });
 
@@ -50,14 +50,13 @@ const getCartItem = asyncHandler(async (req, res) => {
     const cartLength = cart.length;
     successResponse(res, { cart, cartLength, totalNetPrice, totalPrice, totalDiscount, serviceFee, total }, "Cart fetched successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to fetch cart");
+    throw errorResponse(res, 500, `Failed to fetch cart: ${error.message}`);
   }
 });
 
 const deleteCartItem = asyncHandler(async (req, res) => {
   const { id } = req.user;
   const { cartItemId } = req.params;
-
   validateMongodbId(res, id);
   validateMongodbId(res, cartItemId);
 
@@ -65,7 +64,7 @@ const deleteCartItem = asyncHandler(async (req, res) => {
     const cart = await Cart.deleteOne({ userId: id, _id: cartItemId });
 
     if (cart.deletedCount <= 0) {
-      return errorResponse(res, 404, "Cart item not found");
+      throw errorResponse(res, 404, "Cart item not found");
     }
 
     const carts = await Cart.find({ userId: id }).populate("gameId");
@@ -77,7 +76,7 @@ const deleteCartItem = asyncHandler(async (req, res) => {
 
     successResponse(res, { totalPrice }, "Cart item deleted successfully", 200);
   } catch (error) {
-    errorResponse(res, 500, "Failed to delete cart item");
+    throw errorResponse(res, 500, `Failed to delete cart item: ${error.message}`);
   }
 });
 

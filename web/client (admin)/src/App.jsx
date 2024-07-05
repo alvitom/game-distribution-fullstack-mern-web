@@ -8,7 +8,6 @@ import Genres from "./pages/Genres";
 import Features from "./pages/Features";
 import Users from "./pages/Users";
 import Transactions from "./pages/Transactions";
-import Promotions from "./pages/Promotions";
 import AddGame from "./pages/AddGame";
 import AddBlog from "./pages/AddBlog";
 import AddGenre from "./pages/AddGenre";
@@ -22,10 +21,11 @@ import ResetPassword from "./pages/ResetPassword";
 import Languages from "./pages/Languages";
 import AddLanguage from "./pages/AddLanguage";
 import UpdateLanguage from "./pages/UpdateLanguage";
-import UpdatePromotion from "./pages/UpdatePromotion";
-import AddPromotion from "./pages/AddPromotion";
 import ChangePassword from "./pages/ChangePassword";
 import Profile from "./pages/Profile";
+import SaleGames from "./pages/SaleGames";
+import AddSaleGame from "./pages/AddSaleGame";
+import UpdateSaleGame from "./pages/UpdateSaleGame";
 
 const App = () => {
   return (
@@ -45,9 +45,9 @@ const App = () => {
             <Route path="features" element={<Features />} />
             <Route path="features/add" element={<AddFeature />} />
             <Route path="features/update/:id" element={<UpdateFeature />} />
-            <Route path="promotions" element={<Promotions />} />
-            <Route path="promotions/add" element={<AddPromotion />} />
-            <Route path="promotions/update/:id" element={<UpdatePromotion />} />
+            <Route path="sale-games" element={<SaleGames />} />
+            <Route path="sale-games/add" element={<AddSaleGame />} />
+            <Route path="sale-games/:id" element={<UpdateSaleGame />} />
             <Route path="users" element={<Users />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="languages" element={<Languages />} />

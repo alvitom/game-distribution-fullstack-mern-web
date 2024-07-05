@@ -13,7 +13,6 @@ import { FeatureProvider } from "./context/FeatureContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
 import { ModalsProvider } from "@mantine/modals";
-import { PromotionProvider } from "./context/PromotionContext.jsx";
 import { TransactionProvider } from "./context/TransactionContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -25,11 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <FeatureProvider>
               <AuthProvider>
                 <LanguageProvider>
-                  <PromotionProvider>
-                    <TransactionProvider>
-                      <App />
-                    </TransactionProvider>
-                  </PromotionProvider>
+                  <TransactionProvider>
+                    <App />
+                  </TransactionProvider>
                 </LanguageProvider>
               </AuthProvider>
             </FeatureProvider>

@@ -20,7 +20,6 @@ const gameSchema = new mongoose.Schema({
   },
   releaseDate: {
     type: Date,
-    required: true,
   },
   initialRelease: {
     type: Date,
@@ -35,7 +34,6 @@ const gameSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
   },
   discount: {
     percentage: {

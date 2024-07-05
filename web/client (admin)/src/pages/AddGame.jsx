@@ -131,7 +131,7 @@ const AddGame = (props) => {
     formData.append("description", game.description);
     formData.append("developer", game.developer);
     formData.append("publisher", game.publisher);
-    formData.append("releaseDate", game.releaseDate);
+    formData.append("releaseDate", game.releaseDate ? game.releaseDate : "");
     game.genres.forEach((genre) => {
       formData.append("genres", genre);
     });
@@ -141,7 +141,7 @@ const AddGame = (props) => {
     game.platform.forEach((platform) => {
       formData.append("platform", platform);
     })
-    formData.append("price", game.price);
+    formData.append("price", game.price ? game.price : 0);
     formData.append("systemRequirements", JSON.stringify(systemRequirements));
     formData.append("fileDownload", game.fileDownload.path);
     formData.append(`coverImage`, game.coverImage);

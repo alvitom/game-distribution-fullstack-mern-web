@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import ChangePassword from "./pages/ChangePassword";
 import Profile from "./pages/Profile";
 import Transaction from "./pages/Transaction";
+import SaleCollection from "./pages/SaleCollection";
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
             <Route index element={<Home />} />
             <Route path="game" element={<Game />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="collection/sale" element={<SaleCollection />} />
             <Route path="collection/top-sellers" element={<TopSellersCollection />} />
             <Route path="collection/most-played" element={<MostPlayedCollection />} />
             <Route path="collection/upcoming" element={<UpcomingCollection />} />

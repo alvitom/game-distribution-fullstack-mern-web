@@ -136,7 +136,7 @@ const Home = () => {
           <section className="discount-section py-4">
             <div className="row">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
-                <h3 className="section-heading">On Sale</h3>
+                <h3 className="section-heading">Games On Sale</h3>
                 <a href="/collection/sale" className="btn btn-outline-light">
                   View More
                 </a>
