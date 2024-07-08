@@ -4,12 +4,15 @@ const asyncHandler = require("express-async-handler");
 const sendEmail = asyncHandler(async (data, req, res) => {
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
       // TODO: replace `user` and `pass` values from <https://forwardemail.net>
       user: process.env.MAIL_ID,
       pass: process.env.MP,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 
