@@ -5,7 +5,6 @@ const sendEmail = asyncHandler(async (data, req, res) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: "465",
-    secure: true,
     auth: {
       // TODO: replace `user` and `pass` values from <https://forwardemail.net>
       user: process.env.MAIL_ID,
