@@ -23,6 +23,7 @@ const sendEmail = async (data, req, res) => {
       text: data.text, // plain text body
       html: data.htm, // html body
     });
+    transporter.close();
   }
 
   main().catch(console.error);
