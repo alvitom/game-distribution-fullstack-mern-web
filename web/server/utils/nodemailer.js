@@ -5,11 +5,12 @@ const sendEmail = asyncHandler(async (data, req, res) => {
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
     port: process.env.MAIL_PORT,
+    service: process.env.MAIL_SERVICE,
     secure: true,
     auth: {
       // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-      user: process.env.MAIL_ID,
-      pass: process.env.MP,
+      user: process.env.MAIL_USER,
+      pass: process.env.SENDGRID_API_KEY,
     },
   });
 
