@@ -13,20 +13,14 @@ const sendEmail = async (data, req, res) => {
     },
   });
 
-  // async..await is not allowed in global scope, must use a wrapper
-  async function main() {
-    // send mail with defined transport object
-    await transporter.sendMail({
-      from: '"Alvito Game Store" <abc@gmail.com>', // sender address
-      to: data.to, // list of receivers
-      subject: data.subject, // Subject line
-      text: data.text, // plain text body
-      html: data.htm, // html body
-    });
-    transporter.close();
-  }
-
-  main().catch(console.error);
+  // send mail with defined transport object
+  await transporter.sendMail({
+    from: '"Alvito Game Store" <abc@gmail.com>', // sender address
+    to: data.to, // list of receivers
+    subject: data.subject, // Subject line
+    text: data.text, // plain text body
+    html: data.htm, // html body
+  });
 };
 
 module.exports = sendEmail;
