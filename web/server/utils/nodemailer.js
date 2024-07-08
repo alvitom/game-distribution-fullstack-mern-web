@@ -11,6 +11,10 @@ const sendEmail = asyncHandler(async (data, req, res) => {
       user: process.env.MAIL_ID,
       pass: process.env.MP,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    requireTLS: true,
   });
 
   // async..await is not allowed in global scope, must use a wrapper
@@ -28,10 +32,4 @@ const sendEmail = asyncHandler(async (data, req, res) => {
   main().catch(console.error);
 });
 
-module.exports = {
-  config: {
-    external_node_modules: ["nodemailer"],
-  },
-  sendEmail,
-};
-
+module.exports = sendEmail;
