@@ -22,7 +22,9 @@ const midtransNotification = asyncHandler(async (req, res) => {
         text: body,
         htm: body,
       };
-      sendEmail(data);
+
+      await sendEmail(data);
+      
     } else if (transactionStatus === "pending") {
       status = "pending";
     } else if (transactionStatus === "deny" || transactionStatus === "cancel" || transactionStatus === "expire") {
