@@ -296,7 +296,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
       text: `Hey User, click the link below to reset your password. This link will expire in 10 minutes. ${resetURL}`,
     };
 
-    awaitsendEmail(data);
+    await sendEmail(data);
 
     successResponse(res, { token: resetToken }, "Password reset link sent successfully. Please check your email to reset your password", 200);
   } catch (error) {
