@@ -43,7 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
       htm: body,
     };
 
-    sendEmail(data);
+    await sendEmail(data);
 
     setTimeout(async () => {
       await User.deleteOne({ email, isVerified: false });

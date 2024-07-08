@@ -55,7 +55,8 @@ const createTransaction = asyncHandler(async (req, res) => {
       text: body,
       htm: body,
     };
-    sendEmail(data);
+    
+    await sendEmail(data);
 
     successResponse(res, { transaction, orderId }, "Transaction created successfully", 201);
   } catch (error) {
@@ -135,7 +136,8 @@ const updateTransactionStatus = asyncHandler(async (req, res) => {
           text: body,
           htm: body,
         };
-        sendEmail(data);
+
+        await sendEmail(data);
       }
     });
   } catch (error) {
