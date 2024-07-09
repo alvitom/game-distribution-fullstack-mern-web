@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Wishlist = () => {
-  const { wishlists, loading, fetchWishlist, removeWishlist } = useContext(WishlistContext);
+  const { wishlists, loading, getWishlist, removeWishlist } = useContext(WishlistContext);
   const { addCart, carts, setCarts } = useContext(CartContext);
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const Wishlist = () => {
   }, [user]);
 
   useEffect(() => {
-    fetchWishlist();
+    getWishlist();
   }, []);
 
   const handleRemoveWishlist = async (id) => {
@@ -52,7 +52,7 @@ const Wishlist = () => {
         ),
       });
     } else {
-      fetchWishlist();
+      getWishlist();
       modals.closeAll();
     }
   };
@@ -108,7 +108,7 @@ const Wishlist = () => {
       });
     } else {
       setCarts([response.data, ...carts]);
-      fetchWishlist();
+      getWishlist();
       modals.closeAll();
     }
   };

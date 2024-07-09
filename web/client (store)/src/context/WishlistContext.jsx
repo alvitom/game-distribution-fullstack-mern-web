@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
+import { addWishlistUser, fetchWishlistUser, removeWishlistUser } from "../api/wishlist";
 
 export const WishlistContext = createContext();
 
@@ -11,55 +11,38 @@ export const WishlistProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      fetchWishlist();
+      getWishlist();
     }
   }, []);
 
-  const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-  });
-
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const data = JSON.parse(sessionStorage.getItem("user"));
-      if (data) {
-        config.headers["Authorization"] = `Bearer ${data.token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
   const addWishlist = async (gameId) => {
     try {
-      const response = await axiosInstance.post(`/wishlist`, gameId);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
+      setLoading(true);
+      const response = await addWishlistUser(gameId);
+      return response;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchWishlist = async () => {
-    setLoading(true);
+  const getWishlist = async () => {
     try {
-      const response = await axiosInstance.get(`/wishlist`);
-      const datas = await response.data;
-      setWishlists(datas.data.wishlist);
+      setLoading(true);
+      const response = await fetchWishlistUser();
+      const data = await response.data;
+      setWishlists(data.wishlist);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
   const removeWishlist = async (id) => {
     try {
-      const response = await axiosInstance.delete(`/wishlist/${id}`);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
+      setLoading(true);
+      const response = await removeWishlistUser(id);
+      return response;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,7 +54,7 @@ export const WishlistProvider = ({ children }) => {
         loading,
         setLoading,
         addWishlist,
-        fetchWishlist,
+        getWishlist,
         removeWishlist,
       }}
     >

@@ -4,11 +4,11 @@ import GameCard from "../components/GameCard";
 import { GameContext } from "../context/GameContext";
 
 const TopSellersCollection = () => {
-  const { fetchTopSellerGames, topSellerGames } = useContext(GameContext);
+  const { getTopSellerGames, topSellerGames } = useContext(GameContext);
   const limit = 50
 
   useEffect(() => {
-    fetchTopSellerGames(limit);
+    getTopSellerGames(limit);
   }, []);
   return (
     <>

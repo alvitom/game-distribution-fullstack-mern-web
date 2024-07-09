@@ -17,19 +17,19 @@ const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Home = () => {
   const {
-    fetchAllGames,
+    getAllGames,
     games,
-    fetchSaleGames,
+    getSaleGames,
     saleGames,
-    fetchTopSellerGames,
+    getTopSellerGames,
     topSellerGames,
-    fetchMostPlayedGames,
+    getMostPlayedGames,
     mostPlayedGames,
-    fetchNewReleaseGames,
+    getNewReleaseGames,
     newReleaseGames,
-    fetchTrendingGames,
+    getTrendingGames,
     trendingGames,
-    fetchUpcomingGames,
+    getUpcomingGames,
     upcomingGames,
     loading,
   } = useContext(GameContext);
@@ -38,13 +38,13 @@ const Home = () => {
   const limitCollection = 6;
 
   useEffect(() => {
-    fetchAllGames(null, limitCarousel);
-    fetchSaleGames(limitCollection);
-    fetchTopSellerGames(limitCollection);
-    fetchMostPlayedGames(limitCollection);
-    fetchNewReleaseGames(limitCollection);
-    fetchTrendingGames(limitCollection);
-    fetchUpcomingGames(limitCollection);
+    getAllGames(null, limitCarousel);
+    getSaleGames(limitCollection);
+    getTopSellerGames(limitCollection);
+    getMostPlayedGames(limitCollection);
+    getNewReleaseGames(limitCollection);
+    getTrendingGames(limitCollection);
+    getUpcomingGames(limitCollection);
   }, []);
 
   if (loading) {

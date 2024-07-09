@@ -4,11 +4,11 @@ import GameCard from "../components/GameCard";
 import Meta from "../components/Meta";
 
 const SaleCollection = () => {
-  const { fetchSaleGames, saleGames } = useContext(GameContext);
+  const { getSaleGames, saleGames } = useContext(GameContext);
   const limit = 50;
 
   useEffect(() => {
-    fetchSaleGames(limit);
+    getSaleGames(limit);
   }, []);
   return (
     <>

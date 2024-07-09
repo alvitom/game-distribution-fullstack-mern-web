@@ -15,7 +15,7 @@ const user = JSON.parse(sessionStorage.getItem("user"));
 
 const GameDetail = () => {
   const { title } = useParams();
-  const { selectedGame, totalNetPrice, totalDiscount, newPrice, serviceFee, totalPrice, fetchGame } = useContext(GameContext);
+  const { selectedGame, totalNetPrice, totalDiscount, newPrice, serviceFee, totalPrice, getDetailGame } = useContext(GameContext);
   const { addWishlist, wishlists, setWishlists } = useContext(WishlistContext);
   const { addCart, carts, setCarts } = useContext(CartContext);
   const [images, setImages] = useState([]);
@@ -27,7 +27,7 @@ const GameDetail = () => {
   const imagesPerSlide = 7;
 
   useEffect(() => {
-    fetchGame(title);
+    getDetailGame(title);
   }, [title]);
 
   useEffect(() => {

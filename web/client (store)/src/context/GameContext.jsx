@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { createContext, useState } from "react";
+import { fetchAllGames, fetchSaleGames, fetchTopSellerGames, fetchMostPlayedGames, fetchNewReleaseGames, fetchTrendingGames, fetchUpcomingGames, fetchGame } from "../api/game";
 
 export const GameContext = createContext();
 
@@ -26,149 +26,97 @@ export const GameProvider = ({ children }) => {
   const [feature, setFeature] = useState("");
   const [platform, setPlatform] = useState("");
 
-  const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-  });
-
-  const fetchAllGames = async (page, limit, genre, feature, platform) => {
-    setLoading(true);
+  const getAllGames = async (page, limit, genre, feature, platform) => {
     try {
-      const response = await axiosInstance.get(`/game`, {
-        params: {
-          page,
-          limit,
-          genre,
-          feature,
-          platform,
-        },
-      });
-      const datas = await response.data;
-      setGames(datas.data.games);
-      setTotalPages(datas.data.totalPages);
+      setLoading(true);
+      const response = await fetchAllGames(page, limit, genre, feature, platform);
+      const data = await response.data;
+      setGames(data.games);
+      setTotalPages(data.totalPages);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchSaleGames = async (limit) => {
-    setLoading(true);
+  const getSaleGames = async (limit) => {
     try {
-      const response = await axiosInstance.get(`/game/sale`, {
-        params: {
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setSaleGames(datas.data.saleGames);
+      setLoading(true);
+      const response = await fetchSaleGames(limit);
+      const data = await response.data;
+      setSaleGames(data.saleGames);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchTopSellerGames = async (limit) => {
-    setLoading(true);
+  const getTopSellerGames = async (limit) => {
     try {
-      const response = await axiosInstance.get(`/game/top-seller`, {
-        params: {
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setTopSellerGames(datas.data.topSellerGames);
+      setLoading(true);
+      const response = await fetchTopSellerGames(limit);
+      const data = await response.data;
+      setTopSellerGames(data.topSellerGames);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchMostPlayedGames = async (limit) => {
-    setLoading(true);
+  const getMostPlayedGames = async (limit) => {
     try {
-      const response = await axiosInstance.get(`/game/most-played`, {
-        params: {
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setMostPlayedGames(datas.data.mostPlayedGames);
+      setLoading(true);
+      const response = await fetchMostPlayedGames(limit);
+      const data = await response.data;
+      setMostPlayedGames(data.mostPlayedGames);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchNewReleaseGames = async (limit) => {
-    setLoading(true);
+  const getNewReleaseGames = async (limit) => {
     try {
-      const response = await axiosInstance.get(`/game/new-release`, {
-        params: {
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setNewReleaseGames(datas.data.newReleaseGames);
+      setLoading(true);
+      const response = await fetchNewReleaseGames(limit);
+      const data = await response.data;
+      setNewReleaseGames(data.newReleaseGames);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchTrendingGames = async (limit) => {
-    setLoading(true);
+  const getTrendingGames = async (limit) => {
     try {
-      const response = await axiosInstance.get(`/game/trending`, {
-        params: {
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setTrendingGames(datas.data.trendingGames);
+      setLoading(true);
+      const response = await fetchTrendingGames(limit);
+      const data = await response.data;
+      setTrendingGames(data.trendingGames);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchUpcomingGames = async (limit) => {
-    setLoading(true);
+  const getUpcomingGames = async (limit) => {
     try {
-      const response = await axiosInstance.get(`/game/upcoming`, {
-        params: {
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setUpcomingGames(datas.data.upcomingGames);
+      setLoading(true);
+      const response = await fetchUpcomingGames(limit);
+      const data = await response.data;
+      setUpcomingGames(data.upcomingGames);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  const fetchGame = async (title) => {
-    setLoading(true);
+  const getDetailGame = async (title) => {
     try {
-      const response = await axiosInstance.get(`/game/${title}`);
-      const datas = await response.data;
-      setSelectedGame(datas.data.game);
-      setTotalNetPrice(datas.data.totalNetPrice);
-      setTotalDiscount(datas.data.totalDiscount);
-      setNewPrice(datas.data.newPrice);
-      setServiceFee(datas.data.serviceFee);
-      setTotalPrice(datas.data.total);
+      setLoading(true);
+      const response = await fetchGame(title);
+      const data = await response.data;
+      setSelectedGame(data.game);
+      setTotalNetPrice(data.totalNetPrice);
+      setTotalDiscount(data.totalDiscount);
+      setNewPrice(data.newPrice);
+      setServiceFee(data.serviceFee);
+      setTotalPrice(data.total);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
@@ -201,14 +149,14 @@ export const GameProvider = ({ children }) => {
         genre,
         feature,
         platform,
-        fetchAllGames,
-        fetchSaleGames,
-        fetchTopSellerGames,
-        fetchMostPlayedGames,
-        fetchNewReleaseGames,
-        fetchTrendingGames,
-        fetchUpcomingGames,
-        fetchGame,
+        getAllGames,
+        getSaleGames,
+        getTopSellerGames,
+        getMostPlayedGames,
+        getNewReleaseGames,
+        getTrendingGames,
+        getUpcomingGames,
+        getDetailGame,
       }}
     >
       {children}

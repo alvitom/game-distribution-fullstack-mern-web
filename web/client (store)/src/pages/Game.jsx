@@ -5,11 +5,11 @@ import { GameContext } from "../context/GameContext";
 import { Pagination } from "@mantine/core";
 
 const Game = () => {
-  const { fetchAllGames, page, setPage, games, loading, totalPages, genre, feature, platform } = useContext(GameContext);
+  const { getAllGames, page, setPage, games, loading, totalPages, genre, feature, platform } = useContext(GameContext);
   const limit = 40;
 
   useEffect(() => {
-    fetchAllGames(page, limit, genre, feature, platform);
+    getAllGames(page, limit, genre, feature, platform);
   }, [page]);
 
   if (loading) {

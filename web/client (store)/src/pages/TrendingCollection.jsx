@@ -4,11 +4,11 @@ import GameCard from "../components/GameCard";
 import { GameContext } from "../context/GameContext";
 
 const TrendingCollection = () => {
-  const { fetchTrendingGames, trendingGames } = useContext(GameContext);
+  const { getTrendingGames, trendingGames } = useContext(GameContext);
   const limit = 50;
 
   useEffect(() => {
-    fetchTrendingGames(limit);
+    getTrendingGames(limit);
   }, []);
   return (
     <>

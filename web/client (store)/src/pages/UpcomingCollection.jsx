@@ -4,11 +4,11 @@ import GameCard from "../components/GameCard";
 import { GameContext } from "../context/GameContext";
 
 const UpcomingCollection = () => {
-  const { fetchUpcomingGames, upcomingGames } = useContext(GameContext);
+  const { getUpcomingGames, upcomingGames } = useContext(GameContext);
   const limit = 50;
 
   useEffect(() => {
-    fetchUpcomingGames(limit);
+    getUpcomingGames(limit);
   }, []);
   return (
     <>

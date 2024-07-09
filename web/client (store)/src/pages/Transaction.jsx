@@ -11,7 +11,7 @@ const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Transaction = () => {
   const navigate = useNavigate();
-  const { fetchAllTransactions, transactions, loading, updateTransaction, page, setPage, totalPages } = useContext(TransactionContext);
+  const { getAllTransactions, transactions, loading, updateTransaction, page, setPage, totalPages } = useContext(TransactionContext);
   const limit = 10;
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const Transaction = () => {
   }, [user]);
 
   useEffect(() => {
-    fetchAllTransactions(page, limit);
+    getAllTransactions(page, limit);
   }, [page]);
 
   const handleContinueToPayment = (orderId) => {
@@ -57,7 +57,7 @@ const Transaction = () => {
           });
         }
         localStorage.removeItem(orderId);
-        await fetchAllTransactions();
+        await getAllTransactions();
       },
       onPending: async function (result) {
         const response = await updateTransaction(result);
@@ -87,7 +87,7 @@ const Transaction = () => {
             ),
           });
         }
-        await fetchAllTransactions();
+        await getAllTransactions();
       },
       onError: async function (result) {
         const response = await updateTransaction(result);
@@ -118,7 +118,7 @@ const Transaction = () => {
           });
         }
         localStorage.removeItem(orderId);
-        await fetchAllTransactions();
+        await getAllTransactions();
       },
     });
   };

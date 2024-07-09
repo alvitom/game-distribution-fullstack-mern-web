@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const user = JSON.parse(sessionStorage.getItem("user"));
 
 const Cart = () => {
-  const { carts, loading, totalPrice, totalNetPrice, totalDiscount, serviceFee, total, fetchCart, removeCart } = useContext(CartContext);
+  const { carts, loading, totalPrice, totalNetPrice, totalDiscount, serviceFee, total, getCart, removeCart } = useContext(CartContext);
   const { addWishlist, wishlists, setWishlists } = useContext(WishlistContext);
   const { setCheckout } = useContext(CheckoutContext);
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const Cart = () => {
   }, [user]);
 
   useEffect(() => {
-    fetchCart();
+    getCart();
   }, []);
 
   const handleRemoveCart = async (id) => {
@@ -54,7 +54,7 @@ const Cart = () => {
         ),
       });
     } else {
-      fetchCart();
+      getCart();
       modals.closeAll();
     }
   };
@@ -110,7 +110,7 @@ const Cart = () => {
       });
     } else {
       setWishlists([response.data, ...wishlists]);
-      fetchCart();
+      getCart();
       modals.closeAll();
     }
   };

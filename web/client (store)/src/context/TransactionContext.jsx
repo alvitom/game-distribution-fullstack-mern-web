@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { createContext, useState } from "react";
+import { createTransactionUser, fetchAllTransactionUser, updateTransactionUser } from "../api/transaction";
 
 export const TransactionContext = createContext();
 
@@ -9,62 +9,37 @@ export const TransactionProvider = ({ children }) => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-  });
-
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const data = JSON.parse(sessionStorage.getItem("user"));
-      if (data) {
-        config.headers["Authorization"] = `Bearer ${data.token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
   const createTransaction = async (data) => {
-    setLoading(true);
     try {
-      const response = await axiosInstance.post(`/transaction`, data);
+      setLoading(true);
+      const response = await createTransactionUser(data);
+      return response;
+    } finally {
       setLoading(false);
-      return response.data;
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
   const updateTransaction = async (data) => {
     try {
-      const response = await axiosInstance.post(`/midtrans/notification`, data);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
+      setLoading(true);
+      const response = await updateTransactionUser(data);
+      return response;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchAllTransactions = async (page, limit) => {
-    setLoading(true);
+  const getAllTransactions = async (page, limit) => {
     try {
-      const response = await axiosInstance.get(`/transaction`, {
-        params: {
-          page,
-          limit,
-        },
-      });
-      const datas = await response.data;
-      setTransactions(datas.data.transactions);
-      setTotalPages(datas.data.totalPages);
+      setLoading(true);
+      const response = await fetchAllTransactionUser(page, limit);
+      const data = await response.data;
+      setTransactions(data.transactions);
+      setTotalPages(data.totalPages);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
-  return <TransactionContext.Provider value={{ createTransaction, updateTransaction, fetchAllTransactions, transactions, loading, page, totalPages, setPage }}>{children}</TransactionContext.Provider>;
+  return <TransactionContext.Provider value={{ createTransaction, updateTransaction, getAllTransactions, transactions, loading, page, totalPages, setPage }}>{children}</TransactionContext.Provider>;
 };

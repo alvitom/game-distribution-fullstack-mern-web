@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
+import { addCartUser, fetchCartUser, removeCartUser } from "../api/cart";
 
 export const CartContext = createContext();
 
@@ -16,60 +16,43 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      fetchCart();
+      getCart();
     }
   }, []);
 
-  const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-  });
-
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const data = JSON.parse(sessionStorage.getItem("user"));
-      if (data) {
-        config.headers["Authorization"] = `Bearer ${data.token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
   const addCart = async (gameId) => {
     try {
-      const response = await axiosInstance.post(`/cart`, gameId);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
+      setLoading(true);
+      const response = await addCartUser(gameId);
+      return response;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchCart = async () => {
-    setLoading(true);
+  const getCart = async () => {
     try {
-      const response = await axiosInstance.get(`cart`);
-      const datas = await response.data;
-      setCarts(datas.data.cart);
-      setTotalNetPrice(datas.data.totalNetPrice);
-      setTotalPrice(datas.data.totalPrice);
-      setTotalDiscount(datas.data.totalDiscount);
-      setServiceFee(datas.data.serviceFee);
-      setTotal(datas.data.total);
+      setLoading(true);
+      const response = await fetchCartUser();
+      const data = await response.data;
+      setCarts(data.cart);
+      setTotalNetPrice(data.totalNetPrice);
+      setTotalPrice(data.totalPrice);
+      setTotalDiscount(data.totalDiscount);
+      setServiceFee(data.serviceFee);
+      setTotal(data.total);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      return error.response.data;
     }
   };
 
   const removeCart = async (id) => {
     try {
-      const response = await axiosInstance.delete(`/cart/${id}`);
-      return response.data;
-    } catch (error) {
-      return error.response.data;
+      setLoading(true);
+      const response = await removeCartUser(id);
+      return response;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,7 +69,7 @@ export const CartProvider = ({ children }) => {
         loading,
         setLoading,
         addCart,
-        fetchCart,
+        getCart,
         removeCart,
       }}
     >
