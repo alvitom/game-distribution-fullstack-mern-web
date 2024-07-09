@@ -158,9 +158,9 @@ const Cart = () => {
       <Meta title="Cart" />
       <div className="cart-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-3">
             <div className="col-12 my-2">
-              <h1>My Cart</h1>
+              <h1>Cart</h1>
             </div>
             {carts.length < 1 ? (
               <div className="col-12">
@@ -210,13 +210,13 @@ const Cart = () => {
                               }).format(cart.gameId.price)}
                             </p>
                           )}
-                          <div className="d-flex align-items-center gap-2 platform-support">
+                          <div className="d-flex align-items-center gap-2 platform-support justify-content-center justify-content-sm-start">
                             {cart.gameId.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
                           </div>
                           {new Date(cart.gameId.releaseDate) > Date.now() && <span className="available text-warning" style={{ fontSize: "14px" }}>You won't be able to play this game until it's released.</span>}
                         </div>
                       </div>
-                      <div className="action-btn d-flex gap-3 align-items-center mt-3 mt-lg-0">
+                      <div className="action-btn d-flex flex-column flex-xl-row gap-3 align-items-center mt-3 mt-lg-0">
                         <button className="btn btn-outline-light d-flex align-items-center gap-1" onClick={() => openMoveToWishlistModal(cart._id, cart.gameId._id)}>
                           <FaHeart />
                           <span>Move to Wishlist</span>

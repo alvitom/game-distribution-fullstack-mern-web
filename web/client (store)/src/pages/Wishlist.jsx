@@ -141,7 +141,7 @@ const Wishlist = () => {
       <Meta title="Wishlist" />
       <div className="wishlist-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-3">
             <div className="col-12 my-2">
               <h1>Wishlist</h1>
             </div>
@@ -153,11 +153,11 @@ const Wishlist = () => {
               <div className="col-12">
                 {wishlists?.map((wishlist, index) => (
                   <div className="wishlist-item my-4 d-flex justify-content-between align-items-center" key={index}>
-                    <div className="d-flex gap-3 align-items-center">
+                    <div className="d-flex gap-3 align-items-center flex-column flex-sm-row">
                       <div className="game-image">
                         <img src={wishlist.gameId.coverImage?.url} alt={wishlist.gameId.title} className="img-fluid" />
                       </div>
-                      <div className="game-detail">
+                      <div className="game-detail text-center text-sm-start">
                         <h5>{wishlist.gameId.title}</h5>
                         {new Date(wishlist.gameId.releaseDate) > Date.now() && <span className="available text-secondary">Available {new Date(wishlist.gameId.releaseDate).toLocaleDateString("en-US")}</span>}
                         {wishlist.gameId.discount?.isActive ? (
@@ -194,12 +194,12 @@ const Wishlist = () => {
                             {wishlist.gameId.price === 0 && !(wishlist.gameId.releaseDate === null) && "Free"}
                           </p>
                         )}
-                        <div className="d-flex align-items-center gap-2 platform-support">
+                        <div className="d-flex align-items-center gap-2 platform-support justify-content-center justify-content-sm-start">
                           {wishlist.gameId.platform?.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
                         </div>
                       </div>
                     </div>
-                    <div className="action-btn d-flex gap-3 align-items-center">
+                    <div className="action-btn d-flex flex-column flex-lg-row gap-3 align-items-center">
                       {!(wishlist.gameId.releaseDate === null) ? (
                         <button className="btn btn-outline-light d-flex align-items-center gap-2 w-100" onClick={() => openAddToCartModal(wishlist._id, wishlist.gameId._id)}>
                           <FaShoppingCart />

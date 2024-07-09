@@ -30,7 +30,7 @@ const GameCard = ({ collection, page, data }) => {
     }
   };
   return (
-    <div className={collection || page === "game" ? "col-lg-3 col-md-4 col-sm-6 col-12 my-4" : "col-lg-2 col-md-3 col-sm-4 col-6"}>
+    <div className={`${(collection || page === "game") && "my-4"} col-lg-2 col-md-3 col-sm-4 col-6`}>
       {data?.discount.isActive ? (
         <>
           <a href={`/game/${data?.slug}`} className="game-card position-relative">

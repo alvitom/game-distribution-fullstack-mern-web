@@ -15,7 +15,7 @@ const NewReleaseCollection = () => {
       <Meta title="New Release Games" />
       <div className="new-release-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-2">
             <div className="col-12 my-4">
               <h1>New Release</h1>
             </div>

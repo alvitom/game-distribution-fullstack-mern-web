@@ -18,7 +18,7 @@ const Game = () => {
 
   return (
     <>
-      <Meta title="Game Terbaru" />
+      <Meta title="Discover Games" />
       <div className="game-wrapper">
         <div className="container">
           {/* <section className="genre-section py-4">
@@ -42,9 +42,9 @@ const Game = () => {
                   <Select checkIconPosition="right" placeholder="Pick value" data={sort} defaultValue={sort[1]} allowDeselect={false} />
                 </div>
               </div> */}
-          <div className="row">
-            {games.map((game) => (
-              <GameCard page="game" data={game} key={game._id} />
+          <div className="row mx-sm-0 mx-2">
+            {games.map((game, index) => (
+              <GameCard page="game" data={game} key={index} />
             ))}
           </div>
           {/* </div> */}

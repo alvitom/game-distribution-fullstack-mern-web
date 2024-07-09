@@ -15,7 +15,7 @@ const MostPlayedCollection = () => {
       <Meta title="Most Played Games" />
       <div className="most-played-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-2">
             <div className="col-12 my-4">
               <h1>Most Played</h1>
             </div>

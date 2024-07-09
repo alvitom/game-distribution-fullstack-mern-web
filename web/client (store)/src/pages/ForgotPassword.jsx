@@ -67,7 +67,7 @@ const ForgotPassword = () => {
   };
   return (
     <>
-      <Meta title="Lupa Password" />
+      <Meta title="Forgot Password" />
       <div className="auth-wrapper">
         <div className="login-card text-center">
           <h1>Forgot Password</h1>

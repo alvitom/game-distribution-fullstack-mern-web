@@ -15,7 +15,7 @@ const TopSellersCollection = () => {
       <Meta title="Top Seller Games" />
       <div className="top-seller-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-2">
             <div className="col-12 my-4">
               <h1>Top Sellers</h1>
             </div>

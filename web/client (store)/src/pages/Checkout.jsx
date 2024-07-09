@@ -157,23 +157,23 @@ const Checkout = () => {
       <Meta title="Checkout" />
       <div className="checkout-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-3">
             <h1>Checkout</h1>
-            <div className="col-6 mx-auto">
+            <div className="col-lg-6 col-12 mx-auto">
               <h3 className="text-center">Summary</h3>
               <div className="checkout-container my-4">
                 <div className="checkout-items d-flex flex-column gap-3">
                   {checkout?.items?.map((item, index) => (
                     <div className="checkout-item d-flex gap-3 align-items-center" key={index}>
                       <div className="game-image">
-                        <img src={item?.coverImage?.url} alt={item?.title} className="img-fluid" />
+                        <img src={item?.coverImage?.url} alt={item?.title} />
                       </div>
                       <div className="game-detail">
                         <h5>{item?.title}</h5>
                         {new Date(item?.releaseDate) > Date.now() && <span className="available text-secondary">Available {new Date(item?.releaseDate).toLocaleDateString("en-US")}</span>}
                         {item?.discount?.isActive ? (
-                          <div className="discount d-flex flex-column my-2">
-                            <div className="price d-flex align-items-center gap-3">
+                          <div className="discount d-flex flex-column my-1 my-sm-2 gap-1">
+                            <div className="price d-flex flex-wrap align-items-center gap-1 gap-sm-3">
                               <span className="badge bg-success">-{item?.discount.percentage}%</span>
                               <p className="old-price text-decoration-line-through text-secondary mb-0">
                                 {new Intl.NumberFormat("id-ID", {

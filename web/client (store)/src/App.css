@@ -22,6 +22,14 @@ a {
 header .logo {
   color: #fff;
   font-size: 24px;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 16px;
+  }
 }
 
 header a {
@@ -43,11 +51,12 @@ header a:hover {
 }
 
 .header-bottom .search-wrapper {
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  padding: 8px 15px;
-  width: 250px;
-  background-color: #222;
+  @media (min-width: 992px) {
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px 15px;
+    background-color: #222;
+  }
 }
 
 .header-bottom .search-wrapper .btn-search-action {
@@ -55,6 +64,10 @@ header a:hover {
   background-color: transparent;
   color: #bbb;
   margin-top: -3px;
+  
+  @media (max-width: 992px) {
+    font-size: 20px;
+  }
 }
 
 .header-bottom .search-wrapper .search-input {
@@ -63,7 +76,7 @@ header a:hover {
   color: #ccc;
   outline: 0;
   padding: 1px 2px;
-  width: 100%;
+  /* width: 100%; */
 }
 
 .header-bottom .search-wrapper .search-input::-webkit-input-placeholder {
@@ -91,6 +104,15 @@ header a:hover {
   background: none;
   border: none;
   color: #fff;
+  font-size: 24px;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 16px;
+  }
 }
 
 .mobile-menu {
@@ -109,78 +131,6 @@ header a:hover {
   color: #fff;
   transition: 0.2s;
 }
-
-@media (max-width: 575.98px) {
-  .header-top .d-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-top .d-flex .d-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-bottom .d-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-bottom .search-wrapper {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  .header-bottom .wishlist,
-  .header-bottom .cart {
-    margin-top: 10px;
-  }
-}
-
-@media (min-width: 576px) and (max-width: 767.98px) {
-  .header-top .d-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-top .d-flex .d-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-bottom .d-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-bottom .search-wrapper {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  .header-bottom .wishlist,
-  .header-bottom .cart {
-    margin-top: 10px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 991.98px) {
-  .header-bottom .search-wrapper {
-    width: 100%;
-  }
-}
-
-@media (min-width: 992px) and (max-width: 1199.98px) {
-  .header-bottom .search-wrapper {
-    width: 300px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .header-bottom .search-wrapper {
-    width: 350px;
-  }
-}
 /* End Header */
 
 /* Footer */
@@ -198,7 +148,7 @@ footer a:hover {
   color: #fff;
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 576px) {
   .footer-top .container {
     padding: 0 15px;
   }
@@ -449,6 +399,14 @@ footer a:hover {
   background-color: rgb(25, 135, 84) !important;
 }
 
+.notifications {
+  top: 10% !important;
+
+  @media (max-width: 768px) {
+    top: 5% !important;
+  }
+}
+
 /* Home Page */
 /* Carousel Section */
 .swiper {
@@ -549,9 +507,6 @@ footer a:hover {
 .mantine-Select-dropdown {
   border: none !important;
 } */
-.game-wrapper {
-  padding: 20px;
-}
 
 .game-wrapper .mantine-Group-root {
   gap: 15px !important;
@@ -562,15 +517,26 @@ footer a:hover {
 /* Cart Page */
 .cart-wrapper .cart-item {
   background-color: #333;
-  padding: 20px 30px;
+  padding: 20px 30px !important;
   border-radius: 10px;
+
+  @media (max-width: 576px) {
+    padding: 30px !important;
+  }
 }
 
 .cart-wrapper .cart-item .game-image img {
   width: 100px;
 }
 
-@media (max-width: 575.98px) {
+.cart-wrapper .cart-item .action-btn button {
+  @media (max-width: 1200px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
   .cart-wrapper .cart-item {
     padding: 15px 20px;
   }
@@ -644,15 +610,26 @@ footer a:hover {
 /* Wishlist Page */
 .wishlist-wrapper .wishlist-item {
   background-color: #333;
-  padding: 20px 30px;
+  padding: 20px 30px !important;
   border-radius: 10px;
+
+  @media (max-width: 576px) {
+    padding: 30px !important;
+  }
 }
 
 .wishlist-wrapper .wishlist-item .game-image img {
   width: 100px;
 }
 
-@media (max-width: 575.98px) {
+.wishlist-wrapper .wishlist-item .action-btn button {
+  @media (max-width: 992px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
   .wishlist-wrapper .wishlist-item {
     flex-direction: column;
     align-items: flex-start;
@@ -779,6 +756,25 @@ footer a:hover {
   border-radius: 20px;
 }
 
+@media (max-width: 1200px) {
+  .change-password-wrapper .auth-card {
+    width: 50%;
+    padding: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .change-password-wrapper .auth-card {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .change-password-wrapper .auth-card h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+}
+
 /* End Change Password Page */
 
 /* Profile Page */
@@ -869,7 +865,7 @@ footer a:hover {
   color: #fff;
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 576px) {
   .auth-wrapper .login-card {
     padding: 30px;
     width: 100%;
@@ -1041,6 +1037,14 @@ footer a:hover {
 
 .game-detail-wrapper .game-image-original img {
   width: 200px;
+
+  @media (max-width: 768px) {
+    width: 260px;
+  }
+
+  @media (max-width: 576px) {
+    width: 300px;
+  }
 }
 
 .game-detail-wrapper .game-description {
@@ -1085,6 +1089,23 @@ footer a:hover {
 
 .checkout-wrapper .checkout-item .game-image img {
   width: 120px;
+
+  @media (max-width: 576px) {
+    width: 100px;
+    height: 175px;
+  }
+}
+
+.checkout-wrapper .checkout-item .game-detail h5 {
+  @media (max-width: 576px) {
+    font-size: 16px;
+  }
+}
+
+.checkout-wrapper .checkout-item .game-detail .discount {
+  @media (max-width: 576px) {
+    font-size: 14px;
+  }
 }
 
 /* End Checkout Page */
@@ -1130,6 +1151,30 @@ footer a:hover {
 
 .transactions-container .mantine-Group-root {
   gap: 15px !important;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .transactions-container {
+    padding: 15px;
+  }
+
+  .transactions-container h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 576px) {
+  .transactions-container {
+    padding: 10px;
+  }
+
+  .transactions-container h1 {
+    font-size: 20px;
+  }
 }
 
 /* End Transaction Page */

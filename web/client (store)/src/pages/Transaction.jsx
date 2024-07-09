@@ -219,7 +219,7 @@ const Transaction = () => {
       <div className="transactions-wrapper">
         <div className="container">
           <div className="row justify-content-center py-4">
-            <div className="col-9">
+            <div className="col-lg-9 col-md-10 col-12">
               <div className="transactions-container">
                 <h1>My Transactions</h1>
                 {transactions?.length < 1 ? (
@@ -227,22 +227,24 @@ const Transaction = () => {
                 ) : loading ? (
                   <p className="text-center">Loading...</p>
                 ) : (
-                  <Table>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>No.</Table.Th>
-                        <Table.Th>Order ID</Table.Th>
-                        <Table.Th>Description</Table.Th>
-                        <Table.Th>Amount</Table.Th>
-                        <Table.Th>Status</Table.Th>
-                        <Table.Th>Date</Table.Th>
-                        <Table.Th>Action</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{rows}</Table.Tbody>
-                  </Table>
+                  <div className="table-responsive">
+                    <Table>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>No.</Table.Th>
+                          <Table.Th>Order ID</Table.Th>
+                          <Table.Th>Description</Table.Th>
+                          <Table.Th>Amount</Table.Th>
+                          <Table.Th>Status</Table.Th>
+                          <Table.Th>Date</Table.Th>
+                          <Table.Th>Action</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
+                  </div>
                 )}
-                <div className="d-flex justify-content-center align-items-center">
+                <div className="d-flex justify-content-center align-items-center mt-4">
                   <Pagination total={totalPages} value={page} onChange={setPage} mt="xl" withControls={false} withEdges />
                 </div>
               </div>

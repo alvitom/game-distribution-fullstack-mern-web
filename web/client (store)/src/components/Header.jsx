@@ -154,7 +154,7 @@ const Header = () => {
               {/* <a href="/help">Dukungan</a>
               <a href="/distribution">Distribusi</a> */}
             </div>
-            <div className="d-flex align-items-center gap-3">
+            <div className="d-none d-lg-flex align-items-center gap-3">
               {/* <a href="">
                 <IoLanguage className="fs-3" />
               </a> */}
@@ -201,6 +201,60 @@ const Header = () => {
                 <span>Download AGS</span>
               </a> */}
             </div>
+            <button className="btn-hamburger d-lg-none order-2" onClick={toggleMenu}>
+              {menuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+            {menuOpen && (
+              <div className="mobile-menu d-lg-none order-1">
+                <div className="d-flex align-items-center gap-3">
+                  {/* <a href="">
+                <IoLanguage className="fs-3" />
+              </a> */}
+                  {!user ? (
+                    <div className="d-flex align-items-center gap-2">
+                      <a href="/register" className="btn btn-outline-light">
+                        Register
+                      </a>
+                      <a href="/login" className="btn btn-success">
+                        Login
+                      </a>
+                    </div>
+                  ) : (
+                    <Menu shadow="md" width={278}>
+                      <Menu.Target>
+                        <UnstyledButton>
+                          <UserButton />
+                        </UnstyledButton>
+                      </Menu.Target>
+
+                      <Menu.Dropdown>
+                        {/* <Menu.Item leftSection={<MdManageAccounts />} onClick={() => (location.href = "/profile")}>
+                      Profile
+                    </Menu.Item> */}
+                        <Menu.Item leftSection={<MdOutlineAccessTimeFilled />} onClick={() => (location.href = "/transactions")}>
+                          Transactions
+                        </Menu.Item>
+                        {/* <Menu.Item leftSection={<MdOutlineSettings />}>Settings</Menu.Item> */}
+                        <Menu.Item leftSection={<FaExchangeAlt />} onClick={() => (location.href = "/change-password")}>
+                          Change Password
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item color="red" leftSection={<FaTrash />} onClick={openDeleteAccountModal}>
+                          Delete Account
+                        </Menu.Item>
+                        <Menu.Item color="red" leftSection={<MdLogout />} onClick={openLogoutModal}>
+                          Logout
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  )}
+                  {/* <a href="#" className="d-flex gap-2 align-items-center btn btn-primary">
+                <FaDownload />
+                <span>Download AGS</span>
+              </a> */}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -213,7 +267,7 @@ const Header = () => {
                   <button className="btn-search-action">
                     <FaSearch />
                   </button>
-                  <input type="text" className="search-input" placeholder="Cari" />
+                  <input type="text" className="search-input d-none d-lg-block" placeholder="Cari" />
                 </div>
               </div>
               <div className="d-flex align-items-center gap-3">
@@ -276,48 +330,8 @@ const Header = () => {
                   {user && <span className="cart-badge position-absolute bg-danger">{carts.length}</span>}
                 </Link>
               </div>
-              <button className="btn-hamburger d-lg-none" onClick={toggleMenu}>
-                {menuOpen ? <FaTimes className="fs-3" /> : <FaBars className="fs-3" />}
-              </button>
             </div>
           </div>
-          {menuOpen && (
-            <div className="mobile-menu d-lg-none">
-              <Link
-                to="/"
-                className="link"
-                data-active={"Home" === active || undefined}
-                onClick={() => {
-                  setActive("Home");
-                  toggleMenu();
-                }}
-              >
-                Beranda
-              </Link>
-              <Link
-                to="/game"
-                className="link"
-                data-active={"Game" === active || undefined}
-                onClick={() => {
-                  setActive("Game");
-                  toggleMenu();
-                }}
-              >
-                Game
-              </Link>
-              <Link
-                to="/blog"
-                className="link"
-                data-active={"Blog" === active || undefined}
-                onClick={() => {
-                  setActive("Blog");
-                  toggleMenu();
-                }}
-              >
-                Blog
-              </Link>
-            </div>
-          )}
         </div>
       </header>
     </>

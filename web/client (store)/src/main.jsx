@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <HelmetProvider>
       <MantineProvider>
-        <Notifications position="top-center" zIndex={1000} autoClose={3000} style={{ top: 10 + "%" }} />
+        <Notifications position="top-center" zIndex={1000} autoClose={3000} className="notifications" />
         <ModalsProvider>
           <AuthProvider>
             <GameProvider>

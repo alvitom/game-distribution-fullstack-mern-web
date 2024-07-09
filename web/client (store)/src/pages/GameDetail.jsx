@@ -21,10 +21,29 @@ const GameDetail = () => {
   const [images, setImages] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
   const [startImage, setStartImage] = useState(0);
+  const [imagesPerSlide, setImagesPerSlide] = useState(6);
   const { setCheckout } = useContext(CheckoutContext);
   const navigate = useNavigate();
 
-  const imagesPerSlide = 7;
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setImagesPerSlide(3);
+      } else if (window.innerWidth < 992) {
+        setImagesPerSlide(4);
+      } else {
+        setImagesPerSlide(6);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     getDetailGame(title);
@@ -133,9 +152,9 @@ const GameDetail = () => {
       <Meta title={`${selectedGame?.title}`} />
       <div className="game-detail-wrapper">
         <div className="container">
-          <h1>{selectedGame?.title}</h1>
-          <div className="row mt-4">
-            <div className="col-8">
+          <h1 className="text-center text-md-start">{selectedGame?.title}</h1>
+          <div className="row mt-4 mx-sm-0 mx-2">
+            <div className="col-lg-8 col-md-7 col-12 order-md-1 order-2 mt-md-0 mt-5">
               <div className="img-gallery-wrapper">
                 <div className="img-gallery">
                   <img src={images[activeImage]?.url} alt="Hero" className="img-fluid img-gallery-hero" />
@@ -160,13 +179,124 @@ const GameDetail = () => {
               <div className="d-flex justify-content-around my-5 genres-features">
                 <div className="genres">
                   <h5>Genre</h5>
-                  <div className="genre-items">{selectedGame?.genres.map((item) => item.genre).join(", ")}</div>
+                  <div className="genre-items d-flex flex-column flex-lg-row gap-2">
+                    {selectedGame?.genres.map((item) => (
+                      <span>{item.genre},</span>
+                    ))}
+                  </div>
                 </div>
                 <div className="features">
                   <h5>Feature</h5>
-                  <div className="feature-items">{selectedGame?.features.map((item) => item.feature).join(", ")}</div>
+                  <div className="feature-items d-flex flex-column flex-lg-row gap-2">
+                    {selectedGame?.features.map((item) => (
+                      <span>{item.feature},</span>
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
+            <div className="col-lg-4 col-md-5 col-12 order-md-2 order-1 mx-auto">
+              <div className="game-image-original mt-3 text-center">
+                <img src={selectedGame?.coverImage.url} alt={selectedGame?.coverImage.original_filename} className="img-fluid" />
+              </div>
+              {selectedGame?.discount.isActive ? (
+                <div className="discount d-flex flex-column align-items-center my-4 gap-3">
+                  <div className="price d-flex align-items-center justify-content-center gap-3">
+                    <span className="badge bg-success p-2 fs-6">-{selectedGame?.discount.percentage}%</span>
+                    <h5 className="old-price text-decoration-line-through text-secondary mb-0">
+                      {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                      }).format(selectedGame?.price)}
+                    </h5>
+                    <h5 className="new-price mb-0">
+                      {new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                      }).format(newPrice)}
+                    </h5>
+                  </div>
+                  <div className="end-date">
+                    <span>Sale ends at {new Date(selectedGame?.discount.endDate).toLocaleDateString("en-US")}</span>
+                  </div>
+                </div>
+              ) : (
+                <h5 className="price text-center my-4">
+                  {!(selectedGame?.releaseDate === null && selectedGame?.price === 0) &&
+                    new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      minimumFractionDigits: 0,
+                    }).format(selectedGame?.price)}
+                  {selectedGame?.price === 0 && !(selectedGame?.releaseDate === null) && "Free"}
+                </h5>
+              )}
+              <div className="action-btn d-flex flex-column gap-3 w-75 mx-auto">
+                {selectedGame?.releaseDate === null ? (
+                  <button className="btn btn-outline-light w-100 disabled">Coming Soon</button>
+                ) : (
+                  <button className={`${new Date(selectedGame?.releaseDate) > new Date() ? "btn btn-primary" : "btn btn-success"} w-100`} onClick={handleCheckout}>
+                    {new Date(selectedGame?.releaseDate) > new Date() ? "Pre-purchase" : "Buy Now"}
+                  </button>
+                )}
+                {!(selectedGame?.releaseDate === null) && (
+                  <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToCart}>
+                    <FaShoppingCart />
+                    <span>Add to Cart</span>
+                  </button>
+                )}
+                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToWishlist}>
+                  <FaHeart />
+                  <span>Add to Wishlist</span>
+                </button>
+              </div>
+              <div className="d-flex flex-column mt-4 gap-2">
+                <div className="developer d-flex justify-content-between align-items-center border-bottom p-2">
+                  <span className="developer">Developer</span>
+                  <span className="developer-name">{selectedGame?.developer}</span>
+                </div>
+                <div className="publisher d-flex justify-content-between align-items-center border-bottom p-2">
+                  <span className="publisher">Publisher</span>
+                  <span className="publisher-name">{selectedGame?.publisher}</span>
+                </div>
+                <div className="release-date d-flex justify-content-between align-items-center border-bottom p-2">
+                  {new Date(selectedGame?.releaseDate) > new Date() || selectedGame?.releaseDate === null ? (
+                    <>
+                      <span className="release-date">Available</span>
+                      <span className="release-date-info">
+                        {selectedGame?.releaseDate === null
+                          ? "Coming Soon"
+                          : new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
+                              year: "2-digit",
+                              month: "2-digit",
+                              day: "2-digit",
+                            })}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="release-date">Release Date</span>
+                      <span className="release-date-info">
+                        {new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
+                          year: "2-digit",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <div className="platform d-flex justify-content-between align-items-center border-bottom p-2">
+                  <span className="platform">Platform</span>
+                  <div className="platform-support d-flex align-items-center gap-2">
+                    {selectedGame?.platform.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-8 col-md-7 col-12 order-md-3 order-3 mt-md-0 mt-5">
               <div className="system-requirements">
                 <Tabs color="#198754" defaultValue="windows">
                   <Tabs.List grow>
@@ -334,107 +464,6 @@ const GameDetail = () => {
                     </Tabs.Panel>
                   )}
                 </Tabs>
-              </div>
-            </div>
-            <div className="col-4 mx-auto">
-              <div className="game-image-original mt-3 text-center">
-                <img src={selectedGame?.coverImage.url} alt={selectedGame?.coverImage.original_filename} className="img-fluid" />
-              </div>
-              {selectedGame?.discount.isActive ? (
-                <div className="discount d-flex flex-column align-items-center my-4 gap-3">
-                  <div className="price d-flex align-items-center justify-content-center gap-3">
-                    <span className="badge bg-success p-2 fs-6">-{selectedGame?.discount.percentage}%</span>
-                    <h5 className="old-price text-decoration-line-through text-secondary mb-0">
-                      {new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        minimumFractionDigits: 0,
-                      }).format(selectedGame?.price)}
-                    </h5>
-                    <h5 className="new-price mb-0">
-                      {new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        minimumFractionDigits: 0,
-                      }).format(newPrice)}
-                    </h5>
-                  </div>
-                  <div className="end-date">
-                    <span>Sale ends at {new Date(selectedGame?.discount.endDate).toLocaleDateString("en-US")}</span>
-                  </div>
-                </div>
-              ) : (
-                <h5 className="price text-center my-4">
-                  {!(selectedGame?.releaseDate === null && selectedGame?.price === 0) &&
-                    new Intl.NumberFormat("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                      minimumFractionDigits: 0,
-                    }).format(selectedGame?.price)}
-                  {selectedGame?.price === 0 && !(selectedGame?.releaseDate === null) && "Free"}
-                </h5>
-              )}
-              <div className="action-btn d-flex flex-column gap-3 w-75 mx-auto">
-                {selectedGame?.releaseDate === null ? (
-                  <button className="btn btn-outline-light w-100 disabled">Coming Soon</button>
-                ) : (
-                  <button className={`${new Date(selectedGame?.releaseDate) > new Date() ? "btn btn-primary" : "btn btn-success"} w-100`} onClick={handleCheckout}>
-                    {new Date(selectedGame?.releaseDate) > new Date() ? "Pre-purchase" : "Buy Now"}
-                  </button>
-                )}
-                {!(selectedGame?.releaseDate === null) && (
-                  <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToCart}>
-                    <FaShoppingCart />
-                    <span>Add to Cart</span>
-                  </button>
-                )}
-                <button className="btn btn-outline-light w-100 d-flex align-items-center gap-2 justify-content-center" onClick={handleAddToWishlist}>
-                  <FaHeart />
-                  <span>Add to Wishlist</span>
-                </button>
-              </div>
-              <div className="d-flex flex-column mt-4 gap-2">
-                <div className="developer d-flex justify-content-between align-items-center border-bottom p-2">
-                  <span className="developer">Developer</span>
-                  <span className="developer-name">{selectedGame?.developer}</span>
-                </div>
-                <div className="publisher d-flex justify-content-between align-items-center border-bottom p-2">
-                  <span className="publisher">Publisher</span>
-                  <span className="publisher-name">{selectedGame?.publisher}</span>
-                </div>
-                <div className="release-date d-flex justify-content-between align-items-center border-bottom p-2">
-                  {new Date(selectedGame?.releaseDate) > new Date() || selectedGame?.releaseDate === null ? (
-                    <>
-                      <span className="release-date">Available</span>
-                      <span className="release-date-info">
-                        {selectedGame?.releaseDate === null
-                          ? "Coming Soon"
-                          : new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
-                              year: "2-digit",
-                              month: "2-digit",
-                              day: "2-digit",
-                            })}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="release-date">Release Date</span>
-                      <span className="release-date-info">
-                        {new Date(selectedGame?.releaseDate).toLocaleDateString("en-US", {
-                          year: "2-digit",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </span>
-                    </>
-                  )}
-                </div>
-                <div className="platform d-flex justify-content-between align-items-center border-bottom p-2">
-                  <span className="platform">Platform</span>
-                  <div className="platform-support d-flex align-items-center gap-2">
-                    {selectedGame?.platform.map((item, index) => (item === "Windows" ? <FaWindows key={index} /> : item === "Mac OS" ? <FaApple key={index} /> : item === "Linux" ? <FaLinux key={index} /> : null))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>

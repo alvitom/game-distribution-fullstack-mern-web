@@ -76,7 +76,7 @@ const Home = () => {
   };
   return (
     <>
-      <Meta title="Selamat Datang" />
+      <Meta title="Download & Play Games" />
       <div className="home-wrapper">
         <div className="container">
           <section className="carousel-section py-4">
@@ -95,17 +95,17 @@ const Home = () => {
             >
               {games.map((game, index) => (
                 <SwiperSlide key={index}>
-                  <div className="carousel-wrapper row">
-                    <div className="col-8">
+                  <div className="carousel-wrapper row mx-sm-0 mx-2">
+                    <div className="col-lg-8 col-12">
                       <img src={game.coverImage?.eager[2].url} alt={game.title} className="img-fluid" />
                     </div>
-                    <div className="col-4">
-                      <div className="d-flex flex-wrap gap-3">
+                    <div className="col-lg-4 col-12 mt-4 mt-lg-0">
+                      <div className="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                         {game.images
                           .slice(0, 4)
                           .reverse()
                           .map((image, index) => (
-                            <img src={image.url} alt={image.url} className="img-fluid" key={index} />
+                            <img src={image.url} alt={image.url} className="img-fluid col-2 col-lg-4" key={index} />
                           ))}
                       </div>
                       <div className="details d-flex flex-column justify-content-between mt-4">
@@ -134,7 +134,7 @@ const Home = () => {
             </Swiper>
           </section>
           <section className="discount-section py-4">
-            <div className="row">
+            <div className="row mx-sm-0 mx-2">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 className="section-heading">Games On Sale</h3>
                 <a href="/collection/sale" className="btn btn-outline-light">
@@ -147,7 +147,7 @@ const Home = () => {
             </div>
           </section>
           <section className="top-seller-section py-4">
-            <div className="row">
+            <div className="row mx-sm-0 mx-2">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3>Top Sellers</h3>
                 <a href="/collection/top-sellers" className="btn btn-outline-light">
@@ -160,7 +160,7 @@ const Home = () => {
             </div>
           </section>
           <section className="most-played-section py-4">
-            <div className="row">
+            <div className="row mx-sm-0 mx-2">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3>Most Played</h3>
                 <a href="/collection/most-played" className="btn btn-outline-light">
@@ -173,7 +173,7 @@ const Home = () => {
             </div>
           </section>
           <section className="upcoming-section py-4">
-            <div className="row">
+            <div className="row mx-sm-0 mx-2">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3>Upcoming</h3>
                 <a href="/collection/upcoming" className="btn btn-outline-light">
@@ -186,7 +186,7 @@ const Home = () => {
             </div>
           </section>
           <section className="trending-section py-4">
-            <div className="row">
+            <div className="row mx-sm-0 mx-2">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3>Trending</h3>
                 <a href="/collection/trending" className="btn btn-outline-light">
@@ -199,7 +199,7 @@ const Home = () => {
             </div>
           </section>
           <section className="new-release-section py-4">
-            <div className="row">
+            <div className="row mx-sm-0 mx-2">
               <div className="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3>New Release</h3>
                 <a href="/collection/new-release" className="btn btn-outline-light">

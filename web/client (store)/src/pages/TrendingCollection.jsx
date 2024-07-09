@@ -15,7 +15,7 @@ const TrendingCollection = () => {
       <Meta title="Trending Games" />
       <div className="trending-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-2">
             <div className="col-12 my-4">
               <h1>Trending</h1>
             </div>

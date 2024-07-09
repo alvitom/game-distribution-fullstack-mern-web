@@ -15,7 +15,7 @@ const SaleCollection = () => {
       <Meta title="Sale Games" />
       <div className="sale-wrapper">
         <div className="container">
-          <div className="row">
+          <div className="row mx-sm-0 mx-2">
             <div className="col-12 my-4">
               <h1>Games On Sale</h1>
             </div>
