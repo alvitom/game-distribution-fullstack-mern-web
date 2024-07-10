@@ -48,14 +48,15 @@ const createTransaction = asyncHandler(async (req, res) => {
 
     await Cart.deleteMany({ userId: id, gameId: { $in: items.map((item) => item._id) } });
 
-    const body = `Dear customer, your payment for the ${orderId} is currently pending. Please complete your payment to process your order. Thank you.`;
+    const body = `<p>Dear Customer,</p>
+    <p>Your payment for order <strong>${orderId}</strong> is currently pending. To ensure your order is processed without delay, please complete your payment at your earliest convenience.</p>
+    <p>Thank you for your prompt attention to this matter.</p>`;
     const data = {
       to: email,
       subject: "Payment Pending",
-      text: body,
       htm: body,
     };
-    
+
     await sendEmail(data);
 
     successResponse(res, { transaction, orderId }, "Transaction created successfully", 201);
@@ -117,9 +118,7 @@ const getAllTransactions = asyncHandler(async (req, res) => {
 const updateTransactionStatus = asyncHandler(async (req, res) => {
   try {
     const currentDate = new Date();
-    const transactions = await Transaction.find({ status: "pending" })
-      .populate("userId")
-      .select("createdAt orderId status");
+    const transactions = await Transaction.find({ status: "pending" }).populate("userId").select("createdAt orderId status");
 
     transactions.forEach(async (transaction) => {
       const paymentDueDate = new Date(transaction.createdAt);
@@ -129,11 +128,13 @@ const updateTransactionStatus = asyncHandler(async (req, res) => {
         transaction.status = "failed";
         await transaction.save();
 
-        const body = `Your payment for ${transaction.orderId} has been failed.`;
+        const body = `<p>Dear Customer,</p>
+        <p>We regret to inform you that your payment for order <strong>${transaction.orderId}</strong> has failed. Please try again to ensure your order is processed successfully.</p>
+        <p>If you continue to experience issues, please contact our support team for assistance.</p>
+        <p>Thank you for your understanding.</p>`;
         const data = {
           to: transaction.userId.email,
           subject: "Payment Failed",
-          text: body,
           htm: body,
         };
 

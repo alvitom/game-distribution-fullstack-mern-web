@@ -35,11 +35,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const user = await User.create({ email, password, otp, otpExpires });
 
-    const body = `Your OTP code is ${otp}. Please enter the code for verification`;
+    const body = `<h1>Account Verification</h1>
+    <p>Dear User,</p>
+    <p>Your OTP code is <strong>${otp}</strong>. Please use this code to verify your account within the next 30 minutes.</p>
+    <p>If you did not request this code, please ignore this email.</p>`;
     const data = {
       to: email,
-      subject: "Your OTP Code",
-      text: body,
+      subject: "Account Verification",
       htm: body,
     };
 
@@ -290,10 +292,17 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     await user.save();
 
     const resetURL = `${storeBaseURL}/reset-password/${resetToken}`;
+
+    const body = `<h1>Reset Password</h1>
+      <p>We received a request to reset your password. Click the button below to reset your password:</p>
+      <a href="${resetURL}" style="display: inline-block; padding: 10px 20px; background-color: #198754; color: #fff; text-decoration: none; border-radius: 4px;">Reset Password</a>
+      <p>This link will expire in 30 minutes.</p>
+      <p>If you did not request a password reset, please ignore this email.</p>`;
+
     const data = {
       to: email,
-      subject: "Reset Password Link",
-      text: `Hey User, click the link below to reset your password. This link will expire in 10 minutes. ${resetURL}`,
+      subject: "Reset Password",
+      htm: body,
     };
 
     await sendEmail(data);

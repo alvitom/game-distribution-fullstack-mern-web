@@ -15,11 +15,12 @@ const midtransNotification = asyncHandler(async (req, res) => {
 
     if (transactionStatus === "settlement" || transactionStatus === "capture") {
       status = "success";
-      const body = `Your payment for ${orderId} has been successful. Thank you for purchasing.`;
+      const body = `<p>Dear Customer,</p>
+      <p>We are pleased to inform you that your payment for order <strong>${orderId}</strong> has been successfully processed. Thank you for your purchase!</p>
+      <p>If you have any questions or need further assistance, please feel free to contact our support team.</p>`;
       const data = {
         to: email,
         subject: "Payment Successful",
-        text: body,
         htm: body,
       };
 
