@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import Meta from "../components/Meta";
 import GameCard from "../components/GameCard";
 import { GameContext } from "../context/GameContext";
-import { Pagination } from "@mantine/core";
+import { Pagination, Skeleton } from "@mantine/core";
 
 const Game = () => {
   const { getAllGames, page, setPage, games, loading, totalPages, genre, feature, platform } = useContext(GameContext);
@@ -11,11 +11,6 @@ const Game = () => {
   useEffect(() => {
     getAllGames(page, limit, genre, feature, platform);
   }, [page]);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <>
       <Meta title="Discover Games" />
@@ -43,9 +38,13 @@ const Game = () => {
                 </div>
               </div> */}
           <div className="row mx-sm-0 mx-2">
-            {games.map((game, index) => (
-              <GameCard page="game" data={game} key={index} />
-            ))}
+            {loading
+              ? Array.from({ length: limit }).map((_, index) => (
+                  <div className="col-lg-2 col-md-3 col-sm-4 col-6">
+                    <Skeleton height={300} radius="md" key={index} className="my-3" />
+                  </div>
+                ))
+              : games.map((game, index) => <GameCard page="game" data={game} key={index} />)}
           </div>
           {/* </div> */}
           {/* <div className="col-2">

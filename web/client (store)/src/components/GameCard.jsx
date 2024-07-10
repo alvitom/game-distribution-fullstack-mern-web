@@ -30,7 +30,7 @@ const GameCard = ({ collection, page, data }) => {
     }
   };
   return (
-    <div className={`${(collection || page === "game") && "my-4"} col-lg-2 col-md-3 col-sm-4 col-6`}>
+    <div className={`${collection || page === "game" ? "my-3" : "my-lg-0 my-3"} col-lg-2 col-md-3 col-sm-4 col-6`}>
       {data?.discount.isActive ? (
         <>
           <a href={`/game/${data?.slug}`} className="game-card position-relative">
@@ -42,7 +42,7 @@ const GameCard = ({ collection, page, data }) => {
               {new Date(data?.releaseDate) > Date.now() && <p className="available mb-1 text-secondary">Available {new Date(data?.releaseDate).toLocaleDateString("en-US")}</p>}
               <div className="d-flex justify-content-between align-items-center">
                 <div className="dicount-percentage">
-                  <span className="badge bg-success p-2 fs-6">-{data?.discount.percentage}%</span>
+                  <span className="badge bg-success p-2">-{data?.discount.percentage}%</span>
                 </div>
                 <div className="d-flex flex-column price">
                   <div className="old-price">

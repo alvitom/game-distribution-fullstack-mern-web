@@ -2,9 +2,10 @@ import React, { useContext, useEffect } from "react";
 import Meta from "../components/Meta";
 import GameCard from "../components/GameCard";
 import { GameContext } from "../context/GameContext";
+import { Skeleton } from "@mantine/core";
 
 const MostPlayedCollection = () => {
-  const { getMostPlayedGames, mostPlayedGames } = useContext(GameContext);
+  const { getMostPlayedGames, mostPlayedGames, loading } = useContext(GameContext);
   const limit = 50;
 
   useEffect(() => {
@@ -19,9 +20,13 @@ const MostPlayedCollection = () => {
             <div className="col-12 my-4">
               <h1>Most Played</h1>
             </div>
-            {mostPlayedGames.map((game, index) => (
-              <GameCard collection="most-played" data={game} key={index} />
-            ))}
+            {loading
+              ? Array.from({ length: limit }).map((_, index) => (
+                  <div className="col-lg-2 col-md-3 col-sm-4 col-6">
+                    <Skeleton height={300} radius="md" key={index} className="my-3" />
+                  </div>
+                ))
+              : mostPlayedGames.map((game, index) => <GameCard collection="most-played" data={game} key={index} />)}
           </div>
         </div>
       </div>
