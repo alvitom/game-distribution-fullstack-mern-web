@@ -49,18 +49,26 @@ const Login = () => {
       location.href = "/";
     }
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (email && password) {
+        handleLogin();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Login" />
       <div className="auth-wrapper">
         <div className="login-card text-center">
           <h1>Login</h1>
-          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={handleKeyDown} required autoFocus maxLength={50} disabled={loading} />
+          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyDown} required maxLength={20} disabled={loading} />
           <a href="/forgot-password" className="forgot-password d-block text-decoration-underline">
             Forgot Password
           </a>
-          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleLogin}>
+          <button className={`${loading && "disabled"} ${!(email && password) && "disabled"} btn btn-success w-100`} onClick={handleLogin}>
             {loading ? "Loading..." : "Login"}
           </button>
           <div className="d-flex align-items-center justify-content-center gap-2 mt-4">

@@ -73,15 +73,23 @@ const ResetPassword = () => {
       });
     }
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (password && confirmPassword) {
+        handleResetPassword();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Reset Password" />
       <div className="auth-wrapper">
         <div className="login-card text-center">
           <h1>Reset Password</h1>
-          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <input type="password" className="w-100" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleResetPassword}>
+          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required autoFocus onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <input type="password" className="w-100" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <button className={`${loading && "disabled"} ${!(password && confirmPassword) && "disabled"} btn btn-success w-100`} onClick={handleResetPassword}>
             {loading ? "Loading..." : "Reset"}
           </button>
         </div>

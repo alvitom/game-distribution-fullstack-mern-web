@@ -146,7 +146,7 @@ const addUserInformation = asyncHandler(async (req, res) => {
   }
 });
 
-const loginUser = async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -190,7 +190,7 @@ const loginUser = async (req, res) => {
   } catch (error) {
     throw errorResponse(res, 500, `Login failed: ${error.message}`);
   }
-};
+});
 
 const getUser = asyncHandler(async (req, res) => {
   const { id } = req.user;
@@ -422,7 +422,7 @@ const logout = asyncHandler(async (req, res) => {
   }
 });
 
-const loginAdmin = async (req, res) => {
+const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -470,7 +470,7 @@ const loginAdmin = async (req, res) => {
   } catch (error) {
     throw errorResponse(res, 500, `Login failed: ${error.message}`);
   }
-};
+});
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const { page, limit, keyword } = req.query;

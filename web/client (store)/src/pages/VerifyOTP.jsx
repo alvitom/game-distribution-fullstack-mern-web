@@ -8,7 +8,7 @@ import { MdClose } from "react-icons/md";
 
 const VerifyOTP = () => {
   const { id } = useParams();
-  const [otp, setOTP] = useState(null);
+  const [otp, setOTP] = useState("");
   const { verifyOTP, loading } = useContext(AuthContext);
 
   const handleVerify = async () => {
@@ -33,7 +33,7 @@ const VerifyOTP = () => {
                 className="btn btn-light"
                 onClick={() => {
                   modals.closeAll();
-                  setOTP(null);
+                  setOTP("");
                 }}
               >
                 Close
@@ -46,6 +46,14 @@ const VerifyOTP = () => {
       location.href = `/add-user-information/${id}`;
     }
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (otp.length === 6) {
+        handleVerify();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Verification" />
@@ -53,8 +61,8 @@ const VerifyOTP = () => {
         <div className="login-card text-center">
           <h1>Verification</h1>
           <p>OTP code has been sent to your email. Please enter the code you received to continue.</p>
-          <PinInput length={6} type="number" value={otp} onChange={(value) => setOTP(value)} />
-          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleVerify}>
+          <PinInput length={6} type="number" value={otp} onChange={(value) => setOTP(value)} disabled={loading} autoFocus onKeyDown={handleKeyDown}  />
+          <button className={`${loading && "disabled"} ${otp.length < 6 && "disabled"} btn btn-success w-100`} onClick={handleVerify}>
             {loading ? "Verifying..." : "Verify"}
           </button>
         </div>

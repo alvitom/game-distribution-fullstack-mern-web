@@ -50,16 +50,23 @@ const Register = () => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (email && password && confirmPassword) {
+        handleRegister();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Register" />
       <div className="auth-wrapper">
         <div className="login-card text-center">
           <h1>Register</h1>
-          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <input type="password" className="w-100" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleRegister}>
+          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required onKeyDown={handleKeyDown} autoFocus maxLength={50} disabled={loading} />
+          <input type="password" className="w-100" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <input type="password" className="w-100" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <button className={`${loading && "disabled"} ${!(email && password && confirmPassword) && "disabled"} btn btn-success w-100`} onClick={handleRegister}>
             {loading ? "Loading..." : "Register"}
           </button>
           <div className="d-flex align-items-center justify-content-center gap-2 mt-4">

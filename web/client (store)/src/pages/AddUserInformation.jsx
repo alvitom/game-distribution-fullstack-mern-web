@@ -49,15 +49,23 @@ const AddUserInformation = () => {
       location.href = "/";
     }
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (username && fullname) {
+        handleAddUserInfo();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Add User Information" />
       <div className="auth-wrapper">
         <div className="login-card text-center">
           <h1>Add Your Information</h1>
-          <input type="text" className="w-100" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-          <input type="text" className="w-100" placeholder="Full Name" value={fullname} onChange={(e) => setFullname(e.target.value)} />
-          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleAddUserInfo}>
+          <input type="text" className="w-100" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus onKeyDown={handleKeyDown} disabled={loading} maxLength={20} />
+          <input type="text" className="w-100" placeholder="Full Name" value={fullname} onChange={(e) => setFullname(e.target.value)} required onKeyDown={handleKeyDown} disabled={loading} maxLength={50} />
+          <button className={`${loading && "disabled"} ${!(username && fullname) && "disabled"} btn btn-success w-100`} onClick={handleAddUserInfo}>
             {loading ? "Loading..." : "Submit"}
           </button>
         </div>

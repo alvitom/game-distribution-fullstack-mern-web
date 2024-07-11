@@ -65,6 +65,14 @@ const ForgotPassword = () => {
       });
     }
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      if (email) {
+        handleForgotPassword();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Forgot Password" />
@@ -72,8 +80,8 @@ const ForgotPassword = () => {
         <div className="login-card text-center">
           <h1>Forgot Password</h1>
           <p>Please enter your email address</p>
-          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <button className={`${loading && "disabled"} btn btn-success w-100`} onClick={handleForgotPassword}>
+          <input type="email" className="w-100" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus onKeyDown={handleKeyDown} maxLength={50} disabled={loading} />
+          <button className={`${loading && "disabled"} ${!email && "disabled"} btn btn-success w-100`} onClick={handleForgotPassword}>
             {loading ? "Loading..." : "Submit"}
           </button>
         </div>

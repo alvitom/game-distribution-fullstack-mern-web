@@ -1,6 +1,6 @@
 import { Avatar, Menu, UnstyledButton } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaShoppingCart, FaSearch, FaHeart, FaTrash, FaExchangeAlt, FaBars, FaTimes } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { MdClose, MdLogout, MdManageAccounts, MdAccountCircle, MdOutlineAccessTimeFilled, MdOutlineSettings } from "react-icons/md";
@@ -142,6 +142,14 @@ const Header = () => {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [menuOpen]);
   return (
     <>
       <header className="header-top py-3">
@@ -205,13 +213,13 @@ const Header = () => {
               {menuOpen ? <FaTimes /> : <FaBars />}
             </button>
             {menuOpen && (
-              <div className="mobile-menu d-lg-none order-1">
+              <div className="mobile-menu d-lg-none order-1" id="mobile-menu">
                 <div className="d-flex align-items-center gap-3">
                   {/* <a href="">
                 <IoLanguage className="fs-3" />
               </a> */}
                   {!user ? (
-                    <div className="d-flex align-items-center gap-2">
+                    <div className="content d-flex flex-column align-items-center gap-3">
                       <a href="/register" className="btn btn-outline-light">
                         Register
                       </a>

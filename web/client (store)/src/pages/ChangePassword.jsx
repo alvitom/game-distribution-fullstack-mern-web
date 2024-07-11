@@ -12,7 +12,7 @@ const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { changePassword } = useContext(AuthContext);
+  const { changePassword, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,17 +93,24 @@ const ChangePassword = () => {
     location.href = "/";
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (currentPassword && newPassword && confirmPassword) {
+        handleChangePassword();
+      }
+    }
+  };
   return (
     <>
       <Meta title="Change Password" />
       <div className="change-password-wrapper pt-4">
         <div className="auth-card text-center">
           <h1>Change Password</h1>
-          <input type="password" className="w-100" placeholder="Current Password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
-          <input type="password" className="w-100" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-          <input type="password" className="w-100" placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-          <button className="btn btn-success w-100" onClick={handleChangePassword}>
-            Change
+          <input type="password" className="w-100" placeholder="Current Password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required autoFocus onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <input type="password" className="w-100" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <input type="password" className="w-100" placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required onKeyDown={handleKeyDown} maxLength={20} disabled={loading} />
+          <button className={`${loading && "disabled"} ${!(currentPassword && newPassword && confirmPassword) && "disabled"} btn btn-success w-100`} onClick={handleChangePassword}>
+            {loading ? "Loading..." : "Change"}
           </button>
         </div>
       </div>
