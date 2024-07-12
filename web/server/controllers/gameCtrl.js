@@ -63,7 +63,7 @@ const createGame = asyncHandler(async (req, res) => {
       images: urlImages.map((file) => file),
       videos: urlVideos.map((file) => file),
     });
-    successResponse(res.setHeader('Access-Control-Allow-Origin', '*'), newGame, "Game created successfully", 201);
+    successResponse(res, newGame, "Game created successfully", 201);
   } catch (error) {
     throw errorResponse(res, 500, `Failed to create game: ${error.message}`);
   }
