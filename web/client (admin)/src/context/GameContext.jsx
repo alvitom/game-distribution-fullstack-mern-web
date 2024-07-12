@@ -22,6 +22,7 @@ export const GameProvider = ({ children }) => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+    withCredentials: true,
   });
 
   axiosInstance.interceptors.request.use(
