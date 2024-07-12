@@ -26,7 +26,7 @@ const midtransRouter = require("./routes/midtrans");
 app.use(morgan("combined"));
 app.use(
   cors({
-    origin: [process.env.ADMIN_BASE_URL_DEV, process.env.ADMIN_BASE_URL_STG, process.env.STORE_BASE_URL_DEV, process.env.STORE_BASE_URL_STG],
+    origin: process.env.ADMIN_BASE_URL_DEV /*  process.env.ADMIN_BASE_URL_STG, process.env.STORE_BASE_URL_DEV, process.env.STORE_BASE_URL_STG] */,
     credentials: true,
   })
 );
