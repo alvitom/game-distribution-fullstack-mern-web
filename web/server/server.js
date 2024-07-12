@@ -39,7 +39,14 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/user", authRouter);
-app.use("/api/game", gameRouter);
+app.use(
+  "/api/game",
+  cors({
+    origin: [process.env.ADMIN_BASE_URL_DEV, process.env.ADMIN_BASE_URL_STG, process.env.STORE_BASE_URL_DEV, process.env.STORE_BASE_URL_STG],
+    credentials: true,
+  }),
+  gameRouter
+);
 app.use("/api/genre", genreRouter);
 app.use("/api/feature", featureRouter);
 app.use("/api/cart", cartRouter);
