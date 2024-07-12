@@ -26,10 +26,18 @@ const midtransRouter = require("./routes/midtrans");
 app.use(morgan("combined"));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [process.env.ADMIN_BASE_URL_DEV, process.env.ADMIN_BASE_URL_STG, process.env.STORE_BASE_URL_DEV, process.env.STORE_BASE_URL_STG, "http://localhost:3000"],
     credentials: true,
   })
 );
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  next();
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
