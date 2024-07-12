@@ -19,7 +19,7 @@ const Transactions = () => {
     <Table.Tr key={index}>
       <Table.Td>{(page - 1) * 10 + index + 1}</Table.Td>
       <Table.Td>{transaction.orderId}</Table.Td>
-      <Table.Td>{transaction.userId.fullname}</Table.Td>
+      <Table.Td>{transaction.userId?.fullname}</Table.Td>
       <Table.Td>{new Intl.NumberFormat("in-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(transaction.amountPaid)}</Table.Td>
       <Table.Td>{new Date(transaction.createdAt).toLocaleString()}</Table.Td>
       <Table.Td className={`${transaction.status === "success" ? "text-success" : transaction.status === "failed" ? "text-danger" : transaction.status === "pending" && "text-warning"} text-capitalize fw-bold`}>
