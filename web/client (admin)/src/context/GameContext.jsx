@@ -20,7 +20,7 @@ export const GameProvider = ({ children }) => {
   const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json",
     },
   });
 
@@ -143,7 +143,7 @@ export const GameProvider = ({ children }) => {
     setLoading(true);
     const userData = JSON.parse(sessionStorage.getItem("user"));
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL_DEV}/game/sale/${id}`, updatedGame, {
+      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/game/sale/${id}`, updatedGame, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userData.token}`,
