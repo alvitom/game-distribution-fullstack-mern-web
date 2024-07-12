@@ -88,7 +88,7 @@ const AddSaleGame = () => {
           </div>
           <div className="d-flex flex-column gap-2">
             <label htmlFor="end-date">End Date</label>
-            <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={saleGame.endDate} onChange={(date) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, endDate: date }))} size="md" id="end-date" />
+            <DatePickerInput valueFormat="MM/DD/YY" placeholder="End Date" value={new Date(saleGame.endDate)} onChange={(date) => setSaleGame((prevSaleGame) => ({ ...prevSaleGame, endDate: date }))} size="md" id="end-date" />
           </div>
           <div className="d-flex justify-content-center align-items-center mt-4">
             <button className={`${loading && "disabled"} btn btn-success w-25`} onClick={handleCreateSaleGame}>
