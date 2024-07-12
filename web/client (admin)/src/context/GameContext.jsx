@@ -112,7 +112,7 @@ export const GameProvider = ({ children }) => {
     setLoading(true);
     const userData = JSON.parse(sessionStorage.getItem("user"));
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL_DEV}/game/sale`, gameData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/game/sale`, gameData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userData.token}`,
