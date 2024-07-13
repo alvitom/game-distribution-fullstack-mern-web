@@ -11,9 +11,9 @@ const createGenre = asyncHandler(async (req, res) => {
   }
 
   try {
-    const genre = await Genre.findOne({ genre });
+    const findGenre = await Genre.findOne({ genre });
 
-    if (genre) {
+    if (findGenre) {
       throw errorResponse(res, 400, "Genre already exists");
     }
 

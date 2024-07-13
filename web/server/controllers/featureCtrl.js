@@ -11,9 +11,9 @@ const createFeature = asyncHandler(async (req, res) => {
   }
 
   try {
-    const feature = await Feature.findOne({ feature });
+    const findFeature = await Feature.findOne({ feature });
 
-    if (feature) {
+    if (findFeature) {
       throw errorResponse(res, 400, "Feature already exists");
     }
 
